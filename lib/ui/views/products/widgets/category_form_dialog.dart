@@ -36,7 +36,8 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.category?.name ?? '');
     _codeController = TextEditingController(text: widget.category?.code ?? '');
-    _descriptionController = TextEditingController(text: widget.category?.description ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.category?.description ?? '');
     _isActive = widget.category?.isActive ?? true;
   }
 
@@ -49,9 +50,13 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
   }
 
   void _onNameChanged(String val) {
-    if (widget.category == null && _codeController.text.isEmpty && val.isNotEmpty) {
-      final generated = val.trim().replaceAll(RegExp(r'\s+'), '_').toUpperCase();
-      _codeController.text = generated.length > 20 ? generated.substring(0, 20) : generated;
+    if (widget.category == null &&
+        _codeController.text.isEmpty &&
+        val.isNotEmpty) {
+      final generated =
+          val.trim().replaceAll(RegExp(r'\s+'), '_').toUpperCase();
+      _codeController.text =
+          generated.length > 20 ? generated.substring(0, 20) : generated;
     }
   }
 
@@ -67,7 +72,9 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
       await widget.onSave(
         name: _nameController.text.trim(),
         code: _codeController.text.trim().toUpperCase(),
-        description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
         isActive: _isActive,
       );
       if (mounted) {
@@ -75,7 +82,10 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString().replaceFirst('ApiException: ', '').replaceFirst('Exception: ', '');
+        _errorMessage = e
+            .toString()
+            .replaceFirst('ApiException: ', '')
+            .replaceFirst('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -115,10 +125,11 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: kcPrimaryColor.withOpacity(0.12),
+                            color: kcPrimaryColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.category_rounded, color: kcPrimaryColor, size: 22),
+                          child: const Icon(Icons.category_rounded,
+                              color: kcPrimaryColor, size: 22),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -149,20 +160,24 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                     children: [
                       if (_errorMessage != null) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: kcErrorColor.withOpacity(0.1),
+                            color: kcErrorColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: kcErrorColor.withOpacity(0.3)),
+                            border: Border.all(
+                                color: kcErrorColor.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                              const Icon(Icons.error_outline,
+                                  color: kcErrorColor, size: 18),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   _errorMessage!,
-                                  style: const TextStyle(color: kcErrorColor, fontSize: 13),
+                                  style: const TextStyle(
+                                      color: kcErrorColor, fontSize: 13),
                                 ),
                               ),
                             ],
@@ -174,7 +189,8 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                         controller: _nameController,
                         decoration: const InputDecoration(
                           labelText: 'Category Name *',
-                          hintText: 'e.g. Water Products, Raw Materials, Packaging',
+                          hintText:
+                              'e.g. Water Products, Raw Materials, Packaging',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.label_outline),
                         ),
@@ -209,7 +225,8 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Description (Optional)',
-                          hintText: 'Brief notes regarding products in this category',
+                          hintText:
+                              'Brief notes regarding products in this category',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.notes),
                         ),
@@ -217,10 +234,13 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                       const SizedBox(height: 12),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: const Text('Enable or disable this category in listings', style: TextStyle(fontSize: 12)),
+                        title: const Text('Active Status',
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: const Text(
+                            'Enable or disable this category in listings',
+                            style: TextStyle(fontSize: 12)),
                         value: _isActive,
-                        activeColor: kcPrimaryColor,
+                        activeThumbColor: kcPrimaryColor,
                         onChanged: (val) => setState(() => _isActive = val),
                       ),
                     ],
@@ -235,22 +255,26 @@ class _CategoryFormDialogState extends State<CategoryFormDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kcPrimaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     onPressed: _isSaving ? null : _submit,
                     child: _isSaving
                         ? const SizedBox(
                             width: 18,
                             height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : Text(isEditing ? 'Save Changes' : 'Create Category'),
                   ),

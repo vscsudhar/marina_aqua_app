@@ -15,7 +15,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
   const ProductsView({super.key, this.onBack});
 
   @override
-  ProductsViewModel viewModelBuilder(BuildContext context) => ProductsViewModel();
+  ProductsViewModel viewModelBuilder(BuildContext context) =>
+      ProductsViewModel();
 
   @override
   void onViewModelReady(ProductsViewModel viewModel) {
@@ -56,7 +57,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, ProductsViewModel viewModel) {
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, ProductsViewModel viewModel) {
     return AppBar(
       backgroundColor: kcDeepNavy,
       foregroundColor: Colors.white,
@@ -71,10 +73,11 @@ class ProductsView extends StackedView<ProductsViewModel> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(0.3),
+              color: kcPrimaryColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.inventory_2_rounded, color: kcPrimaryLight, size: 20),
+            child: const Icon(Icons.inventory_2_rounded,
+                color: kcPrimaryLight, size: 20),
           ),
           const SizedBox(width: 12),
           const Column(
@@ -82,7 +85,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
             children: [
               Text(
                 'Product Master & Catalog',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
               Text(
                 'Water Products, Raw Materials, Units & Inventory Rules',
@@ -111,7 +117,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildMetricsStrip(ProductsViewModel viewModel, bool isDesktop, bool isTablet) {
+  Widget _buildMetricsStrip(
+      ProductsViewModel viewModel, bool isDesktop, bool isTablet) {
     if (!isDesktop && !isTablet) {
       return Container(
         color: kcSurfaceWhite,
@@ -146,7 +153,9 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   label: 'Low Stock Alert',
                   value: viewModel.lowStockProductsCount.toString(),
                   icon: Icons.warning_amber_rounded,
-                  color: viewModel.lowStockProductsCount > 0 ? kcErrorColor : kcMediumGrey,
+                  color: viewModel.lowStockProductsCount > 0
+                      ? kcErrorColor
+                      : kcMediumGrey,
                   isAlert: viewModel.lowStockProductsCount > 0,
                 ),
               ),
@@ -184,7 +193,9 @@ class ProductsView extends StackedView<ProductsViewModel> {
               label: 'Low Stock Alert',
               value: viewModel.lowStockProductsCount.toString(),
               icon: Icons.warning_amber_rounded,
-              color: viewModel.lowStockProductsCount > 0 ? kcErrorColor : kcMediumGrey,
+              color: viewModel.lowStockProductsCount > 0
+                  ? kcErrorColor
+                  : kcMediumGrey,
               isAlert: viewModel.lowStockProductsCount > 0,
             ),
           ),
@@ -203,10 +214,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isAlert ? color.withOpacity(0.08) : kcVeryLightGrey,
+        color: isAlert ? color.withValues(alpha: 0.08) : kcVeryLightGrey,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isAlert ? color.withOpacity(0.3) : kcBorderColor,
+          color: isAlert ? color.withValues(alpha: 0.3) : kcBorderColor,
         ),
       ),
       child: Row(
@@ -214,7 +225,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -227,7 +238,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 11, color: kcTextSecondary, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 11,
+                      color: kcTextSecondary,
+                      fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -328,7 +342,9 @@ class ProductsView extends StackedView<ProductsViewModel> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? kcPrimaryColor.withOpacity(0.12) : kcVeryLightGrey,
+                color: isSelected
+                    ? kcPrimaryColor.withValues(alpha: 0.12)
+                    : kcVeryLightGrey,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -350,7 +366,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
   // TAB 1: PRODUCTS
   // ========================================================
 
-  Widget _buildProductsTab(BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
+  Widget _buildProductsTab(
+      BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -371,11 +388,14 @@ class ProductsView extends StackedView<ProductsViewModel> {
                     : viewModel.products.isEmpty
                         ? _buildEmptyView(
                             title: 'No Products Found',
-                            description: 'No products match your search or filter criteria. Create your first product to get started.',
+                            description:
+                                'No products match your search or filter criteria. Create your first product to get started.',
                             actionLabel: 'Add Product',
-                            onAction: () => _openProductFormDialog(context, viewModel),
+                            onAction: () =>
+                                _openProductFormDialog(context, viewModel),
                           )
-                        : _buildProductsListOrTable(context, viewModel, isDesktop),
+                        : _buildProductsListOrTable(
+                            context, viewModel, isDesktop),
           ),
           // Pagination Bar
           if (viewModel.products.isNotEmpty) _buildPaginationBar(viewModel),
@@ -384,7 +404,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildProductFilterToolbar(BuildContext context, ProductsViewModel viewModel) {
+  Widget _buildProductFilterToolbar(
+      BuildContext context, ProductsViewModel viewModel) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -426,23 +447,31 @@ class ProductsView extends StackedView<ProductsViewModel> {
           SizedBox(
             width: 200,
             child: DropdownButtonFormField<int?>(
-              value: viewModel.selectedCategoryFilter,
+              initialValue: viewModel.selectedCategoryFilter,
               isExpanded: true,
               isDense: true,
               decoration: InputDecoration(
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              hint: const Text('All Categories', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+              hint: const Text('All Categories',
+                  style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis),
               items: [
                 const DropdownMenuItem<int?>(
                   value: null,
-                  child: Text('All Categories', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                  child: Text('All Categories',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
                 ),
                 ...viewModel.categories.map((c) => DropdownMenuItem<int?>(
                       value: c.id,
-                      child: Text(c.name, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                      child: Text(c.name,
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis),
                     )),
               ],
               onChanged: viewModel.setCategoryFilter,
@@ -452,27 +481,37 @@ class ProductsView extends StackedView<ProductsViewModel> {
           SizedBox(
             width: 140,
             child: DropdownButtonFormField<bool?>(
-              value: viewModel.selectedStatusFilter,
+              initialValue: viewModel.selectedStatusFilter,
               isExpanded: true,
               isDense: true,
               decoration: InputDecoration(
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              hint: const Text('Status: All', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+              hint: const Text('Status: All',
+                  style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis),
               items: const [
                 DropdownMenuItem<bool?>(
                   value: null,
-                  child: Text('Status: All', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                  child: Text('Status: All',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
                 ),
                 DropdownMenuItem<bool?>(
                   value: true,
-                  child: Text('Active Only', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                  child: Text('Active Only',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
                 ),
                 DropdownMenuItem<bool?>(
                   value: false,
-                  child: Text('Inactive Only', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                  child: Text('Inactive Only',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
                 ),
               ],
               onChanged: viewModel.setStatusFilter,
@@ -501,8 +540,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
             ),
             selected: viewModel.lowStockOnly,
             selectedColor: kcErrorColor,
-            backgroundColor: kcErrorColor.withOpacity(0.08),
-            side: BorderSide(color: kcErrorColor.withOpacity(0.4)),
+            backgroundColor: kcErrorColor.withValues(alpha: 0.08),
+            side: BorderSide(color: kcErrorColor.withValues(alpha: 0.4)),
             onSelected: (_) => viewModel.toggleLowStockFilter(),
           ),
           // Add Product Button
@@ -511,10 +550,12 @@ class ProductsView extends StackedView<ProductsViewModel> {
               backgroundColor: kcPrimaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add Product', style: TextStyle(fontWeight: FontWeight.bold)),
+            label: const Text('Add Product',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () => _openProductFormDialog(context, viewModel),
           ),
         ],
@@ -522,7 +563,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildProductsListOrTable(BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
+  Widget _buildProductsListOrTable(
+      BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
     if (!isDesktop) {
       // Mobile / Compact Card View
       return ListView.separated(
@@ -546,18 +588,42 @@ class ProductsView extends StackedView<ProductsViewModel> {
         borderRadius: BorderRadius.circular(12),
         child: SingleChildScrollView(
           child: DataTable(
-            headingRowColor: MaterialStateProperty.all(kcVeryLightGrey),
+            headingRowColor: WidgetStateProperty.all(kcVeryLightGrey),
             horizontalMargin: 16,
             columnSpacing: 20,
             columns: const [
-              DataColumn(label: Text('Product & SKU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Category', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Unit', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Sale Price (₹)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Cost Price (₹)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Stock / Reorder', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Product & SKU',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Category',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Unit',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Sale Price (₹)',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Cost Price (₹)',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Stock / Reorder',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Status',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(
+                  label: Text('Actions',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12))),
             ],
             rows: viewModel.products.map((product) {
               return DataRow(
@@ -569,12 +635,16 @@ class ProductsView extends StackedView<ProductsViewModel> {
                       children: [
                         Text(
                           product.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: kcTextPrimary),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: kcTextPrimary),
                         ),
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: kcVeryLightGrey,
                                 borderRadius: BorderRadius.circular(4),
@@ -582,14 +652,18 @@ class ProductsView extends StackedView<ProductsViewModel> {
                               ),
                               child: Text(
                                 product.sku,
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: kcTextSecondary),
+                                style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: kcTextSecondary),
                               ),
                             ),
                             if (product.hsnCode.isNotEmpty) ...[
                               const SizedBox(width: 6),
                               Text(
                                 'HSN: ${product.hsnCode}',
-                                style: const TextStyle(fontSize: 10, color: kcMediumGrey),
+                                style: const TextStyle(
+                                    fontSize: 10, color: kcMediumGrey),
                               ),
                             ],
                           ],
@@ -599,8 +673,9 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   ),
                   DataCell(
                     Chip(
-                      label: Text(product.categoryName, style: const TextStyle(fontSize: 11)),
-                      backgroundColor: kcPrimaryColor.withOpacity(0.08),
+                      label: Text(product.categoryName,
+                          style: const TextStyle(fontSize: 11)),
+                      backgroundColor: kcPrimaryColor.withValues(alpha: 0.08),
                       side: BorderSide.none,
                       padding: EdgeInsets.zero,
                     ),
@@ -608,19 +683,24 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   DataCell(
                     Text(
                       '${product.unitName} (${product.unitCode.isNotEmpty ? product.unitCode : product.unitName})',
-                      style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+                      style:
+                          const TextStyle(fontSize: 12, color: kcTextSecondary),
                     ),
                   ),
                   DataCell(
                     Text(
                       '₹${product.defaultPrice.toStringAsFixed(2)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kcPrimaryDark),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: kcPrimaryDark),
                     ),
                   ),
                   DataCell(
                     Text(
                       '₹${product.costPrice.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+                      style:
+                          const TextStyle(fontSize: 12, color: kcTextSecondary),
                     ),
                   ),
                   DataCell(
@@ -632,24 +712,31 @@ class ProductsView extends StackedView<ProductsViewModel> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
-                            color: product.isLowStock ? kcErrorColor : kcTextPrimary,
+                            color: product.isLowStock
+                                ? kcErrorColor
+                                : kcTextPrimary,
                           ),
                         ),
                         Text(
                           ' / min ${product.minStockLevel.toStringAsFixed(0)}',
-                          style: const TextStyle(fontSize: 11, color: kcMediumGrey),
+                          style: const TextStyle(
+                              fontSize: 11, color: kcMediumGrey),
                         ),
                         if (product.isLowStock) ...[
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: kcErrorColor.withOpacity(0.12),
+                              color: kcErrorColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
                               'LOW',
-                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: kcErrorColor),
+                              style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: kcErrorColor),
                             ),
                           ),
                         ],
@@ -659,7 +746,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   DataCell(
                     Switch(
                       value: product.isActive,
-                      activeColor: kcSuccessColor,
+                      activeThumbColor: kcSuccessColor,
                       onChanged: (_) => viewModel.toggleProductStatus(product),
                     ),
                   ),
@@ -668,18 +755,28 @@ class ProductsView extends StackedView<ProductsViewModel> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 18, color: kcPrimaryColor),
+                          icon: const Icon(Icons.edit_outlined,
+                              size: 18, color: kcPrimaryColor),
                           tooltip: 'Edit Product',
-                          onPressed: () => _openProductFormDialog(context, viewModel, product: product),
+                          onPressed: () => _openProductFormDialog(
+                              context, viewModel,
+                              product: product),
                         ),
                         IconButton(
                           icon: Icon(
-                            product.isReferenced ? Icons.archive_outlined : Icons.delete_outline,
+                            product.isReferenced
+                                ? Icons.archive_outlined
+                                : Icons.delete_outline,
                             size: 18,
-                            color: product.isReferenced ? kcWarningColor : kcErrorColor,
+                            color: product.isReferenced
+                                ? kcWarningColor
+                                : kcErrorColor,
                           ),
-                          tooltip: product.isReferenced ? 'Deactivate (Referenced)' : 'Delete Product',
-                          onPressed: () => viewModel.confirmDeleteProduct(context, product),
+                          tooltip: product.isReferenced
+                              ? 'Deactivate (Referenced)'
+                              : 'Delete Product',
+                          onPressed: () =>
+                              viewModel.confirmDeleteProduct(context, product),
                         ),
                       ],
                     ),
@@ -693,14 +790,17 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildProductCard(BuildContext context, ProductsViewModel viewModel, ProductModel product) {
+  Widget _buildProductCard(
+      BuildContext context, ProductsViewModel viewModel, ProductModel product) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: kcSurfaceWhite,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: product.isLowStock ? kcErrorColor.withOpacity(0.3) : kcBorderColor,
+          color: product.isLowStock
+              ? kcErrorColor.withValues(alpha: 0.3)
+              : kcBorderColor,
         ),
       ),
       child: Column(
@@ -712,13 +812,18 @@ class ProductsView extends StackedView<ProductsViewModel> {
               Expanded(
                 child: Text(
                   product.name,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: kcTextPrimary),
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kcTextPrimary),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: product.isActive ? kcSuccessColor.withOpacity(0.12) : kcMediumGrey.withOpacity(0.12),
+                  color: product.isActive
+                      ? kcSuccessColor.withValues(alpha: 0.12)
+                      : kcMediumGrey.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -743,7 +848,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
                 ),
                 child: Text(
                   product.sku,
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kcTextSecondary),
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: kcTextSecondary),
                 ),
               ),
               const SizedBox(width: 8),
@@ -760,27 +868,34 @@ class ProductsView extends StackedView<ProductsViewModel> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Selling Price', style: TextStyle(fontSize: 10, color: kcMediumGrey)),
+                  const Text('Selling Price',
+                      style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                   Text(
                     '₹${product.defaultPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: kcPrimaryDark),
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: kcPrimaryDark),
                   ),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Cost Price', style: TextStyle(fontSize: 10, color: kcMediumGrey)),
+                  const Text('Cost Price',
+                      style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                   Text(
                     '₹${product.costPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 13, color: kcTextSecondary),
+                    style:
+                        const TextStyle(fontSize: 13, color: kcTextSecondary),
                   ),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('Physical Stock', style: TextStyle(fontSize: 10, color: kcMediumGrey)),
+                  const Text('Physical Stock',
+                      style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                   Row(
                     children: [
                       Text(
@@ -788,12 +903,14 @@ class ProductsView extends StackedView<ProductsViewModel> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: product.isLowStock ? kcErrorColor : kcTextPrimary,
+                          color:
+                              product.isLowStock ? kcErrorColor : kcTextPrimary,
                         ),
                       ),
                       if (product.isLowStock) ...[
                         const SizedBox(width: 4),
-                        const Icon(Icons.warning, size: 14, color: kcErrorColor),
+                        const Icon(Icons.warning,
+                            size: 14, color: kcErrorColor),
                       ],
                     ],
                   ),
@@ -808,20 +925,26 @@ class ProductsView extends StackedView<ProductsViewModel> {
               TextButton.icon(
                 icon: const Icon(Icons.edit_outlined, size: 16),
                 label: const Text('Edit'),
-                onPressed: () => _openProductFormDialog(context, viewModel, product: product),
+                onPressed: () => _openProductFormDialog(context, viewModel,
+                    product: product),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
                 icon: Icon(
-                  product.isReferenced ? Icons.archive_outlined : Icons.delete_outline,
+                  product.isReferenced
+                      ? Icons.archive_outlined
+                      : Icons.delete_outline,
                   size: 16,
                   color: product.isReferenced ? kcWarningColor : kcErrorColor,
                 ),
                 label: Text(
                   product.isReferenced ? 'Deactivate' : 'Delete',
-                  style: TextStyle(color: product.isReferenced ? kcWarningColor : kcErrorColor),
+                  style: TextStyle(
+                      color:
+                          product.isReferenced ? kcWarningColor : kcErrorColor),
                 ),
-                onPressed: () => viewModel.confirmDeleteProduct(context, product),
+                onPressed: () =>
+                    viewModel.confirmDeleteProduct(context, product),
               ),
             ],
           ),
@@ -849,7 +972,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   foregroundColor: kcTextPrimary,
                   elevation: 0,
                   side: const BorderSide(color: kcBorderColor),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 icon: const Icon(Icons.chevron_left, size: 18),
                 label: const Text('Previous'),
@@ -864,7 +988,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   foregroundColor: kcTextPrimary,
                   elevation: 0,
                   side: const BorderSide(color: kcBorderColor),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 icon: const Icon(Icons.chevron_right, size: 18),
                 label: const Text('Next'),
@@ -883,7 +1008,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
   // TAB 2: CATEGORIES
   // ========================================================
 
-  Widget _buildCategoriesTab(BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
+  Widget _buildCategoriesTab(
+      BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -907,8 +1033,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
                       hintText: 'Search categories...',
                       hintStyle: const TextStyle(fontSize: 12),
                       prefixIcon: const Icon(Icons.search, size: 18),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     onChanged: viewModel.setCategorySearch,
                   ),
@@ -918,11 +1046,14 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kcPrimaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add Category', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('Add Category',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   onPressed: () => _openCategoryFormDialog(context, viewModel),
                 ),
               ],
@@ -934,16 +1065,20 @@ class ProductsView extends StackedView<ProductsViewModel> {
             child: viewModel.isLoadingCategories
                 ? const Center(child: CircularProgressIndicator())
                 : viewModel.categoriesError != null
-                    ? _buildErrorView(viewModel.categoriesError!, onRetry: viewModel.fetchCategories)
+                    ? _buildErrorView(viewModel.categoriesError!,
+                        onRetry: viewModel.fetchCategories)
                     : viewModel.categories.isEmpty
                         ? _buildEmptyView(
                             title: 'No Categories Found',
-                            description: 'Categories help group water cans, bottled boxes, and raw packaging materials.',
+                            description:
+                                'Categories help group water cans, bottled boxes, and raw packaging materials.',
                             actionLabel: 'Add Category',
-                            onAction: () => _openCategoryFormDialog(context, viewModel),
+                            onAction: () =>
+                                _openCategoryFormDialog(context, viewModel),
                           )
                         : GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: isDesktop ? 3 : 1,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
@@ -952,7 +1087,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                             itemCount: viewModel.categories.length,
                             itemBuilder: (ctx, index) {
                               final cat = viewModel.categories[index];
-                              return _buildCategoryCard(context, viewModel, cat);
+                              return _buildCategoryCard(
+                                  context, viewModel, cat);
                             },
                           ),
           ),
@@ -961,7 +1097,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, ProductsViewModel viewModel, CategoryModel cat) {
+  Widget _buildCategoryCard(
+      BuildContext context, ProductsViewModel viewModel, CategoryModel cat) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -981,22 +1118,28 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: kcPrimaryColor.withOpacity(0.1),
+                      color: kcPrimaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.category, size: 16, color: kcPrimaryColor),
+                    child: const Icon(Icons.category,
+                        size: 16, color: kcPrimaryColor),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     cat.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kcTextPrimary),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: kcTextPrimary),
                   ),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: cat.isActive ? kcSuccessColor.withOpacity(0.12) : kcMediumGrey.withOpacity(0.12),
+                  color: cat.isActive
+                      ? kcSuccessColor.withValues(alpha: 0.12)
+                      : kcMediumGrey.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -1020,7 +1163,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Chip(
-                label: Text('${cat.productsCount} products', style: const TextStyle(fontSize: 10)),
+                label: Text('${cat.productsCount} products',
+                    style: const TextStyle(fontSize: 10)),
                 backgroundColor: kcVeryLightGrey,
                 side: BorderSide.none,
                 visualDensity: VisualDensity.compact,
@@ -1028,14 +1172,18 @@ class ProductsView extends StackedView<ProductsViewModel> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 16, color: kcPrimaryColor),
+                    icon: const Icon(Icons.edit_outlined,
+                        size: 16, color: kcPrimaryColor),
                     tooltip: 'Edit Category',
-                    onPressed: () => _openCategoryFormDialog(context, viewModel, category: cat),
+                    onPressed: () => _openCategoryFormDialog(context, viewModel,
+                        category: cat),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 16, color: kcErrorColor),
+                    icon: const Icon(Icons.delete_outline,
+                        size: 16, color: kcErrorColor),
                     tooltip: 'Delete Category',
-                    onPressed: () => viewModel.confirmDeleteCategory(context, cat),
+                    onPressed: () =>
+                        viewModel.confirmDeleteCategory(context, cat),
                   ),
                 ],
               ),
@@ -1050,7 +1198,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
   // TAB 3: UNITS
   // ========================================================
 
-  Widget _buildUnitsTab(BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
+  Widget _buildUnitsTab(
+      BuildContext context, ProductsViewModel viewModel, bool isDesktop) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -1074,8 +1223,10 @@ class ProductsView extends StackedView<ProductsViewModel> {
                       hintText: 'Search units (Litre, ML, NOS, KG)...',
                       hintStyle: const TextStyle(fontSize: 12),
                       prefixIcon: const Icon(Icons.search, size: 18),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     onChanged: viewModel.setUnitSearch,
                   ),
@@ -1085,11 +1236,14 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kcPrimaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add Measurement Unit', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('Add Measurement Unit',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   onPressed: () => _openUnitFormDialog(context, viewModel),
                 ),
               ],
@@ -1101,16 +1255,20 @@ class ProductsView extends StackedView<ProductsViewModel> {
             child: viewModel.isLoadingUnits
                 ? const Center(child: CircularProgressIndicator())
                 : viewModel.unitsError != null
-                    ? _buildErrorView(viewModel.unitsError!, onRetry: viewModel.fetchUnits)
+                    ? _buildErrorView(viewModel.unitsError!,
+                        onRetry: viewModel.fetchUnits)
                     : viewModel.units.isEmpty
                         ? _buildEmptyView(
                             title: 'No Units Found',
-                            description: 'Define units such as Litre, ml, nos, kg and pack for accurate stock accounting.',
+                            description:
+                                'Define units such as Litre, ml, nos, kg and pack for accurate stock accounting.',
                             actionLabel: 'Add Measurement Unit',
-                            onAction: () => _openUnitFormDialog(context, viewModel),
+                            onAction: () =>
+                                _openUnitFormDialog(context, viewModel),
                           )
                         : GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: isDesktop ? 3 : 1,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
@@ -1128,7 +1286,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  Widget _buildUnitCard(BuildContext context, ProductsViewModel viewModel, UnitModel unit) {
+  Widget _buildUnitCard(
+      BuildContext context, ProductsViewModel viewModel, UnitModel unit) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1148,26 +1307,34 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: kcAquaCyan.withOpacity(0.12),
+                      color: kcAquaCyan.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.straighten, size: 16, color: kcAquaTeal),
+                    child: const Icon(Icons.straighten,
+                        size: 16, color: kcAquaTeal),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     unit.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kcTextPrimary),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: kcTextPrimary),
                   ),
                   const SizedBox(width: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: kcVeryLightGrey,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       unit.code,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: kcTextSecondary),
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: kcTextSecondary),
                     ),
                   ),
                 ],
@@ -1175,7 +1342,9 @@ class ProductsView extends StackedView<ProductsViewModel> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: unit.isActive ? kcSuccessColor.withOpacity(0.12) : kcMediumGrey.withOpacity(0.12),
+                  color: unit.isActive
+                      ? kcSuccessColor.withValues(alpha: 0.12)
+                      : kcMediumGrey.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -1199,7 +1368,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Chip(
-                label: Text('${unit.productsCount} products', style: const TextStyle(fontSize: 10)),
+                label: Text('${unit.productsCount} products',
+                    style: const TextStyle(fontSize: 10)),
                 backgroundColor: kcVeryLightGrey,
                 side: BorderSide.none,
                 visualDensity: VisualDensity.compact,
@@ -1207,12 +1377,15 @@ class ProductsView extends StackedView<ProductsViewModel> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 16, color: kcPrimaryColor),
+                    icon: const Icon(Icons.edit_outlined,
+                        size: 16, color: kcPrimaryColor),
                     tooltip: 'Edit Unit',
-                    onPressed: () => _openUnitFormDialog(context, viewModel, unit: unit),
+                    onPressed: () =>
+                        _openUnitFormDialog(context, viewModel, unit: unit),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 16, color: kcErrorColor),
+                    icon: const Icon(Icons.delete_outline,
+                        size: 16, color: kcErrorColor),
                     tooltip: 'Delete Unit',
                     onPressed: () => viewModel.confirmDeleteUnit(context, unit),
                   ),
@@ -1242,15 +1415,19 @@ class ProductsView extends StackedView<ProductsViewModel> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(0.08),
+              color: kcPrimaryColor.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.inventory_2_outlined, size: 48, color: kcPrimaryColor),
+            child: const Icon(Icons.inventory_2_outlined,
+                size: 48, color: kcPrimaryColor),
           ),
           const SizedBox(height: 16),
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kcTextPrimary),
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kcTextPrimary),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -1267,7 +1444,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
               backgroundColor: kcPrimaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             icon: const Icon(Icons.add, size: 18),
             label: Text(actionLabel),
@@ -1301,7 +1479,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  void _openProductFormDialog(BuildContext context, ProductsViewModel viewModel, {ProductModel? product}) {
+  void _openProductFormDialog(BuildContext context, ProductsViewModel viewModel,
+      {ProductModel? product}) {
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1314,7 +1493,11 @@ class ProductsView extends StackedView<ProductsViewModel> {
             context: context,
             barrierDismissible: false,
             builder: (unitCtx) => UnitFormDialog(
-              onSave: ({required name, required code, description, required isActive}) {
+              onSave: (
+                  {required name,
+                  required code,
+                  description,
+                  required isActive}) {
                 return viewModel.saveUnit(
                   name: name,
                   code: code,
@@ -1334,13 +1517,16 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  void _openCategoryFormDialog(BuildContext context, ProductsViewModel viewModel, {CategoryModel? category}) {
+  void _openCategoryFormDialog(
+      BuildContext context, ProductsViewModel viewModel,
+      {CategoryModel? category}) {
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => CategoryFormDialog(
         category: category,
-        onSave: ({required name, required code, description, required isActive}) {
+        onSave: (
+            {required name, required code, description, required isActive}) {
           return viewModel.saveCategory(
             id: category?.id,
             name: name,
@@ -1353,13 +1539,15 @@ class ProductsView extends StackedView<ProductsViewModel> {
     );
   }
 
-  void _openUnitFormDialog(BuildContext context, ProductsViewModel viewModel, {UnitModel? unit}) {
+  void _openUnitFormDialog(BuildContext context, ProductsViewModel viewModel,
+      {UnitModel? unit}) {
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => UnitFormDialog(
         unit: unit,
-        onSave: ({required name, required code, description, required isActive}) {
+        onSave: (
+            {required name, required code, description, required isActive}) {
           return viewModel.saveUnit(
             id: unit?.id,
             name: name,

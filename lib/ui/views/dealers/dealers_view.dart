@@ -50,12 +50,15 @@ class DealersView extends StackedView<DealersViewModel> {
                     child: viewModel.isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : viewModel.errorMessage != null
-                            ? _buildErrorView(viewModel.errorMessage!, onRetry: viewModel.fetchDealers)
+                            ? _buildErrorView(viewModel.errorMessage!,
+                                onRetry: viewModel.fetchDealers)
                             : viewModel.dealers.isEmpty
                                 ? _buildEmptyView(context, viewModel)
-                                : _buildDealersListOrTable(context, viewModel, isDesktop),
+                                : _buildDealersListOrTable(
+                                    context, viewModel, isDesktop),
                   ),
-                  if (viewModel.dealers.isNotEmpty) _buildPaginationBar(viewModel),
+                  if (viewModel.dealers.isNotEmpty)
+                    _buildPaginationBar(viewModel),
                 ],
               ),
             ),
@@ -65,7 +68,8 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, DealersViewModel viewModel) {
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, DealersViewModel viewModel) {
     return AppBar(
       backgroundColor: kcDeepNavy,
       foregroundColor: Colors.white,
@@ -80,10 +84,11 @@ class DealersView extends StackedView<DealersViewModel> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(0.3),
+              color: kcPrimaryColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.storefront_rounded, color: kcPrimaryLight, size: 20),
+            child: const Icon(Icons.storefront_rounded,
+                color: kcPrimaryLight, size: 20),
           ),
           const SizedBox(width: 12),
           const Expanded(
@@ -93,7 +98,10 @@ class DealersView extends StackedView<DealersViewModel> {
               children: [
                 Text(
                   'Dealer Management & Contract Pricing',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -119,7 +127,8 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
-  Widget _buildMetricsStrip(DealersViewModel viewModel, bool isDesktop, bool isTablet) {
+  Widget _buildMetricsStrip(
+      DealersViewModel viewModel, bool isDesktop, bool isTablet) {
     if (!isDesktop && !isTablet) {
       // Mobile View: Horizontally scrollable strip to prevent pixel overflows on small screens
       return Container(
@@ -153,9 +162,12 @@ class DealersView extends StackedView<DealersViewModel> {
                 width: 240,
                 child: _buildMetricTile(
                   label: 'Total Outstanding Balance',
-                  value: '₹${viewModel.totalOutstandingBalance.toStringAsFixed(2)}',
+                  value:
+                      '₹${viewModel.totalOutstandingBalance.toStringAsFixed(2)}',
                   icon: Icons.account_balance_wallet,
-                  color: viewModel.totalOutstandingBalance > 0 ? kcErrorColor : kcSuccessColor,
+                  color: viewModel.totalOutstandingBalance > 0
+                      ? kcErrorColor
+                      : kcSuccessColor,
                   isAlert: viewModel.totalOutstandingBalance > 0,
                 ),
               ),
@@ -193,7 +205,9 @@ class DealersView extends StackedView<DealersViewModel> {
               label: 'Total Outstanding Balance',
               value: '₹${viewModel.totalOutstandingBalance.toStringAsFixed(2)}',
               icon: Icons.account_balance_wallet,
-              color: viewModel.totalOutstandingBalance > 0 ? kcErrorColor : kcSuccessColor,
+              color: viewModel.totalOutstandingBalance > 0
+                  ? kcErrorColor
+                  : kcSuccessColor,
               isAlert: viewModel.totalOutstandingBalance > 0,
             ),
           ),
@@ -212,10 +226,10 @@ class DealersView extends StackedView<DealersViewModel> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isAlert ? color.withOpacity(0.08) : kcVeryLightGrey,
+        color: isAlert ? color.withValues(alpha: 0.08) : kcVeryLightGrey,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isAlert ? color.withOpacity(0.3) : kcBorderColor,
+          color: isAlert ? color.withValues(alpha: 0.3) : kcBorderColor,
         ),
       ),
       child: Row(
@@ -223,7 +237,7 @@ class DealersView extends StackedView<DealersViewModel> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -236,7 +250,10 @@ class DealersView extends StackedView<DealersViewModel> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 11, color: kcTextSecondary, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 11,
+                      color: kcTextSecondary,
+                      fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -286,7 +303,8 @@ class DealersView extends StackedView<DealersViewModel> {
                       )
                     : null,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
               onChanged: viewModel.setSearch,
             ),
@@ -297,16 +315,24 @@ class DealersView extends StackedView<DealersViewModel> {
             height: 40,
             child: DropdownButtonFormField<bool?>(
               isExpanded: true,
-              value: viewModel.selectedStatusFilter,
+              initialValue: viewModel.selectedStatusFilter,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
               hint: const Text('Status: All', style: TextStyle(fontSize: 12)),
               items: const [
-                DropdownMenuItem<bool?>(value: null, child: Text('Status: All', style: TextStyle(fontSize: 12))),
-                DropdownMenuItem<bool?>(value: true, child: Text('Active Only', style: TextStyle(fontSize: 12))),
-                DropdownMenuItem<bool?>(value: false, child: Text('Inactive Only', style: TextStyle(fontSize: 12))),
+                DropdownMenuItem<bool?>(
+                    value: null,
+                    child: Text('Status: All', style: TextStyle(fontSize: 12))),
+                DropdownMenuItem<bool?>(
+                    value: true,
+                    child: Text('Active Only', style: TextStyle(fontSize: 12))),
+                DropdownMenuItem<bool?>(
+                    value: false,
+                    child:
+                        Text('Inactive Only', style: TextStyle(fontSize: 12))),
               ],
               onChanged: viewModel.setStatusFilter,
             ),
@@ -319,7 +345,9 @@ class DealersView extends StackedView<DealersViewModel> {
                 Icon(
                   Icons.account_balance_wallet_outlined,
                   size: 14,
-                  color: viewModel.hasOutstandingOnly ? Colors.white : kcWarningColor,
+                  color: viewModel.hasOutstandingOnly
+                      ? Colors.white
+                      : kcWarningColor,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -327,7 +355,9 @@ class DealersView extends StackedView<DealersViewModel> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: viewModel.hasOutstandingOnly ? Colors.white : kcTextSecondary,
+                    color: viewModel.hasOutstandingOnly
+                        ? Colors.white
+                        : kcTextSecondary,
                   ),
                 ),
               ],
@@ -335,7 +365,7 @@ class DealersView extends StackedView<DealersViewModel> {
             selected: viewModel.hasOutstandingOnly,
             selectedColor: kcWarningColor,
             backgroundColor: kcVeryLightGrey,
-            side: BorderSide(color: kcBorderColor),
+            side: const BorderSide(color: kcBorderColor),
             onSelected: (_) => viewModel.toggleOutstandingFilter(),
           ),
           // Add Dealer Button
@@ -344,10 +374,12 @@ class DealersView extends StackedView<DealersViewModel> {
               backgroundColor: kcPrimaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             icon: const Icon(Icons.add_business, size: 18),
-            label: const Text('Onboard Dealer', style: TextStyle(fontWeight: FontWeight.bold)),
+            label: const Text('Onboard Dealer',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () => _openDealerFormDialog(context, viewModel),
           ),
         ],
@@ -355,7 +387,8 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
-  Widget _buildDealersListOrTable(BuildContext context, DealersViewModel viewModel, bool isDesktop) {
+  Widget _buildDealersListOrTable(
+      BuildContext context, DealersViewModel viewModel, bool isDesktop) {
     if (!isDesktop) {
       // Mobile / Compact Card View
       return ListView.separated(
@@ -388,13 +421,34 @@ class DealersView extends StackedView<DealersViewModel> {
               horizontalMargin: 16,
               columnSpacing: 18,
               columns: const [
-                DataColumn(label: Text('Dealer & Code', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Contact / Phone', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Opening Balance (₹)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Current Outstanding', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Credit Limit', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Dealer & Code',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Contact / Phone',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Opening Balance (₹)',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Current Outstanding',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Credit Limit',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Status',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Actions',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
               ],
               rows: viewModel.dealers.map((dealer) {
                 final hasBalance = dealer.currentOutstanding > 0;
@@ -408,18 +462,25 @@ class DealersView extends StackedView<DealersViewModel> {
                         children: [
                           Text(
                             dealer.name,
-                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: kcTextPrimary),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: kcTextPrimary),
                           ),
                           Container(
                             margin: const EdgeInsets.only(top: 2),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
                             decoration: BoxDecoration(
-                              color: kcPrimaryColor.withOpacity(0.08),
+                              color: kcPrimaryColor.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               dealer.code,
-                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: kcPrimaryDark),
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: kcPrimaryDark),
                             ),
                           ),
                         ],
@@ -431,9 +492,14 @@ class DealersView extends StackedView<DealersViewModel> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(dealer.phone, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                          if (dealer.contactPerson != null && dealer.contactPerson!.isNotEmpty)
-                            Text(dealer.contactPerson!, style: const TextStyle(fontSize: 10, color: kcMediumGrey)),
+                          Text(dealer.phone,
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w500)),
+                          if (dealer.contactPerson != null &&
+                              dealer.contactPerson!.isNotEmpty)
+                            Text(dealer.contactPerson!,
+                                style: const TextStyle(
+                                    fontSize: 10, color: kcMediumGrey)),
                         ],
                       ),
                     ),
@@ -445,105 +511,138 @@ class DealersView extends StackedView<DealersViewModel> {
                         children: [
                           Text(
                             '₹${dealer.openingBalance.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+                            style: const TextStyle(
+                                fontSize: 12, color: kcTextSecondary),
                           ),
                           if (dealer.openingDate != null)
-                            Text(dealer.openingDate!, style: const TextStyle(fontSize: 9, color: kcMediumGrey)),
+                            Text(dealer.openingDate!,
+                                style: const TextStyle(
+                                    fontSize: 9, color: kcMediumGrey)),
                         ],
                       ),
                     ),
-                  DataCell(
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: hasBalance ? kcErrorColor.withOpacity(0.1) : kcSuccessColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
+                    DataCell(
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: hasBalance
+                              ? kcErrorColor.withValues(alpha: 0.1)
+                              : kcSuccessColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '₹${dealer.currentOutstanding.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: hasBalance ? kcErrorColor : kcSuccessColor,
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        '₹${dealer.currentOutstanding.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: hasBalance ? kcErrorColor : kcSuccessColor,
-                        ),
+                    ),
+                    DataCell(
+                      Text('₹${dealer.creditLimit.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: kcTextSecondary)),
+                    ),
+                    DataCell(
+                      Switch(
+                        value: dealer.isActive,
+                        activeThumbColor: kcSuccessColor,
+                        onChanged: (_) => viewModel.toggleDealerStatus(dealer),
                       ),
                     ),
-                  ),
-                  DataCell(
-                    Text('₹${dealer.creditLimit.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12, color: kcTextSecondary)),
-                  ),
-                  DataCell(
-                    Switch(
-                      value: dealer.isActive,
-                      activeColor: kcSuccessColor,
-                      onChanged: (_) => viewModel.toggleDealerStatus(dealer),
+                    DataCell(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF003366)
+                                  .withValues(alpha: 0.1),
+                              foregroundColor: const Color(0xFF003366),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.receipt_long_outlined,
+                                size: 14),
+                            label: const Text('Statement',
+                                style: TextStyle(
+                                    fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () =>
+                                DealerStatementDialog.show(context, dealer),
+                          ),
+                          const SizedBox(width: 6),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  kcPrimaryColor.withValues(alpha: 0.1),
+                              foregroundColor: kcPrimaryDark,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.sell_outlined, size: 14),
+                            label: const Text('Pricing',
+                                style: TextStyle(
+                                    fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () => _openDealerPricingDialog(
+                                context, viewModel, dealer),
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined,
+                                size: 18, color: kcPrimaryColor),
+                            tooltip: 'Edit Dealer',
+                            onPressed: () => _openDealerFormDialog(
+                                context, viewModel,
+                                dealer: dealer),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              dealer.isReferenced
+                                  ? Icons.archive_outlined
+                                  : Icons.delete_outline,
+                              size: 18,
+                              color: dealer.isReferenced
+                                  ? kcWarningColor
+                                  : kcErrorColor,
+                            ),
+                            tooltip: dealer.isReferenced
+                                ? 'Deactivate (Referenced)'
+                                : 'Delete Dealer',
+                            onPressed: () =>
+                                viewModel.confirmDeleteDealer(context, dealer),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  DataCell(
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF003366).withOpacity(0.1),
-                            foregroundColor: const Color(0xFF003366),
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          icon: const Icon(Icons.receipt_long_outlined, size: 14),
-                          label: const Text('Statement', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                          onPressed: () => DealerStatementDialog.show(context, dealer),
-                        ),
-                        const SizedBox(width: 6),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kcPrimaryColor.withOpacity(0.1),
-                            foregroundColor: kcPrimaryDark,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          icon: const Icon(Icons.sell_outlined, size: 14),
-                          label: const Text('Pricing', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                          onPressed: () => _openDealerPricingDialog(context, viewModel, dealer),
-                        ),
-                        const SizedBox(width: 6),
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 18, color: kcPrimaryColor),
-                          tooltip: 'Edit Dealer',
-                          onPressed: () => _openDealerFormDialog(context, viewModel, dealer: dealer),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            dealer.isReferenced ? Icons.archive_outlined : Icons.delete_outline,
-                            size: 18,
-                            color: dealer.isReferenced ? kcWarningColor : kcErrorColor,
-                          ),
-                          tooltip: dealer.isReferenced ? 'Deactivate (Referenced)' : 'Delete Dealer',
-                          onPressed: () => viewModel.confirmDeleteDealer(context, dealer),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
+                  ],
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  Widget _buildDealerCard(BuildContext context, DealersViewModel viewModel, DealerModel dealer) {
+  Widget _buildDealerCard(
+      BuildContext context, DealersViewModel viewModel, DealerModel dealer) {
     final hasBalance = dealer.currentOutstanding > 0;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: kcSurfaceWhite,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: hasBalance ? kcErrorColor.withOpacity(0.3) : kcBorderColor),
+        border: Border.all(
+            color: hasBalance
+                ? kcErrorColor.withValues(alpha: 0.3)
+                : kcBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,13 +653,18 @@ class DealersView extends StackedView<DealersViewModel> {
               Expanded(
                 child: Text(
                   dealer.name,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: kcTextPrimary),
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kcTextPrimary),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: dealer.isActive ? kcSuccessColor.withOpacity(0.12) : kcMediumGrey.withOpacity(0.12),
+                  color: dealer.isActive
+                      ? kcSuccessColor.withValues(alpha: 0.12)
+                      : kcMediumGrey.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -580,12 +684,15 @@ class DealersView extends StackedView<DealersViewModel> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: kcPrimaryColor.withOpacity(0.08),
+                  color: kcPrimaryColor.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   dealer.code,
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kcPrimaryDark),
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: kcPrimaryDark),
                 ),
               ),
               const SizedBox(width: 8),
@@ -607,10 +714,12 @@ class DealersView extends StackedView<DealersViewModel> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Opening Balance', style: TextStyle(fontSize: 10, color: kcMediumGrey)),
+                    const Text('Opening Balance',
+                        style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                     Text(
                       '₹${dealer.openingBalance.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w600),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -621,7 +730,8 @@ class DealersView extends StackedView<DealersViewModel> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('Current Outstanding', style: TextStyle(fontSize: 10, color: kcMediumGrey)),
+                  const Text('Current Outstanding',
+                      style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                   Text(
                     '₹${dealer.currentOutstanding.toStringAsFixed(2)}',
                     style: TextStyle(
@@ -647,7 +757,8 @@ class DealersView extends StackedView<DealersViewModel> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF003366),
                   side: const BorderSide(color: Color(0xFF003366)),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
                 onPressed: () => DealerStatementDialog.show(context, dealer),
               ),
@@ -657,18 +768,24 @@ class DealersView extends StackedView<DealersViewModel> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: kcPrimaryDark,
                   side: const BorderSide(color: kcPrimaryDark),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
-                onPressed: () => _openDealerPricingDialog(context, viewModel, dealer),
+                onPressed: () =>
+                    _openDealerPricingDialog(context, viewModel, dealer),
               ),
               IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 18, color: kcPrimaryColor),
+                icon: const Icon(Icons.edit_outlined,
+                    size: 18, color: kcPrimaryColor),
                 tooltip: 'Edit Dealer',
-                onPressed: () => _openDealerFormDialog(context, viewModel, dealer: dealer),
+                onPressed: () =>
+                    _openDealerFormDialog(context, viewModel, dealer: dealer),
               ),
               IconButton(
                 icon: Icon(
-                  dealer.isReferenced ? Icons.archive_outlined : Icons.delete_outline,
+                  dealer.isReferenced
+                      ? Icons.archive_outlined
+                      : Icons.delete_outline,
                   size: 18,
                   color: dealer.isReferenced ? kcWarningColor : kcErrorColor,
                 ),
@@ -706,7 +823,8 @@ class DealersView extends StackedView<DealersViewModel> {
                   foregroundColor: kcTextPrimary,
                   elevation: 0,
                   side: const BorderSide(color: kcBorderColor),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 icon: const Icon(Icons.chevron_left, size: 18),
                 label: const Text('Previous'),
@@ -721,7 +839,8 @@ class DealersView extends StackedView<DealersViewModel> {
                   foregroundColor: kcTextPrimary,
                   elevation: 0,
                   side: const BorderSide(color: kcBorderColor),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 icon: const Icon(Icons.chevron_right, size: 18),
                 label: const Text('Next'),
@@ -744,15 +863,19 @@ class DealersView extends StackedView<DealersViewModel> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(0.08),
+              color: kcPrimaryColor.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.storefront_outlined, size: 48, color: kcPrimaryColor),
+            child: const Icon(Icons.storefront_outlined,
+                size: 48, color: kcPrimaryColor),
           ),
           const SizedBox(height: 16),
           const Text(
             'No Dealers Found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kcTextPrimary),
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kcTextPrimary),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -766,7 +889,8 @@ class DealersView extends StackedView<DealersViewModel> {
               backgroundColor: kcPrimaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             icon: const Icon(Icons.add_business, size: 18),
             label: const Text('Onboard First Dealer'),
@@ -784,7 +908,8 @@ class DealersView extends StackedView<DealersViewModel> {
         children: [
           const Icon(Icons.cloud_off_rounded, size: 48, color: kcErrorColor),
           const SizedBox(height: 12),
-          Text(message, style: const TextStyle(fontSize: 14, color: kcErrorColor)),
+          Text(message,
+              style: const TextStyle(fontSize: 14, color: kcErrorColor)),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             icon: const Icon(Icons.refresh, size: 18),
@@ -796,7 +921,8 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
-  void _openDealerFormDialog(BuildContext context, DealersViewModel viewModel, {DealerModel? dealer}) {
+  void _openDealerFormDialog(BuildContext context, DealersViewModel viewModel,
+      {DealerModel? dealer}) {
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -807,14 +933,16 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
-  void _openDealerPricingDialog(BuildContext context, DealersViewModel viewModel, DealerModel dealer) {
+  void _openDealerPricingDialog(
+      BuildContext context, DealersViewModel viewModel, DealerModel dealer) {
     showDialog<void>(
       context: context,
       builder: (ctx) => DealerPricingDialog(
         dealer: dealer,
         dealerService: viewModel.dealerService,
         catalogProducts: viewModel.catalogProducts,
-        onPricesUpdated: () => viewModel.fetchDealers(page: viewModel.dealerMeta.currentPage),
+        onPricesUpdated: () =>
+            viewModel.fetchDealers(page: viewModel.dealerMeta.currentPage),
       ),
     );
   }

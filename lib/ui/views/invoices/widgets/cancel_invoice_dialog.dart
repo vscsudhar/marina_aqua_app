@@ -75,7 +75,8 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 26),
+                  const Icon(Icons.warning_amber_rounded,
+                      color: Colors.white, size: 26),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -83,12 +84,16 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                       children: [
                         Text(
                           'Cancel Issued Invoice',
-                          style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Invoice: ${widget.invoice.invoiceNo}',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 12),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -107,7 +112,7 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: kcErrorColor.withOpacity(0.1),
+                  color: kcErrorColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: kcErrorColor),
                 ),
@@ -126,8 +131,9 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'GST Compliance Warning: Once finalized, an invoice cannot be deleted. Cancelling will reverse any ledger debits and mark this invoice as void in reports.',
-                        style: GoogleFonts.inter(fontSize: 13, color: kcTextSecondary, height: 1.4),
+                        'Cancelling will reverse any ledger debits and mark this invoice as cancelled in reports.\n\nTip: If you want to permanently delete this invoice and release its invoice number for reuse, you can use the "Delete Invoice" option instead.',
+                        style: GoogleFonts.inter(
+                            fontSize: 13, color: kcTextSecondary, height: 1.4),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -135,11 +141,14 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                         maxLines: 3,
                         decoration: const InputDecoration(
                           labelText: 'Mandatory Cancellation Reason *',
-                          hintText: 'e.g. Order cancelled by customer, duplicate entry, incorrect tax rate',
+                          hintText:
+                              'e.g. Order cancelled by customer, duplicate entry, incorrect tax rate',
                           isDense: true,
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? 'Cancellation reason is required' : null,
+                        validator: (v) => v?.trim().isEmpty ?? true
+                            ? 'Cancellation reason is required'
+                            : null,
                       ),
                     ],
                   ),
@@ -149,9 +158,10 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
 
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -161,8 +171,11 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isCancelling ? null : () => Navigator.of(context).pop(),
-                    child: Text('Keep Invoice', style: GoogleFonts.inter(color: kcTextSecondary)),
+                    onPressed: _isCancelling
+                        ? null
+                        : () => Navigator.of(context).pop(),
+                    child: Text('Keep Invoice',
+                        style: GoogleFonts.inter(color: kcTextSecondary)),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isCancelling ? null : _handleCancel,
@@ -170,14 +183,18 @@ class _CancelInvoiceDialogState extends State<CancelInvoiceDialog> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
-                        : const Icon(Icons.cancel, size: 18, color: Colors.white),
+                        : const Icon(Icons.cancel,
+                            size: 18, color: Colors.white),
                     label: Text(
                       _isCancelling ? 'Cancelling...' : 'Confirm Cancellation',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, color: Colors.white),
                     ),
-                    style: ElevatedButton.styleFrom(backgroundColor: kcErrorColor),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: kcErrorColor),
                   ),
                 ],
               ),

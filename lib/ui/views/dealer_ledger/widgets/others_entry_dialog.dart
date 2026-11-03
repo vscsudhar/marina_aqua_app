@@ -40,12 +40,17 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
   void initState() {
     super.initState();
     _selectedDate = widget.initialDate;
-    _caneQtyController = TextEditingController(text: widget.initialCaneQty?.toString() ?? '0');
+    _caneQtyController =
+        TextEditingController(text: widget.initialCaneQty?.toString() ?? '0');
     _fillingAmountController = TextEditingController(
-      text: widget.initialFilling != null ? widget.initialFilling!.toStringAsFixed(2) : '0.00',
+      text: widget.initialFilling != null
+          ? widget.initialFilling!.toStringAsFixed(2)
+          : '0.00',
     );
     _paymentsReceivedController = TextEditingController(
-      text: widget.initialPayments != null ? widget.initialPayments!.toStringAsFixed(2) : '0.00',
+      text: widget.initialPayments != null
+          ? widget.initialPayments!.toStringAsFixed(2)
+          : '0.00',
     );
     _notesController = TextEditingController(text: widget.initialNotes ?? '');
   }
@@ -68,7 +73,7 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: Colors.white,
               onSurface: AppColors.textPrimary,
@@ -95,9 +100,13 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
     final payload = {
       'transaction_date': DateFormat('yyyy-MM-dd').format(_selectedDate),
       'cane_quantity': int.tryParse(_caneQtyController.text.trim()) ?? 0,
-      'filling_amount': double.tryParse(_fillingAmountController.text.trim()) ?? 0.0,
-      'payments_received': double.tryParse(_paymentsReceivedController.text.trim()) ?? 0.0,
-      'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      'filling_amount':
+          double.tryParse(_fillingAmountController.text.trim()) ?? 0.0,
+      'payments_received':
+          double.tryParse(_paymentsReceivedController.text.trim()) ?? 0.0,
+      'notes': _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
     };
 
     try {
@@ -108,7 +117,8 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
           Navigator.of(context).pop(true);
         } else {
           setState(() {
-            _errorMessage = 'Failed to save entry. Please check the inputs and try again.';
+            _errorMessage =
+                'Failed to save entry. Please check the inputs and try again.';
           });
         }
       }
@@ -152,7 +162,8 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
                         color: AppColors.accent.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.people_outline, color: Color(0xFF007791), size: 24),
+                      child: const Icon(Icons.people_outline,
+                          color: Color(0xFF007791), size: 24),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -189,20 +200,24 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
 
                 if (_errorMessage != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, size: 18, color: AppColors.error),
+                        const Icon(Icons.error_outline,
+                            size: 18, color: AppColors.error),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _errorMessage!,
-                            style: GoogleFonts.inter(fontSize: 12, color: AppColors.error),
+                            style: GoogleFonts.inter(
+                                fontSize: 12, color: AppColors.error),
                           ),
                         ),
                       ],
@@ -211,145 +226,160 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
                   const SizedBox(height: 14),
                 ],
 
-              // Date Picker Field
-              InkWell(
-                onTap: _selectDate,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today, size: 18, color: Color(0xFF003366)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          dateStr,
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+                // Date Picker Field
+                InkWell(
+                  onTap: _selectDate,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today,
+                            size: 18, color: Color(0xFF003366)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            dateStr,
+                            style: GoogleFonts.inter(
+                                fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Period $period',
+                            style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary),
+                          ),
                         ),
-                        child: Text(
-                          'Period $period',
-                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Cane Quantity & Filling Amount
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _caneQtyController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Cane Quantity (Canes)',
-                        hintText: 'e.g. 15',
-                        prefixIcon: Icon(Icons.water_drop_outlined, size: 18),
-                      ),
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) return 'Enter quantity';
-                        final n = int.tryParse(val.trim());
-                        if (n == null || n < 0) return 'Invalid qty';
-                        return null;
-                      },
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _fillingAmountController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(
-                        labelText: 'Filling Amount (₹)',
-                        hintText: '0.00',
-                        prefixIcon: Icon(Icons.currency_rupee, size: 18),
+                ),
+                const SizedBox(height: 16),
+
+                // Cane Quantity & Filling Amount
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _caneQtyController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Cane Quantity (Canes)',
+                          hintText: 'e.g. 15',
+                          prefixIcon: Icon(Icons.water_drop_outlined, size: 18),
+                        ),
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty)
+                            return 'Enter quantity';
+                          final n = int.tryParse(val.trim());
+                          if (n == null || n < 0) return 'Invalid qty';
+                          return null;
+                        },
                       ),
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) return 'Enter amount';
-                        final n = double.tryParse(val.trim());
-                        if (n == null || n < 0) return 'Invalid amount';
-                        return null;
-                      },
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Payments Received
-              TextFormField(
-                controller: _paymentsReceivedController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Payments Received Today (₹)',
-                  hintText: '0.00',
-                  prefixIcon: Icon(Icons.payments_outlined, size: 18),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _fillingAmountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Filling Amount (₹)',
+                          hintText: '0.00',
+                          prefixIcon: Icon(Icons.currency_rupee, size: 18),
+                        ),
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty)
+                            return 'Enter amount';
+                          final n = double.tryParse(val.trim());
+                          if (n == null || n < 0) return 'Invalid amount';
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) return 'Enter payment';
-                  final n = double.tryParse(val.trim());
-                  if (n == null || n < 0) return 'Invalid amount';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 14),
+                const SizedBox(height: 14),
 
-              // Notes
-              TextFormField(
-                controller: _notesController,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Audit Notes / Description',
-                  hintText: 'Walk-in cash counter sale, event supply, etc.',
-                  prefixIcon: Icon(Icons.notes_outlined, size: 18),
+                // Payments Received
+                TextFormField(
+                  controller: _paymentsReceivedController,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Payments Received Today (₹)',
+                    hintText: '0.00',
+                    prefixIcon: Icon(Icons.payments_outlined, size: 18),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty)
+                      return 'Enter payment';
+                    final n = double.tryParse(val.trim());
+                    if (n == null || n < 0) return 'Invalid amount';
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
-              // Action Buttons
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                alignment: WrapAlignment.end,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
+                // Notes
+                TextFormField(
+                  controller: _notesController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Audit Notes / Description',
+                    hintText: 'Walk-in cash counter sale, event supply, etc.',
+                    prefixIcon: Icon(Icons.notes_outlined, size: 18),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _isSubmitting ? null : _handleSubmit,
-                    icon: _isSubmitting
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.save, size: 18),
-                    label: Text(_isSubmitting ? 'Saving...' : 'Save Entry'),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+
+                // Action Buttons
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    OutlinedButton(
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      icon: _isSubmitting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.save, size: 18),
+                      label: Text(_isSubmitting ? 'Saving...' : 'Save Entry'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

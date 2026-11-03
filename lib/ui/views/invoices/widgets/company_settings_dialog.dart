@@ -1,7 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
+import 'package:marina_aqua/services/api_service.dart';
+import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 
 class CompanySettingsDialog extends StatefulWidget {
@@ -40,12 +44,15 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
   late TextEditingController _invoiceFooterNotesController;
 
   bool _isSaving = false;
+  bool _isUploadingLogo = false;
+  String? _logoUrl;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     final s = widget.settings;
+    _logoUrl = s.logoUrl ?? s.logoPath;
     _companyNameController = TextEditingController(text: s.companyName);
     _taglineController = TextEditingController(text: s.tagline);
     _phoneController = TextEditingController(text: s.phone);
@@ -62,7 +69,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     _ifscCodeController = TextEditingController(text: s.ifscCode);
     _upiIdController = TextEditingController(text: s.upiId);
     _invoicePrefixController = TextEditingController(text: s.invoicePrefix);
-    _invoiceFooterNotesController = TextEditingController(text: s.invoiceFooterNotes);
+    _invoiceFooterNotesController =
+        TextEditingController(text: s.invoiceFooterNotes);
   }
 
   @override
@@ -130,6 +138,54 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     }
   }
 
+  Future<void> _pickLogo() async {
+    try {
+      final files = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'],
+      );
+      if (files.isNotEmpty) {
+        setState(() => _isUploadingLogo = true);
+        final file = files.first;
+        final bytes = await file.xFile.readAsBytes();
+        final updated = await locator<SettingsService>().uploadCompanyLogo(bytes, file.name);
+        if (mounted) {
+          setState(() {
+            _logoUrl = updated.logoUrl ?? updated.logoPath;
+            _isUploadingLogo = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Logo upload failed: ${e.toString()}';
+          _isUploadingLogo = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _removeLogo() async {
+    try {
+      setState(() => _isUploadingLogo = true);
+      final updated = await locator<SettingsService>().deleteCompanyLogo();
+      if (mounted) {
+        setState(() {
+          _logoUrl = updated.logoUrl;
+          _isUploadingLogo = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Logo removal failed: ${e.toString()}';
+          _isUploadingLogo = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -145,9 +201,9 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: kcOceanGradient,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Row(
                 children: [
@@ -188,7 +244,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: kcErrorColor.withOpacity(0.1),
+                  color: kcErrorColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: kcErrorColor),
                 ),
@@ -199,7 +255,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: GoogleFonts.inter(color: kcErrorColor, fontSize: 13),
+                        style: GoogleFonts.inter(
+                            color: kcErrorColor, fontSize: 13),
                       ),
                     ),
                   ],
@@ -217,6 +274,77 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                     children: [
                       _sectionHeader('Company Identity', Icons.storefront),
                       const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: kcVeryLightGrey,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: kcBorderColor),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: kcBorderColor),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: _logoUrl != null && _logoUrl!.isNotEmpty
+                                    ? Image.network(
+                                        ApiService.resolveLogoUrl(_logoUrl) ?? _logoUrl!,
+                                        key: ValueKey(_logoUrl),
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) => const Center(
+                                          child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Company Logo',
+                                    style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: kcDeepNavy),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Displayed on invoices, sidebar, and print views (PNG, JPG, SVG).',
+                                    style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            OutlinedButton.icon(
+                              onPressed: _isUploadingLogo ? null : _pickLogo,
+                              icon: _isUploadingLogo
+                                  ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                                  : const Icon(Icons.upload_file, size: 16),
+                              label: Text(_isUploadingLogo ? 'Uploading...' : 'Change Logo'),
+                              style: OutlinedButton.styleFrom(foregroundColor: kcPrimaryColor),
+                            ),
+                            if (_logoUrl != null && _logoUrl!.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, color: kcErrorColor, size: 20),
+                                tooltip: 'Remove Logo',
+                                onPressed: _removeLogo,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                       Row(
                         children: [
                           Expanded(
@@ -224,7 +352,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             child: _buildTextField(
                               controller: _companyNameController,
                               label: 'Company Legal Name *',
-                              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                              validator: (v) =>
+                                  v?.trim().isEmpty ?? true ? 'Required' : null,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -232,7 +361,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             child: _buildTextField(
                               controller: _invoicePrefixController,
                               label: 'Invoice Prefix (e.g. INV)',
-                              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                              validator: (v) =>
+                                  v?.trim().isEmpty ?? true ? 'Required' : null,
                             ),
                           ),
                         ],
@@ -249,12 +379,14 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           final phoneField = _buildTextField(
                             controller: _phoneController,
                             label: 'Phone *',
-                            validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                            validator: (v) =>
+                                v?.trim().isEmpty ?? true ? 'Required' : null,
                           );
                           final emailField = _buildTextField(
                             controller: _emailController,
                             label: 'Email *',
-                            validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                            validator: (v) =>
+                                v?.trim().isEmpty ?? true ? 'Required' : null,
                           );
                           final webField = _buildTextField(
                             controller: _websiteController,
@@ -289,7 +421,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                         controller: _addressController,
                         label: 'Registered Office Address *',
                         maxLines: 2,
-                        validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                        validator: (v) =>
+                            v?.trim().isEmpty ?? true ? 'Required' : null,
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -306,14 +439,15 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             child: _buildTextField(
                               controller: _stateCodeController,
                               label: 'State Code (e.g. 33)',
-                              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                              validator: (v) =>
+                                  v?.trim().isEmpty ?? true ? 'Required' : null,
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 24),
-                      _sectionHeader('Tax & Regulatory Credentials', Icons.verified_user_outlined),
+                      _sectionHeader('Tax & Regulatory Credentials',
+                          Icons.verified_user_outlined),
                       const SizedBox(height: 12),
                       Row(
                         children: [
@@ -322,9 +456,10 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                               controller: _gstinController,
                               label: 'Company GSTIN * (15 digits)',
                               hintText: '33AABCM1234F1Z9',
-                              validator: (v) => (v == null || v.trim().length != 15)
-                                  ? 'Valid 15-digit GSTIN required'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.trim().length != 15)
+                                      ? 'Valid 15-digit GSTIN required'
+                                      : null,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -333,16 +468,17 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                               controller: _panController,
                               label: 'Company PAN * (10 chars)',
                               hintText: 'AABCM1234F',
-                              validator: (v) => (v == null || v.trim().length != 10)
-                                  ? 'Valid 10-character PAN required'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.trim().length != 10)
+                                      ? 'Valid 10-character PAN required'
+                                      : null,
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 24),
-                      _sectionHeader('Bank Account & Remittance Details', Icons.account_balance),
+                      _sectionHeader('Bank Account & Remittance Details',
+                          Icons.account_balance),
                       const SizedBox(height: 12),
                       Row(
                         children: [
@@ -405,13 +541,14 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           );
                         },
                       ),
-
                       const SizedBox(height: 24),
-                      _sectionHeader('Default Terms & Conditions', Icons.description_outlined),
+                      _sectionHeader('Default Terms & Conditions',
+                          Icons.description_outlined),
                       const SizedBox(height: 12),
                       _buildTextField(
                         controller: _invoiceFooterNotesController,
-                        label: 'Standard Terms & Conditions on Printed Invoices',
+                        label:
+                            'Standard Terms & Conditions on Printed Invoices',
                         maxLines: 4,
                       ),
                     ],
@@ -423,9 +560,10 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
             // Footer Actions
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -435,12 +573,15 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      side: BorderSide(color: kcBorderColor),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                      side: const BorderSide(color: kcBorderColor),
                     ),
-                    child: Text('Cancel', style: GoogleFonts.inter(color: kcTextSecondary)),
+                    child: Text('Cancel',
+                        style: GoogleFonts.inter(color: kcTextSecondary)),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _handleSave,
@@ -448,17 +589,22 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                         ? const SizedBox(
                             width: 18,
                             height: 18,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
-                        : const Icon(Icons.check_circle_outline, size: 18, color: Colors.white),
+                        : const Icon(Icons.check_circle_outline,
+                            size: 18, color: Colors.white),
                     label: Text(
                       _isSaving ? 'Saving...' : 'Save Settings',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kcPrimaryColor,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                 ],
@@ -507,18 +653,19 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         isDense: true,
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kcBorderColor),
+          borderSide: const BorderSide(color: kcBorderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kcBorderColor),
+          borderSide: const BorderSide(color: kcBorderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kcPrimaryColor, width: 1.5),
+          borderSide: const BorderSide(color: kcPrimaryColor, width: 1.5),
         ),
       ),
     );

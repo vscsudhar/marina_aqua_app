@@ -18,7 +18,8 @@ class LoginView extends StackedView<LoginViewModel> {
   }
 
   @override
-  Widget builder(BuildContext context, LoginViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, LoginViewModel viewModel, Widget? child) {
     final size = MediaQuery.of(context).size;
     final isDesktop = size.width >= 1024;
     final isTablet = size.width >= 650 && size.width < 1024;
@@ -53,7 +54,7 @@ class LoginView extends StackedView<LoginViewModel> {
                     height: 320,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: kcPrimaryColor.withOpacity(0.18),
+                      color: kcPrimaryColor.withValues(alpha: 0.18),
                     ),
                   ),
                 ),
@@ -65,15 +66,17 @@ class LoginView extends StackedView<LoginViewModel> {
                     height: 350,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: kcAquaCyan.withOpacity(0.12),
+                      color: kcAquaCyan.withValues(alpha: 0.12),
                     ),
                   ),
                 ),
                 // Content
                 SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 56.0, vertical: 48.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 56.0, vertical: 48.0),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 96),
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height - 96),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,16 +92,19 @@ class LoginView extends StackedView<LoginViewModel> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 6),
                               decoration: BoxDecoration(
                                 color: kcAquaCyan.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: kcAquaCyan.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                    color: kcAquaCyan.withValues(alpha: 0.3)),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.verified_rounded, color: kcAquaCyan, size: 16),
+                                  const Icon(Icons.verified_rounded,
+                                      color: kcAquaCyan, size: 16),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
@@ -140,19 +146,22 @@ class LoginView extends StackedView<LoginViewModel> {
                             _buildFeatureBadge(
                               icon: Icons.account_balance_wallet_outlined,
                               title: 'Single Source of Truth Ledgers',
-                              subtitle: 'Strict debit/credit tracking with immutable transaction histories.',
+                              subtitle:
+                                  'Strict debit/credit tracking with immutable transaction histories.',
                             ),
                             const SizedBox(height: 16),
                             _buildFeatureBadge(
                               icon: Icons.receipt_long_outlined,
                               title: 'Automated GST Tax Invoicing',
-                              subtitle: 'Instant manual tax invoices with A4 landscape print support.',
+                              subtitle:
+                                  'Instant manual tax invoices with A4 landscape print support.',
                             ),
                             const SizedBox(height: 16),
                             _buildFeatureBadge(
                               icon: Icons.inventory_2_outlined,
                               title: 'Inventory & Empty Can Tracking',
-                              subtitle: 'Real-time monitoring of filled 20L jars, deposits, and returns.',
+                              subtitle:
+                                  'Real-time monitoring of filled 20L jars, deposits, and returns.',
                             ),
                           ],
                         ),
@@ -160,13 +169,14 @@ class LoginView extends StackedView<LoginViewModel> {
                         // Footer info
                         Row(
                           children: [
-                            const Icon(Icons.shield_outlined, color: kcPrimaryLight, size: 16),
+                            const Icon(Icons.shield_outlined,
+                                color: kcPrimaryLight, size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 '256-Bit SSL Encrypted • Role-Based Access • FSSAI Certified',
                                 style: GoogleFonts.inter(
-                                  color: kcLightGrey.withOpacity(0.7),
+                                  color: kcLightGrey.withValues(alpha: 0.7),
                                   fontSize: 12,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -259,7 +269,7 @@ class LoginView extends StackedView<LoginViewModel> {
         border: Border.all(color: kcBorderColor, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: kcDeepNavy.withOpacity(0.06),
+            color: kcDeepNavy.withValues(alpha: 0.06),
             blurRadius: 28,
             offset: const Offset(0, 10),
           ),
@@ -292,13 +302,14 @@ class LoginView extends StackedView<LoginViewModel> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: kcErrorColor.withOpacity(0.08),
+                color: kcErrorColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: kcErrorColor.withOpacity(0.3)),
+                border: Border.all(color: kcErrorColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: kcErrorColor, size: 20),
+                  const Icon(Icons.error_outline_rounded,
+                      color: kcErrorColor, size: 20),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -311,7 +322,8 @@ class LoginView extends StackedView<LoginViewModel> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 16, color: kcErrorColor),
+                    icon: const Icon(Icons.close_rounded,
+                        size: 16, color: kcErrorColor),
                     onPressed: viewModel.clearErrorMessage,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -340,10 +352,12 @@ class LoginView extends StackedView<LoginViewModel> {
             decoration: InputDecoration(
               hintText: AppStrings.hintEmailOrUsername,
               hintStyle: GoogleFonts.inter(color: kcTextMuted, fontSize: 14),
-              prefixIcon: const Icon(Icons.person_outline_rounded, color: kcPrimaryDark, size: 20),
+              prefixIcon: const Icon(Icons.person_outline_rounded,
+                  color: kcPrimaryDark, size: 20),
               filled: true,
-              fillColor: kcVeryLightGrey.withOpacity(0.5),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              fillColor: kcVeryLightGrey.withValues(alpha: 0.5),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: kcBorderColor),
@@ -384,7 +398,8 @@ class LoginView extends StackedView<LoginViewModel> {
             decoration: InputDecoration(
               hintText: AppStrings.hintPassword,
               hintStyle: GoogleFonts.inter(color: kcTextMuted, fontSize: 14),
-              prefixIcon: const Icon(Icons.lock_outline_rounded, color: kcPrimaryDark, size: 20),
+              prefixIcon: const Icon(Icons.lock_outline_rounded,
+                  color: kcPrimaryDark, size: 20),
               suffixIcon: IconButton(
                 icon: Icon(
                   viewModel.isPasswordVisible
@@ -396,8 +411,9 @@ class LoginView extends StackedView<LoginViewModel> {
                 onPressed: viewModel.togglePasswordVisibility,
               ),
               filled: true,
-              fillColor: kcVeryLightGrey.withOpacity(0.5),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              fillColor: kcVeryLightGrey.withValues(alpha: 0.5),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: kcBorderColor),
@@ -537,7 +553,8 @@ class LoginView extends StackedView<LoginViewModel> {
                 TextButton(
                   onPressed: viewModel.fillDemoAdmin,
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -570,9 +587,9 @@ class LoginView extends StackedView<LoginViewModel> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.12)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
           ),
           child: Icon(icon, color: kcAquaCyan, size: 22),
         ),

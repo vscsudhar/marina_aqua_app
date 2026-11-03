@@ -44,7 +44,11 @@ class ExportPrintService {
     final response = await _apiService.client.get(
       endpoint,
       queryParameters: queryParams ?? {},
-      options: Options(responseType: ResponseType.bytes),
+      options: Options(
+        responseType: ResponseType.bytes,
+        receiveTimeout: const Duration(seconds: 45),
+        sendTimeout: const Duration(seconds: 45),
+      ),
     );
 
     final bytes = response.data as List<int>;
@@ -60,7 +64,11 @@ class ExportPrintService {
     final response = await _apiService.client.get(
       endpoint,
       queryParameters: queryParams ?? {},
-      options: Options(responseType: ResponseType.bytes),
+      options: Options(
+        responseType: ResponseType.bytes,
+        receiveTimeout: const Duration(seconds: 45),
+        sendTimeout: const Duration(seconds: 45),
+      ),
     );
 
     final bytes = response.data as List<int>;

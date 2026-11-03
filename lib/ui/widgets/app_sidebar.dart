@@ -82,6 +82,15 @@ class AppSidebar extends StatelessWidget {
       badge: 'MATRIX',
     ),
     AppSidebarItem(
+      id: 'bottle_ledger',
+      title: 'Bottle Ledger',
+      subtitle: 'Monthly bottle purchase & stock',
+      icon: Icons.auto_stories_rounded,
+      color: Color(0xFF0D9488),
+      route: '/bottle-ledger',
+      badge: 'BOTTLE',
+    ),
+    AppSidebarItem(
       id: 'purchases',
       title: 'Purchases & Stock',
       subtitle: 'Cans, caps & raw stock',
@@ -168,7 +177,11 @@ class AppSidebar extends StatelessWidget {
               settingsService?.settings.logoUrl != null &&
               settingsService!.settings.logoUrl!.isNotEmpty)
           ? settingsService.settings.logoUrl
-          : effectiveUser?.companyLogo;
+          : (settingsService?.isInitialized == true &&
+                  settingsService?.settings.logoPath != null &&
+                  settingsService!.settings.logoPath!.isNotEmpty
+              ? settingsService.settings.logoPath
+              : effectiveUser?.companyLogo);
       final resolvedLogo = ApiService.resolveLogoUrl(rawLogo);
 
       final companyName = (settingsService?.isInitialized == true &&

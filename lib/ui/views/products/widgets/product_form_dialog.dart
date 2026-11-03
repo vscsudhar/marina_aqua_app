@@ -171,7 +171,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _descriptionController = TextEditingController(text: p?.description ?? '');
 
     _units = List.from(widget.units);
-    _selectedCategoryId = p?.categoryId ?? (widget.categories.isNotEmpty ? widget.categories.first.id : null);
+    _selectedCategoryId = p?.categoryId ??
+        (widget.categories.isNotEmpty ? widget.categories.first.id : null);
     _selectedUnitId = p?.unitId ?? (_units.isNotEmpty ? _units.first.id : null);
     _trackStock = p?.trackStock ?? true;
     _isActive = p?.isActive ?? true;
@@ -203,13 +204,16 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       _currentStockController.text = preset['stock'];
 
       // Match unit
-      final matchedUnit = _units.where((u) => u.code == preset['unit_code']).firstOrNull;
+      final matchedUnit =
+          _units.where((u) => u.code == preset['unit_code']).firstOrNull;
       if (matchedUnit != null) {
         _selectedUnitId = matchedUnit.id;
       }
 
       // Match category
-      final matchedCat = widget.categories.where((c) => c.code == preset['category_code']).firstOrNull;
+      final matchedCat = widget.categories
+          .where((c) => c.code == preset['category_code'])
+          .firstOrNull;
       if (matchedCat != null) {
         _selectedCategoryId = matchedCat.id;
       }
@@ -217,9 +221,13 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   }
 
   void _onNameChanged(String val) {
-    if (widget.product == null && _skuController.text.isEmpty && val.isNotEmpty) {
-      final generated = val.trim().replaceAll(RegExp(r'[^a-zA-Z0-9]'), '-').toUpperCase();
-      _skuController.text = generated.length > 25 ? generated.substring(0, 25) : generated;
+    if (widget.product == null &&
+        _skuController.text.isEmpty &&
+        val.isNotEmpty) {
+      final generated =
+          val.trim().replaceAll(RegExp(r'[^a-zA-Z0-9]'), '-').toUpperCase();
+      _skuController.text =
+          generated.length > 25 ? generated.substring(0, 25) : generated;
     }
   }
 
@@ -246,14 +254,21 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       'sku': _skuController.text.trim().toUpperCase(),
       'category_id': _selectedCategoryId,
       'unit_id': _selectedUnitId,
-      'hsn_code': _hsnController.text.trim().isEmpty ? '2201' : _hsnController.text.trim(),
-      'default_price': double.tryParse(_defaultPriceController.text.trim()) ?? 0.0,
+      'hsn_code': _hsnController.text.trim().isEmpty
+          ? '2201'
+          : _hsnController.text.trim(),
+      'default_price':
+          double.tryParse(_defaultPriceController.text.trim()) ?? 0.0,
       'cost_price': double.tryParse(_costPriceController.text.trim()) ?? 0.0,
       'tax_rate': double.tryParse(_taxRateController.text.trim()) ?? 0.0,
-      'current_stock': double.tryParse(_currentStockController.text.trim()) ?? 0.0,
+      'current_stock':
+          double.tryParse(_currentStockController.text.trim()) ?? 0.0,
       'track_stock': _trackStock,
-      'min_stock_level': double.tryParse(_minStockController.text.trim()) ?? 0.0,
-      'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+      'min_stock_level':
+          double.tryParse(_minStockController.text.trim()) ?? 0.0,
+      'description': _descriptionController.text.trim().isEmpty
+          ? null
+          : _descriptionController.text.trim(),
       'is_active': _isActive,
     };
 
@@ -264,7 +279,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString().replaceFirst('ApiException: ', '').replaceFirst('Exception: ', '');
+        _errorMessage = e
+            .toString()
+            .replaceFirst('ApiException: ', '')
+            .replaceFirst('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -305,10 +323,11 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: kcPrimaryColor.withOpacity(0.12),
+                            color: kcPrimaryColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.inventory_2_rounded, color: kcPrimaryColor, size: 22),
+                          child: const Icon(Icons.inventory_2_rounded,
+                              color: kcPrimaryColor, size: 22),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -316,7 +335,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isEditing ? 'Edit Product Specification' : 'Create New Product',
+                                isEditing
+                                    ? 'Edit Product Specification'
+                                    : 'Create New Product',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -325,8 +346,11 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                isEditing ? 'Update catalog details, pricing and stock rules' : 'Define catalog item, supply price, and reorder levels',
-                                style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+                                isEditing
+                                    ? 'Update catalog details, pricing and stock rules'
+                                    : 'Define catalog item, supply price, and reorder levels',
+                                style: const TextStyle(
+                                    fontSize: 12, color: kcTextSecondary),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -353,7 +377,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                         controller: _nameController,
                         decoration: const InputDecoration(
                           labelText: 'Product Name *',
-                          hintText: 'e.g. 20-Litre Water Can, 1L Packaged Water',
+                          hintText:
+                              'e.g. 20-Litre Water Can, 1L Packaged Water',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.label),
                         ),
@@ -384,7 +409,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                       );
 
                       final categoryField = DropdownButtonFormField<int>(
-                        value: _selectedCategoryId,
+                        initialValue: _selectedCategoryId,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Product Category *',
@@ -400,8 +425,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             ),
                           );
                         }).toList(),
-                        onChanged: (val) => setState(() => _selectedCategoryId = val),
-                        validator: (val) => val == null ? 'Category is required' : null,
+                        onChanged: (val) =>
+                            setState(() => _selectedCategoryId = val),
+                        validator: (val) =>
+                            val == null ? 'Category is required' : null,
                       );
 
                       final unitField = Row(
@@ -409,7 +436,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<int>(
-                              value: _selectedUnitId,
+                              initialValue: _selectedUnitId,
                               isExpanded: true,
                               decoration: const InputDecoration(
                                 labelText: 'Measurement Unit *',
@@ -425,8 +452,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                   ),
                                 );
                               }).toList(),
-                              onChanged: (val) => setState(() => _selectedUnitId = val),
-                              validator: (val) => val == null ? 'Unit is required' : null,
+                              onChanged: (val) =>
+                                  setState(() => _selectedUnitId = val),
+                              validator: (val) =>
+                                  val == null ? 'Unit is required' : null,
                             ),
                           ),
                           if (widget.onAddUnit != null) ...[
@@ -438,7 +467,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                   final newUnit = await widget.onAddUnit!();
                                   if (newUnit != null && mounted) {
                                     setState(() {
-                                      if (!_units.any((u) => u.id == newUnit.id)) {
+                                      if (!_units
+                                          .any((u) => u.id == newUnit.id)) {
                                         _units.add(newUnit);
                                       }
                                       _selectedUnitId = newUnit.id;
@@ -452,9 +482,11 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                   decoration: BoxDecoration(
                                     border: Border.all(color: kcBorderColor),
                                     borderRadius: BorderRadius.circular(8),
-                                    color: kcPrimaryLight.withOpacity(0.1),
+                                    color:
+                                        kcPrimaryLight.withValues(alpha: 0.1),
                                   ),
-                                  child: const Icon(Icons.add, color: kcPrimaryColor, size: 22),
+                                  child: const Icon(Icons.add,
+                                      color: kcPrimaryColor, size: 22),
                                 ),
                               ),
                             ),
@@ -464,7 +496,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
                       final priceField = TextFormField(
                         controller: _defaultPriceController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'Selling/Supply Price (₹) *',
                           hintText: '35.00',
@@ -473,15 +506,18 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.sell),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty) return 'Price required';
-                          if (double.tryParse(val) == null) return 'Invalid amount';
+                          if (val == null || val.trim().isEmpty)
+                            return 'Price required';
+                          if (double.tryParse(val) == null)
+                            return 'Invalid amount';
                           return null;
                         },
                       );
 
                       final costField = TextFormField(
                         controller: _costPriceController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'Purchase/Cost Price (₹) *',
                           hintText: '18.00',
@@ -490,15 +526,18 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.shopping_bag_outlined),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty) return 'Cost required';
-                          if (double.tryParse(val) == null) return 'Invalid amount';
+                          if (val == null || val.trim().isEmpty)
+                            return 'Cost required';
+                          if (double.tryParse(val) == null)
+                            return 'Invalid amount';
                           return null;
                         },
                       );
 
                       final taxField = TextFormField(
                         controller: _taxRateController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'GST Tax Rate (%)',
                           hintText: '18.0',
@@ -507,7 +546,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.percent),
                         ),
                         validator: (val) {
-                          if (val != null && val.isNotEmpty && double.tryParse(val) == null) {
+                          if (val != null &&
+                              val.isNotEmpty &&
+                              double.tryParse(val) == null) {
                             return 'Invalid rate';
                           }
                           return null;
@@ -527,7 +568,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                       final minStockField = TextFormField(
                         controller: _minStockController,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         decoration: const InputDecoration(
                           labelText: 'Reorder Level (Alert) *',
                           hintText: '50',
@@ -535,7 +578,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.warning_amber_rounded),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty) return 'Required';
+                          if (val == null || val.trim().isEmpty)
+                            return 'Required';
                           return null;
                         },
                       );
@@ -543,7 +587,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                       final currentStockField = TextFormField(
                         controller: _currentStockController,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         decoration: const InputDecoration(
                           labelText: 'Current Physical Stock',
                           hintText: '0',
@@ -554,20 +600,29 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
                       final trackStockTile = CheckboxListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Track Inventory Stock', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        subtitle: const Text('Trigger low-stock alerts when stock <= reorder level', style: TextStyle(fontSize: 12)),
+                        title: const Text('Track Inventory Stock',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 14)),
+                        subtitle: const Text(
+                            'Trigger low-stock alerts when stock <= reorder level',
+                            style: TextStyle(fontSize: 12)),
                         value: _trackStock,
                         activeColor: kcPrimaryColor,
-                        onChanged: (val) => setState(() => _trackStock = val ?? true),
+                        onChanged: (val) =>
+                            setState(() => _trackStock = val ?? true),
                         controlAffinity: ListTileControlAffinity.leading,
                       );
 
                       final activeTile = SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        subtitle: const Text('Available for dealer supplies & invoices', style: TextStyle(fontSize: 12)),
+                        title: const Text('Active Status',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 14)),
+                        subtitle: const Text(
+                            'Available for dealer supplies & invoices',
+                            style: TextStyle(fontSize: 12)),
                         value: _isActive,
-                        activeColor: kcPrimaryColor,
+                        activeThumbColor: kcPrimaryColor,
                         onChanged: (val) => setState(() => _isActive = val),
                       );
 
@@ -577,7 +632,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           if (!isEditing) ...[
                             const Text(
                               'Quick Water Industry Presets (Click to autofill):',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kcTextSecondary),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: kcTextSecondary),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -585,8 +643,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                               runSpacing: 6,
                               children: productPresets.map((preset) {
                                 return ActionChip(
-                                  avatar: const Icon(Icons.bolt, size: 14, color: kcPrimaryDark),
-                                  label: Text(preset['name'], style: const TextStyle(fontSize: 11)),
+                                  avatar: const Icon(Icons.bolt,
+                                      size: 14, color: kcPrimaryDark),
+                                  label: Text(preset['name'],
+                                      style: const TextStyle(fontSize: 11)),
                                   backgroundColor: kcVeryLightGrey,
                                   onPressed: () => _applyPreset(preset),
                                 );
@@ -596,20 +656,24 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           ],
                           if (_errorMessage != null) ...[
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
-                                color: kcErrorColor.withOpacity(0.1),
+                                color: kcErrorColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: kcErrorColor.withOpacity(0.3)),
+                                border: Border.all(
+                                    color: kcErrorColor.withValues(alpha: 0.3)),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                                  const Icon(Icons.error_outline,
+                                      color: kcErrorColor, size: 18),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       _errorMessage!,
-                                      style: const TextStyle(color: kcErrorColor, fontSize: 13),
+                                      style: const TextStyle(
+                                          color: kcErrorColor, fontSize: 13),
                                     ),
                                   ),
                                 ],
@@ -695,7 +759,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             maxLines: 2,
                             decoration: const InputDecoration(
                               labelText: 'Product Description (Optional)',
-                              hintText: 'Capacity, packaging specifications, or material details',
+                              hintText:
+                                  'Capacity, packaging specifications, or material details',
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.notes),
                             ),
@@ -730,21 +795,25 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kcPrimaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     icon: _isSaving
                         ? const SizedBox(
                             width: 18,
                             height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : const Icon(Icons.check, size: 18),
                     label: Text(isEditing ? 'Update Product' : 'Save Product'),

@@ -221,24 +221,44 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   // ===================== INVOICE ACTIONS =====================
 
-  Future<void> createInvoice(Map<String, dynamic> payload, bool isFinal) async {
+  Future<InvoiceModel> createInvoice(Map<String, dynamic> payload, bool isFinal) async {
     try {
-      await _billingService.createInvoice(payload);
+      final inv = await _billingService.createInvoice(payload);
       _successMessage = isFinal ? 'Invoice issued & finalized successfully!' : 'Invoice saved as draft!';
       await loadInvoices();
+      return inv;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       rethrow;
     }
   }
 
-  Future<void> updateInvoice(int id, Map<String, dynamic> payload, bool isFinal) async {
+  Future<InvoiceModel> updateInvoice(int id, Map<String, dynamic> payload, bool isFinal) async {
     try {
-      await _billingService.updateInvoice(id, payload);
+      final inv = await _billingService.updateInvoice(id, payload);
       _successMessage = isFinal ? 'Invoice updated & finalized!' : 'Invoice draft updated!';
+      await loadInvoices();
+      return inv;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      rethrow;
+    }
+  }
+
+  /// Open live HTML invoice rendered by backend URL in browser
+  void openInvoiceInBrowser(int id) {
+    final url = _billingService.getInvoiceHtmlUrl(id);
+    _exportPrintService.openUrlInBrowser(url);
+  }
+
+  Future<void> updateInvoiceNumber(int id, String newInvoiceNo, {String? reason}) async {
+    try {
+      await _billingService.updateInvoiceNumber(id, newInvoiceNo, reason: reason);
+      _successMessage = 'Invoice number updated to $newInvoiceNo successfully!';
       await loadInvoices();
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
       rethrow;
     }
   }
@@ -287,16 +307,20 @@ class InvoicesViewModel extends ReactiveViewModel {
     }
   }
 
-  Future<void> deleteDraftInvoice(int id) async {
+  Future<void> deleteInvoice(int id) async {
     try {
       await _billingService.deleteInvoice(id);
-      _successMessage = 'Draft invoice deleted!';
+      _successMessage = 'Invoice deleted successfully! The number is now released for reuse.';
       await loadInvoices();
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
+      rethrow;
     }
   }
+
+  // Alias for backward compatibility
+  Future<void> deleteDraftInvoice(int id) => deleteInvoice(id);
 
   Future<void> updateCompanySettings(Map<String, dynamic> payload) async {
     try {

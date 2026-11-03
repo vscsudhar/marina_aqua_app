@@ -21,6 +21,9 @@ class InvoicePreviewDialog extends StatelessWidget {
   final VoidCallback? onRecordPayment;
   final VoidCallback? onIssueCreditNote;
   final VoidCallback? onCancelInvoice;
+  final VoidCallback? onDelete;
+  final VoidCallback? onChangeNumber;
+  final VoidCallback? onOpenBrowser;
 
   const InvoicePreviewDialog({
     super.key,
@@ -33,11 +36,15 @@ class InvoicePreviewDialog extends StatelessWidget {
     this.onRecordPayment,
     this.onIssueCreditNote,
     this.onCancelInvoice,
+    this.onDelete,
+    this.onChangeNumber,
+    this.onOpenBrowser,
   });
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -103,7 +110,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                     border: Border.all(color: kcBorderColor),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -117,23 +124,43 @@ class InvoicePreviewDialog extends StatelessWidget {
                       LayoutBuilder(
                         builder: (context, headerConstraints) {
                           final isNarrow = headerConstraints.maxWidth < 600;
-                          final rawLogo = (companySettings.logoUrl != null && companySettings.logoUrl!.isNotEmpty)
+                          final rawLogo = (companySettings.logoUrl != null &&
+                                  companySettings.logoUrl!.isNotEmpty)
                               ? companySettings.logoUrl
-                              : (locator.isRegistered<SettingsService>() &&
-                                      locator<SettingsService>().settings.logoUrl != null &&
-                                      locator<SettingsService>().settings.logoUrl!.isNotEmpty
-                                  ? locator<SettingsService>().settings.logoUrl
-                                  : (locator.isRegistered<AuthService>()
-                                      ? locator<AuthService>().currentUser?.companyLogo
-                                      : null));
-                          final resolvedLogo = ApiService.resolveLogoUrl(rawLogo);
+                              : (companySettings.logoPath != null &&
+                                      companySettings.logoPath!.isNotEmpty
+                                  ? companySettings.logoPath
+                                  : (locator.isRegistered<SettingsService>() &&
+                                          locator<SettingsService>()
+                                                  .settings
+                                                  .logoUrl !=
+                                              null &&
+                                          locator<SettingsService>()
+                                              .settings
+                                              .logoUrl!
+                                              .isNotEmpty
+                                      ? locator<SettingsService>()
+                                          .settings
+                                          .logoUrl
+                                      : (locator.isRegistered<AuthService>()
+                                          ? locator<AuthService>()
+                                              .currentUser
+                                              ?.companyLogo
+                                          : null)));
+                          final resolvedLogo =
+                              ApiService.resolveLogoUrl(rawLogo);
 
-                          final effectiveCompanyName = (companySettings.companyName.isNotEmpty &&
-                                  companySettings.companyName != 'Marina Aqua Pure Water Co.')
-                              ? companySettings.companyName
-                              : (locator.isRegistered<AuthService>()
-                                  ? (locator<AuthService>().currentUser?.companyName ?? companySettings.companyName)
-                                  : companySettings.companyName);
+                          final effectiveCompanyName =
+                              (companySettings.companyName.isNotEmpty &&
+                                      companySettings.companyName !=
+                                          'Marina Aqua Pure Water Co.')
+                                  ? companySettings.companyName
+                                  : (locator.isRegistered<AuthService>()
+                                      ? (locator<AuthService>()
+                                              .currentUser
+                                              ?.companyName ??
+                                          companySettings.companyName)
+                                      : companySettings.companyName);
 
                           final companyWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,24 +168,28 @@ class InvoicePreviewDialog extends StatelessWidget {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (resolvedLogo != null && resolvedLogo.isNotEmpty)
+                                  if (resolvedLogo != null &&
+                                      resolvedLogo.isNotEmpty)
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: Container(
                                         constraints: const BoxConstraints(
-                                          minWidth: 50,
-                                          maxWidth: 140,
-                                          minHeight: 48,
-                                          maxHeight: 65,
+                                          minWidth: 55,
+                                          maxWidth: 145,
+                                          minHeight: 50,
+                                          maxHeight: 70,
                                         ),
                                         padding: const EdgeInsets.all(4),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: kcBorderColor),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: kcBorderColor),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.04),
+                                              color: Colors.black
+                                                  .withValues(alpha: 0.04),
                                               blurRadius: 4,
                                               offset: const Offset(0, 1),
                                             ),
@@ -168,13 +199,18 @@ class InvoicePreviewDialog extends StatelessWidget {
                                           resolvedLogo,
                                           key: ValueKey(resolvedLogo),
                                           fit: BoxFit.contain,
-                                          errorBuilder: (_, __, ___) => Container(
+                                          errorBuilder: (_, __, ___) =>
+                                              Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: kcPrimaryColor.withValues(alpha: 0.12),
-                                              borderRadius: BorderRadius.circular(8),
+                                              color: kcPrimaryColor.withValues(
+                                                  alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            child: const Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                            child: const Icon(Icons.water_drop,
+                                                color: kcPrimaryColor,
+                                                size: 28),
                                           ),
                                         ),
                                       ),
@@ -183,15 +219,18 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: kcPrimaryColor.withValues(alpha: 0.12),
+                                        color: kcPrimaryColor.withValues(
+                                            alpha: 0.12),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: const Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                      child: const Icon(Icons.water_drop,
+                                          color: kcPrimaryColor, size: 28),
                                     ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           effectiveCompanyName,
@@ -205,7 +244,9 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         if (companySettings.tagline.isNotEmpty)
                                           Text(
                                             companySettings.tagline,
-                                            style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                                            style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: kcMediumGrey),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                       ],
@@ -216,7 +257,8 @@ class InvoicePreviewDialog extends StatelessWidget {
                               const SizedBox(height: 10),
                               Text(
                                 companySettings.address,
-                                style: GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
+                                style: GoogleFonts.inter(
+                                    fontSize: 12, color: kcTextSecondary),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -229,16 +271,20 @@ class InvoicePreviewDialog extends StatelessWidget {
                               ),
                               Text(
                                 'Phone: ${companySettings.phone} | Email: ${companySettings.email}',
-                                style: GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
+                                style: GoogleFonts.inter(
+                                    fontSize: 12, color: kcTextSecondary),
                               ),
                             ],
                           );
 
                           final metaWidget = Column(
-                            crossAxisAlignment: isNarrow ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                            crossAxisAlignment: isNarrow
+                                ? CrossAxisAlignment.start
+                                : CrossAxisAlignment.end,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: kcPrimaryDark,
                                   borderRadius: BorderRadius.circular(4),
@@ -254,12 +300,16 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              _metaRow('Invoice No:', invoice.invoiceNo, isBold: true),
+                              _metaRow('Invoice No:', invoice.invoiceNo,
+                                  isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              if (invoice.dueDate != null) _metaRow('Due Date:', invoice.dueDate!),
-                              _metaRow('Place of Supply:', invoice.placeOfSupply),
+                              if (invoice.dueDate != null)
+                                _metaRow('Due Date:', invoice.dueDate!),
+                              _metaRow(
+                                  'Place of Supply:', invoice.placeOfSupply),
                               if (invoice.dealerSupplyNo != null)
-                                _metaRow('Supply Ref:', invoice.dealerSupplyNo!),
+                                _metaRow(
+                                    'Supply Ref:', invoice.dealerSupplyNo!),
                             ],
                           );
 
@@ -318,25 +368,32 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     color: kcDeepNavy,
                                   ),
                                 ),
-                                if (invoice.customerAddress != null && invoice.customerAddress!.isNotEmpty) ...[
+                                if (invoice.customerAddress != null &&
+                                    invoice.customerAddress!.isNotEmpty) ...[
                                   const SizedBox(height: 2),
                                   Text(
                                     invoice.customerAddress!,
-                                    style: GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
+                                    style: GoogleFonts.inter(
+                                        fontSize: 12, color: kcTextSecondary),
                                   ),
                                 ],
-                                if (invoice.customerPhone != null && invoice.customerPhone!.isNotEmpty)
+                                if (invoice.customerPhone != null &&
+                                    invoice.customerPhone!.isNotEmpty)
                                   Text(
                                     'Phone: ${invoice.customerPhone}',
-                                    style: GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
+                                    style: GoogleFonts.inter(
+                                        fontSize: 12, color: kcTextSecondary),
                                   ),
                               ],
                             );
 
                             final gstinWidget = Column(
-                              crossAxisAlignment: isNarrow ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                              crossAxisAlignment: isNarrow
+                                  ? CrossAxisAlignment.start
+                                  : CrossAxisAlignment.end,
                               children: [
-                                if (invoice.customerGstin != null && invoice.customerGstin!.isNotEmpty) ...[
+                                if (invoice.customerGstin != null &&
+                                    invoice.customerGstin!.isNotEmpty) ...[
                                   Text(
                                     'Customer GSTIN: ${invoice.customerGstin}',
                                     style: GoogleFonts.inter(
@@ -357,11 +414,15 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ],
                                 const SizedBox(height: 4),
                                 Text(
-                                  invoice.isInterstate ? 'Interstate Supply (IGST)' : 'Intrastate Supply (CGST+SGST)',
+                                  invoice.isInterstate
+                                      ? 'Interstate Supply (IGST)'
+                                      : 'Intrastate Supply (CGST+SGST)',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: invoice.isInterstate ? kcWarningColor : kcSuccessColor,
+                                    color: invoice.isInterstate
+                                        ? kcWarningColor
+                                        : kcSuccessColor,
                                   ),
                                 ),
                               ],
@@ -400,7 +461,8 @@ class InvoicePreviewDialog extends StatelessWidget {
                             child: SizedBox(
                               width: max(tableConstraints.maxWidth, 780.0),
                               child: Table(
-                                border: TableBorder.all(color: kcBorderColor, width: 1),
+                                border: TableBorder.all(
+                                    color: kcBorderColor, width: 1),
                                 columnWidths: const {
                                   0: FixedColumnWidth(40), // Sl
                                   1: FlexColumnWidth(3), // Description
@@ -409,22 +471,44 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   4: FlexColumnWidth(1.2), // Rate
                                   5: FlexColumnWidth(1), // Disc
                                   6: FlexColumnWidth(1.3), // Taxable
-                                  7: FlexColumnWidth(1.6), // Tax Split (CGST + SGST or IGST)
+                                  7: FlexColumnWidth(
+                                      1.6), // Tax Split (CGST + SGST or IGST)
                                   8: FlexColumnWidth(1.4), // Total
                                 },
                                 children: [
                                   TableRow(
-                                    decoration: const BoxDecoration(color: Color(0xFFE2E8F0)),
+                                    decoration: const BoxDecoration(
+                                        color: Color(0xFFE2E8F0)),
                                     children: [
-                                      _pCell('#', isHeader: true, align: TextAlign.center),
-                                      _pCell('Item Description', isHeader: true),
-                                      _pCell('HSN/SAC', isHeader: true, align: TextAlign.center),
-                                      _pCell('Qty & Unit', isHeader: true, align: TextAlign.right),
-                                      _pCell('Rate (₹)', isHeader: true, align: TextAlign.right),
-                                      _pCell('Disc (₹)', isHeader: true, align: TextAlign.right),
-                                      _pCell('Taxable (₹)', isHeader: true, align: TextAlign.right),
-                                      _pCell(!invoice.isInterstate ? 'GST Split (CGST+SGST)' : 'IGST (₹)', isHeader: true, align: TextAlign.right),
-                                      _pCell('Total (₹)', isHeader: true, align: TextAlign.right),
+                                      _pCell('#',
+                                          isHeader: true,
+                                          align: TextAlign.center),
+                                      _pCell('Item Description',
+                                          isHeader: true),
+                                      _pCell('HSN/SAC',
+                                          isHeader: true,
+                                          align: TextAlign.center),
+                                      _pCell('Qty & Unit',
+                                          isHeader: true,
+                                          align: TextAlign.right),
+                                      _pCell('Rate (₹)',
+                                          isHeader: true,
+                                          align: TextAlign.right),
+                                      _pCell('Disc (₹)',
+                                          isHeader: true,
+                                          align: TextAlign.right),
+                                      _pCell('Taxable (₹)',
+                                          isHeader: true,
+                                          align: TextAlign.right),
+                                      _pCell(
+                                          !invoice.isInterstate
+                                              ? 'GST Split (CGST+SGST)'
+                                              : 'IGST (₹)',
+                                          isHeader: true,
+                                          align: TextAlign.right),
+                                      _pCell('Total (₹)',
+                                          isHeader: true,
+                                          align: TextAlign.right),
                                     ],
                                   ),
                                   ...invoice.items.asMap().entries.map((entry) {
@@ -434,11 +518,22 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       children: [
                                         _pCell('$idx', align: TextAlign.center),
                                         _pCell(it.itemDescription),
-                                        _pCell(it.hsnSac, align: TextAlign.center),
-                                        _pCell('${it.quantity.toStringAsFixed(0)} ${it.unit}', align: TextAlign.right),
-                                        _pCell(it.unitPrice.toStringAsFixed(2), align: TextAlign.right),
-                                        _pCell(it.discountAmount > 0 ? it.discountAmount.toStringAsFixed(2) : '-', align: TextAlign.right),
-                                        _pCell(it.taxableAmount.toStringAsFixed(2), align: TextAlign.right),
+                                        _pCell(it.hsnSac,
+                                            align: TextAlign.center),
+                                        _pCell(
+                                            '${it.quantity.toStringAsFixed(0)} ${it.unit}',
+                                            align: TextAlign.right),
+                                        _pCell(it.unitPrice.toStringAsFixed(2),
+                                            align: TextAlign.right),
+                                        _pCell(
+                                            it.discountAmount > 0
+                                                ? it.discountAmount
+                                                    .toStringAsFixed(2)
+                                                : '-',
+                                            align: TextAlign.right),
+                                        _pCell(
+                                            it.taxableAmount.toStringAsFixed(2),
+                                            align: TextAlign.right),
                                         _pCell(
                                           !invoice.isInterstate
                                               ? (it.taxRate > 0
@@ -449,7 +544,9 @@ class InvoicePreviewDialog extends StatelessWidget {
                                                   : '0.00 (0%)'),
                                           align: TextAlign.right,
                                         ),
-                                        _pCell(it.lineTotal.toStringAsFixed(2), align: TextAlign.right, isBold: true),
+                                        _pCell(it.lineTotal.toStringAsFixed(2),
+                                            align: TextAlign.right,
+                                            isBold: true),
                                       ],
                                     );
                                   }),
@@ -488,44 +585,68 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    Text('Bank: ${companySettings.bankName} (${companySettings.bankBranch})',
-                                        style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary)),
-                                    Text('A/C No: ${companySettings.accountNumber}',
-                                        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600)),
-                                    Text('IFSC: ${companySettings.ifscCode} | UPI: ${companySettings.upiId}',
-                                        style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary)),
+                                    Text(
+                                        'Bank: ${companySettings.bankName} (${companySettings.bankBranch})',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            color: kcTextSecondary)),
+                                    Text(
+                                        'A/C No: ${companySettings.accountNumber}',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600)),
+                                    Text(
+                                        'IFSC: ${companySettings.ifscCode} | UPI: ${companySettings.upiId}',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            color: kcTextSecondary)),
                                   ],
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              if (invoice.notes != null && invoice.notes!.isNotEmpty) ...[
+                              if (invoice.notes != null &&
+                                  invoice.notes!.isNotEmpty) ...[
                                 Text(
                                   'Notes: ${invoice.notes}',
-                                  style: GoogleFonts.inter(fontSize: 11, fontStyle: FontStyle.italic, color: kcTextSecondary),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.italic,
+                                      color: kcTextSecondary),
                                 ),
                                 const SizedBox(height: 6),
                               ],
                               Text(
-                                invoice.terms ?? companySettings.invoiceFooterNotes,
-                                style: GoogleFonts.inter(fontSize: 10, color: kcMediumGrey),
+                                invoice.terms ??
+                                    companySettings.invoiceFooterNotes,
+                                style: GoogleFonts.inter(
+                                    fontSize: 10, color: kcMediumGrey),
                               ),
                             ],
                           );
 
                           final sumWidget = Column(
                             children: [
-                              _sumRow('Subtotal:', currencyFormat.format(invoice.subtotal)),
+                              _sumRow('Subtotal:',
+                                  currencyFormat.format(invoice.subtotal)),
                               if (invoice.discountTotal > 0)
-                                _sumRow('Discount:', '- ${currencyFormat.format(invoice.discountTotal)}', color: kcErrorColor),
-                              _sumRow('Taxable Amount:', currencyFormat.format(invoice.taxableAmount), isBold: true),
+                                _sumRow('Discount:',
+                                    '- ${currencyFormat.format(invoice.discountTotal)}',
+                                    color: kcErrorColor),
+                              _sumRow('Taxable Amount:',
+                                  currencyFormat.format(invoice.taxableAmount),
+                                  isBold: true),
                               if (!invoice.isInterstate) ...[
-                                _sumRow('CGST:', currencyFormat.format(invoice.cgstAmount)),
-                                _sumRow('SGST:', currencyFormat.format(invoice.sgstAmount)),
+                                _sumRow('CGST:',
+                                    currencyFormat.format(invoice.cgstAmount)),
+                                _sumRow('SGST:',
+                                    currencyFormat.format(invoice.sgstAmount)),
                               ] else ...[
-                                _sumRow('IGST:', currencyFormat.format(invoice.igstAmount)),
+                                _sumRow('IGST:',
+                                    currencyFormat.format(invoice.igstAmount)),
                               ],
                               if (invoice.roundOff != 0)
-                                _sumRow('Round Off:', currencyFormat.format(invoice.roundOff)),
+                                _sumRow('Round Off:',
+                                    currencyFormat.format(invoice.roundOff)),
                               const Divider(height: 16),
                               _sumRow(
                                 'Grand Total:',
@@ -534,12 +655,16 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 fontSize: 16,
                                 color: kcDeepNavy,
                               ),
-                              _sumRow('Amount Paid:', currencyFormat.format(invoice.paidAmount), color: kcSuccessColor),
+                              _sumRow('Amount Paid:',
+                                  currencyFormat.format(invoice.paidAmount),
+                                  color: kcSuccessColor),
                               _sumRow(
                                 'Balance Due:',
                                 currencyFormat.format(invoice.balanceDue),
                                 isBold: true,
-                                color: invoice.balanceDue > 0 ? kcErrorColor : kcSuccessColor,
+                                color: invoice.balanceDue > 0
+                                    ? kcErrorColor
+                                    : kcSuccessColor,
                               ),
                             ],
                           );
@@ -572,7 +697,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: kcErrorColor.withOpacity(0.08),
+                            color: kcErrorColor.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: kcErrorColor),
                           ),
@@ -583,7 +708,10 @@ class InvoicePreviewDialog extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   'INVOICE CANCELLED: ${invoice.cancellationReason ?? "No reason specified"}\nCancelled on: ${invoice.cancelledAt ?? "N/A"}',
-                                  style: GoogleFonts.inter(fontSize: 12, color: kcErrorColor, fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: kcErrorColor,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ],
@@ -599,9 +727,10 @@ class InvoicePreviewDialog extends StatelessWidget {
             // Bottom Action Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -620,15 +749,28 @@ class InvoicePreviewDialog extends StatelessWidget {
                         label: const Text('Print A4'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: kcDeepNavy,
-                          side: BorderSide(color: kcBorderColor),
+                          side: const BorderSide(color: kcBorderColor),
                         ),
                       ),
                       ElevatedButton.icon(
                         onPressed: onDownloadPdf,
-                        icon: const Icon(Icons.picture_as_pdf, size: 18, color: Colors.white),
-                        label: const Text('Download PDF', style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                        icon: const Icon(Icons.picture_as_pdf,
+                            size: 18, color: Colors.white),
+                        label: const Text('Download PDF',
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: kcPrimaryColor),
                       ),
+                      if (onOpenBrowser != null)
+                        OutlinedButton.icon(
+                          onPressed: onOpenBrowser,
+                          icon: const Icon(Icons.open_in_browser, size: 18),
+                          label: const Text('View HTML (URL)'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: kcPrimaryColor,
+                            side: const BorderSide(color: kcPrimaryColor),
+                          ),
+                        ),
                     ],
                   ),
                   Wrap(
@@ -645,17 +787,23 @@ class InvoicePreviewDialog extends StatelessWidget {
                         if (onFinalize != null)
                           ElevatedButton.icon(
                             onPressed: onFinalize,
-                            icon: const Icon(Icons.check_circle, size: 18, color: Colors.white),
-                            label: const Text('Finalize Invoice', style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(backgroundColor: kcSuccessColor),
+                            icon: const Icon(Icons.check_circle,
+                                size: 18, color: Colors.white),
+                            label: const Text('Finalize Invoice',
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kcSuccessColor),
                           ),
                       ] else if (invoice.isFinalized) ...[
                         if (onRecordPayment != null && invoice.balanceDue > 0)
                           ElevatedButton.icon(
                             onPressed: onRecordPayment,
-                            icon: const Icon(Icons.payment, size: 18, color: Colors.white),
-                            label: const Text('Record Payment', style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryDark),
+                            icon: const Icon(Icons.payment,
+                                size: 18, color: Colors.white),
+                            label: const Text('Record Payment',
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kcPrimaryDark),
                           ),
                         if (onIssueCreditNote != null)
                           OutlinedButton.icon(
@@ -666,11 +814,33 @@ class InvoicePreviewDialog extends StatelessWidget {
                         if (onCancelInvoice != null)
                           OutlinedButton.icon(
                             onPressed: onCancelInvoice,
-                            icon: const Icon(Icons.cancel_outlined, size: 18, color: kcErrorColor),
-                            label: const Text('Cancel Invoice', style: TextStyle(color: kcErrorColor)),
-                            style: OutlinedButton.styleFrom(side: BorderSide(color: kcErrorColor.withOpacity(0.5))),
+                            icon: const Icon(Icons.cancel_outlined,
+                                size: 18, color: kcErrorColor),
+                            label: const Text('Cancel Invoice',
+                                style: TextStyle(color: kcErrorColor)),
+                            style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color:
+                                        kcErrorColor.withValues(alpha: 0.5))),
                           ),
                       ],
+                      if (onChangeNumber != null)
+                        OutlinedButton.icon(
+                          onPressed: onChangeNumber,
+                          icon: const Icon(Icons.tag, size: 18, color: kcPrimaryDark),
+                          label: const Text('Change Number'),
+                        ),
+                      if (onDelete != null)
+                        OutlinedButton.icon(
+                          onPressed: onDelete,
+                          icon: const Icon(Icons.delete_forever,
+                              size: 18, color: kcErrorColor),
+                          label: const Text('Delete Invoice',
+                              style: TextStyle(color: kcErrorColor)),
+                          style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  color: kcErrorColor.withValues(alpha: 0.5))),
+                        ),
                     ],
                   ),
                 ],
@@ -712,7 +882,8 @@ class InvoicePreviewDialog extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey)),
+          Text(label,
+              style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey)),
           const SizedBox(width: 6),
           Text(
             value,
@@ -739,16 +910,20 @@ class InvoicePreviewDialog extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: fontSize,
-              fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-              color: kcTextSecondary,
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: fontSize,
+                fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+                color: kcTextSecondary,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             value,
+            textAlign: TextAlign.right,
             style: GoogleFonts.inter(
               fontSize: fontSize,
               fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
@@ -765,15 +940,15 @@ class InvoicePreviewDialog extends StatelessWidget {
     Color fg;
     switch (status.toLowerCase()) {
       case 'finalized':
-        bg = kcSuccessColor.withOpacity(0.18);
+        bg = kcSuccessColor.withValues(alpha: 0.18);
         fg = kcSuccessColor;
         break;
       case 'cancelled':
-        bg = kcErrorColor.withOpacity(0.18);
+        bg = kcErrorColor.withValues(alpha: 0.18);
         fg = kcErrorColor;
         break;
       default:
-        bg = kcWarningColor.withOpacity(0.18);
+        bg = kcWarningColor.withValues(alpha: 0.18);
         fg = kcWarningColor;
     }
     return Container(
@@ -784,7 +959,8 @@ class InvoicePreviewDialog extends StatelessWidget {
       ),
       child: Text(
         status.toUpperCase(),
-        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
+        style: GoogleFonts.inter(
+            fontSize: 11, fontWeight: FontWeight.w700, color: fg),
       ),
     );
   }
@@ -794,15 +970,15 @@ class InvoicePreviewDialog extends StatelessWidget {
     Color fg;
     switch (status.toLowerCase()) {
       case 'paid':
-        bg = kcSuccessColor.withOpacity(0.18);
+        bg = kcSuccessColor.withValues(alpha: 0.18);
         fg = kcSuccessColor;
         break;
       case 'partially_paid':
-        bg = kcPrimaryColor.withOpacity(0.18);
+        bg = kcPrimaryColor.withValues(alpha: 0.18);
         fg = kcPrimaryLight;
         break;
       default:
-        bg = kcErrorColor.withOpacity(0.18);
+        bg = kcErrorColor.withValues(alpha: 0.18);
         fg = kcErrorColor;
     }
     return Container(
@@ -813,7 +989,8 @@ class InvoicePreviewDialog extends StatelessWidget {
       ),
       child: Text(
         status.replaceAll('_', ' ').toUpperCase(),
-        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
+        style: GoogleFonts.inter(
+            fontSize: 11, fontWeight: FontWeight.w700, color: fg),
       ),
     );
   }

@@ -12,6 +12,7 @@ import 'package:marina_aqua/ui/widgets/low_stock_list.dart';
 import 'package:marina_aqua/ui/widgets/monthly_sales_chart.dart';
 import 'package:marina_aqua/ui/views/daily_collection/daily_collection_view.dart';
 import 'package:marina_aqua/ui/views/dealer_ledger/dealer_ledger_view.dart';
+import 'package:marina_aqua/ui/views/bottle_ledger/bottle_ledger_view.dart';
 import 'package:marina_aqua/ui/views/dealers/dealers_view.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_view.dart';
 import 'package:marina_aqua/ui/views/products/products_view.dart';
@@ -63,7 +64,8 @@ class HomeView extends StackedView<HomeViewModel> {
           Expanded(
             child: PlanExpiredGuard(
               user: user,
-              child: _buildRightSideContent(context, viewModel, isDesktop, isTablet),
+              child: _buildRightSideContent(
+                  context, viewModel, isDesktop, isTablet),
             ),
           ),
         ],
@@ -77,7 +79,7 @@ class HomeView extends StackedView<HomeViewModel> {
     bool isDesktop,
     bool isTablet,
   ) {
-    final onBack = () => viewModel.onShortcutSelected('dashboard');
+    void onBack() => viewModel.onShortcutSelected('dashboard');
 
     switch (viewModel.activeModule) {
       case 'dealers':
@@ -92,6 +94,8 @@ class HomeView extends StackedView<HomeViewModel> {
         return DailyCollectionView(onBack: onBack);
       case 'ledger':
         return DealerLedgerView(onBack: onBack);
+      case 'bottle_ledger':
+        return BottleLedgerView(onBack: onBack);
       case 'users':
         return UsersView(onBack: onBack);
       case 'settings':
@@ -102,7 +106,8 @@ class HomeView extends StackedView<HomeViewModel> {
             ? _buildLoadingState()
             : viewModel.errorMessage != null && viewModel.summary == null
                 ? _buildErrorState(viewModel)
-                : _buildDashboardContent(context, viewModel, isDesktop, isTablet);
+                : _buildDashboardContent(
+                    context, viewModel, isDesktop, isTablet);
     }
   }
 
@@ -112,7 +117,8 @@ class HomeView extends StackedView<HomeViewModel> {
     bool isDesktop,
     bool isTablet,
   ) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
     final metrics = viewModel.summary?.metrics;
 
     return SingleChildScrollView(
@@ -129,7 +135,8 @@ class HomeView extends StackedView<HomeViewModel> {
               children: [
                 Builder(
                   builder: (scaffoldContext) => IconButton(
-                    icon: const Icon(Icons.menu_rounded, color: kcDeepNavy, size: 26),
+                    icon: const Icon(Icons.menu_rounded,
+                        color: kcDeepNavy, size: 26),
                     tooltip: 'Open Menu',
                     onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
                   ),
@@ -151,7 +158,8 @@ class HomeView extends StackedView<HomeViewModel> {
                     color: viewModel.isLoading ? kcTextMuted : kcPrimaryDark,
                     size: 22,
                   ),
-                  onPressed: viewModel.isLoading ? null : viewModel.fetchDashboardData,
+                  onPressed:
+                      viewModel.isLoading ? null : viewModel.fetchDashboardData,
                 ),
               ],
             ),
@@ -195,10 +203,13 @@ class HomeView extends StackedView<HomeViewModel> {
                       tooltip: 'Refresh Dashboard Data',
                       icon: Icon(
                         Icons.refresh_rounded,
-                        color: viewModel.isLoading ? kcTextMuted : kcPrimaryDark,
+                        color:
+                            viewModel.isLoading ? kcTextMuted : kcPrimaryDark,
                         size: 24,
                       ),
-                      onPressed: viewModel.isLoading ? null : viewModel.fetchDashboardData,
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : viewModel.fetchDashboardData,
                     ),
                     const SizedBox(width: 8),
                     DateFilterSelector(
@@ -252,8 +263,12 @@ class HomeView extends StackedView<HomeViewModel> {
           // Primary KPI Cards Grid
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth >= 950 ? 4 : (constraints.maxWidth >= 500 ? 2 : 1);
-              final childAspectRatio = constraints.maxWidth >= 950 ? 1.25 : (constraints.maxWidth >= 500 ? 1.45 : 2.0);
+              final crossAxisCount = constraints.maxWidth >= 950
+                  ? 4
+                  : (constraints.maxWidth >= 500 ? 2 : 1);
+              final childAspectRatio = constraints.maxWidth >= 950
+                  ? 1.25
+                  : (constraints.maxWidth >= 500 ? 1.45 : 2.0);
 
               return GridView.count(
                 shrinkWrap: true,
@@ -265,7 +280,8 @@ class HomeView extends StackedView<HomeViewModel> {
                 children: [
                   KpiCard(
                     title: "Today's Supply Quantity",
-                    value: '${metrics?.todaySupplyQuantity.toInt() ?? 0} Jars/Units',
+                    value:
+                        '${metrics?.todaySupplyQuantity.toInt() ?? 0} Jars/Units',
                     subtitle: 'Water units dispatched',
                     icon: Icons.water_drop_rounded,
                     accentColor: kcPrimaryColor,
@@ -273,7 +289,8 @@ class HomeView extends StackedView<HomeViewModel> {
                   ),
                   KpiCard(
                     title: "Today's Supply Invoiced",
-                    value: currencyFormat.format(metrics?.todaySupplyAmount ?? 0),
+                    value:
+                        currencyFormat.format(metrics?.todaySupplyAmount ?? 0),
                     subtitle: 'Delivered supplies revenue',
                     icon: Icons.receipt_long_rounded,
                     accentColor: kcAquaCyan,
@@ -281,7 +298,8 @@ class HomeView extends StackedView<HomeViewModel> {
                   ),
                   KpiCard(
                     title: "Payments Collected Today",
-                    value: currencyFormat.format(metrics?.todayCollectedAmount ?? 0),
+                    value: currencyFormat
+                        .format(metrics?.todayCollectedAmount ?? 0),
                     subtitle: 'Cash, UPI & Bank receipts',
                     icon: Icons.payments_rounded,
                     accentColor: kcSuccessColor,
@@ -290,7 +308,8 @@ class HomeView extends StackedView<HomeViewModel> {
                   ),
                   KpiCard(
                     title: 'Total Outstanding Balance',
-                    value: currencyFormat.format(metrics?.totalOutstandingDealerBalance ?? 0),
+                    value: currencyFormat
+                        .format(metrics?.totalOutstandingDealerBalance ?? 0),
                     subtitle: 'All active dealers receivable',
                     icon: Icons.account_balance_wallet_rounded,
                     accentColor: kcErrorColor,
@@ -314,11 +333,19 @@ class HomeView extends StackedView<HomeViewModel> {
                   KpiCard(
                     title: 'Low-Stock Inventory Alerts',
                     value: '${metrics?.lowStockItemsCount ?? 0} Items',
-                    subtitle: (metrics?.lowStockItemsCount ?? 0) > 0 ? 'Requires replenishment' : 'Adequately stocked',
+                    subtitle: (metrics?.lowStockItemsCount ?? 0) > 0
+                        ? 'Requires replenishment'
+                        : 'Adequately stocked',
                     icon: Icons.warning_amber_rounded,
-                    accentColor: (metrics?.lowStockItemsCount ?? 0) > 0 ? kcWarningColor : kcSuccessColor,
-                    badgeText: (metrics?.lowStockItemsCount ?? 0) > 0 ? 'ATTENTION' : 'HEALTHY',
-                    badgeColor: (metrics?.lowStockItemsCount ?? 0) > 0 ? kcWarningColor : kcSuccessColor,
+                    accentColor: (metrics?.lowStockItemsCount ?? 0) > 0
+                        ? kcWarningColor
+                        : kcSuccessColor,
+                    badgeText: (metrics?.lowStockItemsCount ?? 0) > 0
+                        ? 'ATTENTION'
+                        : 'HEALTHY',
+                    badgeColor: (metrics?.lowStockItemsCount ?? 0) > 0
+                        ? kcWarningColor
+                        : kcSuccessColor,
                   ),
                   const KpiCard(
                     title: 'Operating Zone & Currency',
@@ -377,7 +404,8 @@ class HomeView extends StackedView<HomeViewModel> {
                     flex: 4,
                     child: LowStockList(
                       items: viewModel.summary!.lowStockItems,
-                      onReorderPressed: () => viewModel.onShortcutSelected('purchases'),
+                      onReorderPressed: () =>
+                          viewModel.onShortcutSelected('purchases'),
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -385,7 +413,8 @@ class HomeView extends StackedView<HomeViewModel> {
                     flex: 6,
                     child: RecentTransactionsList(
                       transactions: viewModel.summary!.recentTransactions,
-                      onViewAllPressed: () => viewModel.onShortcutSelected('ledger'),
+                      onViewAllPressed: () =>
+                          viewModel.onShortcutSelected('ledger'),
                     ),
                   ),
                 ],
@@ -393,7 +422,8 @@ class HomeView extends StackedView<HomeViewModel> {
             else ...[
               LowStockList(
                 items: viewModel.summary!.lowStockItems,
-                onReorderPressed: () => viewModel.onShortcutSelected('purchases'),
+                onReorderPressed: () =>
+                    viewModel.onShortcutSelected('purchases'),
               ),
               const SizedBox(height: 20),
               RecentTransactionsList(
@@ -463,7 +493,8 @@ class HomeView extends StackedView<HomeViewModel> {
                 color: kcErrorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.cloud_off_rounded, color: kcErrorColor, size: 36),
+              child: const Icon(Icons.cloud_off_rounded,
+                  color: kcErrorColor, size: 36),
             ),
             const SizedBox(height: 20),
             Text(
@@ -476,9 +507,11 @@ class HomeView extends StackedView<HomeViewModel> {
             ),
             const SizedBox(height: 8),
             Text(
-              viewModel.errorMessage ?? 'An error occurred while fetching real-time dealer records.',
+              viewModel.errorMessage ??
+                  'An error occurred while fetching real-time dealer records.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 13, color: kcTextSecondary, height: 1.5),
+              style: GoogleFonts.inter(
+                  fontSize: 13, color: kcTextSecondary, height: 1.5),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -491,8 +524,10 @@ class HomeView extends StackedView<HomeViewModel> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
           ],
@@ -519,7 +554,8 @@ class HomeView extends StackedView<HomeViewModel> {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: kcTextSecondary, fontWeight: FontWeight.w600),
+              style: GoogleFonts.inter(
+                  color: kcTextSecondary, fontWeight: FontWeight.w600),
             ),
           ),
           ElevatedButton(
@@ -530,7 +566,8 @@ class HomeView extends StackedView<HomeViewModel> {
             style: ElevatedButton.styleFrom(
               backgroundColor: kcErrorColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             child: Text(
               'Sign Out',

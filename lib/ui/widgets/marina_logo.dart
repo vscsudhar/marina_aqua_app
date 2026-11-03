@@ -212,7 +212,9 @@ class MarinaLogo extends StatelessWidget {
           ? logoUrl
           : ((settings?.logoUrl != null && settings!.logoUrl!.isNotEmpty)
               ? settings.logoUrl
-              : user?.companyLogo);
+              : ((settings?.logoPath != null && settings!.logoPath!.isNotEmpty)
+                  ? settings.logoPath
+                  : user?.companyLogo));
 
       final effectiveName = (companyName != null && companyName!.trim().isNotEmpty)
           ? companyName

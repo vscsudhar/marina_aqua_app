@@ -167,6 +167,8 @@ class HomeViewModel extends ReactiveViewModel {
         return Routes.dailyCollectionView;
       case 'ledger':
         return Routes.dealerLedgerView;
+      case 'bottle_ledger':
+        return '/bottle-ledger';
       case 'purchases':
         return Routes.purchasesView;
       case 'products':

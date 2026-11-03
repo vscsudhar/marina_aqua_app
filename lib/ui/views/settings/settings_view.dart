@@ -244,10 +244,10 @@ class SettingsView extends StackedView<SettingsViewModel> {
                     borderRadius: BorderRadius.circular(8),
                     child: viewModel.previewLogoBytes != null
                         ? Image.memory(viewModel.previewLogoBytes!, fit: BoxFit.contain)
-                        : s.logoUrl != null
+                        : (s.logoUrl != null || s.logoPath != null)
                             ? Image.network(
-                                ApiService.resolveLogoUrl(s.logoUrl) ?? s.logoUrl!,
-                                key: ValueKey(s.logoUrl),
+                                ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? s.logoUrl ?? s.logoPath!,
+                                key: ValueKey(ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? s.logoUrl),
                                 fit: BoxFit.contain,
                                 errorBuilder: (_, __, ___) => const Center(
                                   child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 36),
@@ -1067,7 +1067,9 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                           }
                           final rawUrl = (s.logoUrl != null && s.logoUrl!.isNotEmpty)
                               ? s.logoUrl
-                              : viewModel.companyLogo;
+                              : ((s.logoPath != null && s.logoPath!.isNotEmpty)
+                                  ? s.logoPath
+                                  : viewModel.companyLogo);
                           final resolved = ApiService.resolveLogoUrl(rawUrl);
                           if (resolved != null && resolved.isNotEmpty) {
                             return Image.network(

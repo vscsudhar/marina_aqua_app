@@ -22,7 +22,8 @@ class UsersView extends StackedView<UsersViewModel> {
   }
 
   @override
-  Widget builder(BuildContext context, UsersViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, UsersViewModel viewModel, Widget? child) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 768;
 
@@ -83,7 +84,8 @@ class UsersView extends StackedView<UsersViewModel> {
                     Expanded(
                       child: Text(
                         viewModel.errorMessage!,
-                        style: GoogleFonts.inter(color: Colors.red.shade800, fontSize: 13),
+                        style: GoogleFonts.inter(
+                            color: Colors.red.shade800, fontSize: 13),
                       ),
                     ),
                   ],
@@ -108,7 +110,8 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  Widget _buildPlanUsageBanner(BuildContext context, UsersViewModel viewModel, bool isMobile) {
+  Widget _buildPlanUsageBanner(
+      BuildContext context, UsersViewModel viewModel, bool isMobile) {
     final isLimitReached = viewModel.isLimitReached;
 
     return Container(
@@ -124,7 +127,8 @@ class UsersView extends StackedView<UsersViewModel> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: (isLimitReached ? Colors.red : const Color(0xFF0F766E)).withValues(alpha: 0.25),
+            color: (isLimitReached ? Colors.red : const Color(0xFF0F766E))
+                .withValues(alpha: 0.25),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -139,7 +143,9 @@ class UsersView extends StackedView<UsersViewModel> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              isLimitReached ? Icons.warning_amber_rounded : Icons.workspace_premium_rounded,
+              isLimitReached
+                  ? Icons.warning_amber_rounded
+                  : Icons.workspace_premium_rounded,
               color: Colors.white,
               size: 28,
             ),
@@ -163,7 +169,8 @@ class UsersView extends StackedView<UsersViewModel> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(12),
@@ -179,7 +186,8 @@ class UsersView extends StackedView<UsersViewModel> {
                     ),
                     if (viewModel.formattedExpiresAt != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: viewModel.isPlanExpired
                               ? Colors.black.withValues(alpha: 0.35)
@@ -232,7 +240,8 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  Widget _buildControlsBar(BuildContext context, UsersViewModel viewModel, bool isMobile) {
+  Widget _buildControlsBar(
+      BuildContext context, UsersViewModel viewModel, bool isMobile) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -248,10 +257,13 @@ class UsersView extends StackedView<UsersViewModel> {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Search by staff name, email, or phone...',
-                    hintStyle: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade500),
-                    prefixIcon: const Icon(Icons.search, size: 20, color: Colors.grey),
+                    hintStyle: GoogleFonts.inter(
+                        fontSize: 13, color: Colors.grey.shade500),
+                    prefixIcon:
+                        const Icon(Icons.search, size: 20, color: Colors.grey),
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: const BorderSide(color: kcBorderColor),
@@ -274,7 +286,8 @@ class UsersView extends StackedView<UsersViewModel> {
                     horizontal: isMobile ? 12 : 18,
                     vertical: 14,
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: viewModel.isLimitReached
                     ? () {
@@ -315,7 +328,8 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  Widget _buildRoleFilterChip(UsersViewModel viewModel, String roleKey, String label) {
+  Widget _buildRoleFilterChip(
+      UsersViewModel viewModel, String roleKey, String label) {
     final isSelected = viewModel.selectedRole == roleKey;
     return ChoiceChip(
       label: Text(
@@ -333,7 +347,8 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  Widget _buildUsersList(BuildContext context, UsersViewModel viewModel, bool isMobile) {
+  Widget _buildUsersList(
+      BuildContext context, UsersViewModel viewModel, bool isMobile) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -354,7 +369,8 @@ class UsersView extends StackedView<UsersViewModel> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: _getRoleColor(user.role).withValues(alpha: 0.15),
+                backgroundColor:
+                    _getRoleColor(user.role).withValues(alpha: 0.15),
                 child: Text(
                   user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                   style: GoogleFonts.outfit(
@@ -385,7 +401,8 @@ class UsersView extends StackedView<UsersViewModel> {
                         if (isSelf) ...[
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: kcPrimaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
@@ -405,13 +422,15 @@ class UsersView extends StackedView<UsersViewModel> {
                     const SizedBox(height: 2),
                     Text(
                       user.email,
-                      style: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade600),
+                      style: GoogleFonts.inter(
+                          fontSize: 13, color: Colors.grey.shade600),
                     ),
                     if (user.phone != null && user.phone!.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
                         user.phone!,
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade500),
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: Colors.grey.shade500),
                       ),
                     ],
                   ],
@@ -420,7 +439,8 @@ class UsersView extends StackedView<UsersViewModel> {
               const SizedBox(width: 8),
               // Role badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: _getRoleColor(user.role).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -438,7 +458,7 @@ class UsersView extends StackedView<UsersViewModel> {
               // Status & Actions
               Switch(
                 value: user.isActive,
-                activeColor: kcPrimaryColor,
+                activeThumbColor: kcPrimaryColor,
                 onChanged: isSelf ? null : (_) => viewModel.toggleStatus(user),
               ),
               PopupMenuButton<String>(
@@ -466,7 +486,8 @@ class UsersView extends StackedView<UsersViewModel> {
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                          Icon(Icons.delete_outline,
+                              size: 18, color: Colors.red),
                           SizedBox(width: 8),
                           Text('Delete', style: TextStyle(color: Colors.red)),
                         ],
@@ -502,7 +523,8 @@ class UsersView extends StackedView<UsersViewModel> {
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            Icon(Icons.group_off_rounded, size: 56, color: Colors.grey.shade400),
+            Icon(Icons.group_off_rounded,
+                size: 56, color: Colors.grey.shade400),
             const SizedBox(height: 12),
             Text(
               'No Staff Accounts Found',
@@ -515,7 +537,8 @@ class UsersView extends StackedView<UsersViewModel> {
             const SizedBox(height: 4),
             Text(
               'Create staff accounts to let team members access your business workspace.',
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade600),
+              style:
+                  GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
           ],
@@ -535,10 +558,12 @@ class UsersView extends StackedView<UsersViewModel> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             'Add Staff User',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.w700, color: kcDeepNavy),
+            style: GoogleFonts.outfit(
+                fontWeight: FontWeight.w700, color: kcDeepNavy),
           ),
           content: SingleChildScrollView(
             child: SizedBox(
@@ -586,17 +611,22 @@ class UsersView extends StackedView<UsersViewModel> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: selectedRole,
+                    initialValue: selectedRole,
                     decoration: const InputDecoration(
                       labelText: 'Role *',
                       isDense: true,
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'manager', child: Text('Operations Manager')),
-                      DropdownMenuItem(value: 'accountant', child: Text('Accountant')),
-                      DropdownMenuItem(value: 'sales_rep', child: Text('Sales Representative')),
-                      DropdownMenuItem(value: 'admin', child: Text('Company Co-Admin')),
+                      DropdownMenuItem(
+                          value: 'manager', child: Text('Operations Manager')),
+                      DropdownMenuItem(
+                          value: 'accountant', child: Text('Accountant')),
+                      DropdownMenuItem(
+                          value: 'sales_rep',
+                          child: Text('Sales Representative')),
+                      DropdownMenuItem(
+                          value: 'admin', child: Text('Company Co-Admin')),
                     ],
                     onChanged: (val) {
                       if (val != null) setState(() => selectedRole = val);
@@ -621,7 +651,8 @@ class UsersView extends StackedView<UsersViewModel> {
                     emailCtrl.text.trim().isEmpty ||
                     passCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please fill all required fields.')),
+                    const SnackBar(
+                        content: Text('Please fill all required fields.')),
                   );
                   return;
                 }
@@ -631,7 +662,9 @@ class UsersView extends StackedView<UsersViewModel> {
                   email: emailCtrl.text.trim(),
                   password: passCtrl.text.trim(),
                   role: selectedRole,
-                  phone: phoneCtrl.text.trim().isNotEmpty ? phoneCtrl.text.trim() : null,
+                  phone: phoneCtrl.text.trim().isNotEmpty
+                      ? phoneCtrl.text.trim()
+                      : null,
                 );
 
                 if (success && ctx.mounted) {
@@ -652,7 +685,8 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  void _showEditUserDialog(BuildContext context, UsersViewModel viewModel, UserModel user) {
+  void _showEditUserDialog(
+      BuildContext context, UsersViewModel viewModel, UserModel user) {
     final nameCtrl = TextEditingController(text: user.name);
     final emailCtrl = TextEditingController(text: user.email);
     final phoneCtrl = TextEditingController(text: user.phone ?? '');
@@ -663,10 +697,12 @@ class UsersView extends StackedView<UsersViewModel> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             'Edit Staff User',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.w700, color: kcDeepNavy),
+            style: GoogleFonts.outfit(
+                fontWeight: FontWeight.w700, color: kcDeepNavy),
           ),
           content: SingleChildScrollView(
             child: SizedBox(
@@ -712,17 +748,22 @@ class UsersView extends StackedView<UsersViewModel> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: selectedRole,
+                    initialValue: selectedRole,
                     decoration: const InputDecoration(
                       labelText: 'Role *',
                       isDense: true,
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'manager', child: Text('Operations Manager')),
-                      DropdownMenuItem(value: 'accountant', child: Text('Accountant')),
-                      DropdownMenuItem(value: 'sales_rep', child: Text('Sales Representative')),
-                      DropdownMenuItem(value: 'admin', child: Text('Company Co-Admin')),
+                      DropdownMenuItem(
+                          value: 'manager', child: Text('Operations Manager')),
+                      DropdownMenuItem(
+                          value: 'accountant', child: Text('Accountant')),
+                      DropdownMenuItem(
+                          value: 'sales_rep',
+                          child: Text('Sales Representative')),
+                      DropdownMenuItem(
+                          value: 'admin', child: Text('Company Co-Admin')),
                     ],
                     onChanged: (val) {
                       if (val != null) setState(() => selectedRole = val);
@@ -749,7 +790,9 @@ class UsersView extends StackedView<UsersViewModel> {
                   email: emailCtrl.text.trim(),
                   role: selectedRole,
                   phone: phoneCtrl.text.trim(),
-                  password: passCtrl.text.trim().isNotEmpty ? passCtrl.text.trim() : null,
+                  password: passCtrl.text.trim().isNotEmpty
+                      ? passCtrl.text.trim()
+                      : null,
                 );
 
                 if (success && ctx.mounted) {
@@ -770,19 +813,22 @@ class UsersView extends StackedView<UsersViewModel> {
     );
   }
 
-  void _confirmDelete(BuildContext context, UsersViewModel viewModel, UserModel user) {
+  void _confirmDelete(
+      BuildContext context, UsersViewModel viewModel, UserModel user) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete User?'),
-        content: Text('Are you sure you want to delete ${user.name} (${user.email})? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete ${user.name} (${user.email})? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await viewModel.deleteUser(user);

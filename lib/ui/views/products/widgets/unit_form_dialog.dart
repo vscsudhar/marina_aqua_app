@@ -32,13 +32,37 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
   String? _errorMessage;
 
   static const List<Map<String, String>> presets = [
-    {'name': 'Litre', 'code': 'LTR', 'desc': 'Volume in litres for bottled water and 20L cans'},
-    {'name': 'Millilitre', 'code': 'ML', 'desc': 'Volume in millilitres (200ml, 500ml)'},
-    {'name': 'Numbers', 'code': 'NOS', 'desc': 'Individual piece count or count of cans'},
-    {'name': 'Kilogram', 'code': 'KG', 'desc': 'Mass in kilograms for bulk plastics, resin, scrap'},
-    {'name': 'Pack', 'code': 'PACK', 'desc': 'Shrink-wrapped bottle package (e.g. 12 pack, 24 pack)'},
+    {
+      'name': 'Litre',
+      'code': 'LTR',
+      'desc': 'Volume in litres for bottled water and 20L cans'
+    },
+    {
+      'name': 'Millilitre',
+      'code': 'ML',
+      'desc': 'Volume in millilitres (200ml, 500ml)'
+    },
+    {
+      'name': 'Numbers',
+      'code': 'NOS',
+      'desc': 'Individual piece count or count of cans'
+    },
+    {
+      'name': 'Kilogram',
+      'code': 'KG',
+      'desc': 'Mass in kilograms for bulk plastics, resin, scrap'
+    },
+    {
+      'name': 'Pack',
+      'code': 'PACK',
+      'desc': 'Shrink-wrapped bottle package (e.g. 12 pack, 24 pack)'
+    },
     {'name': 'Can', 'code': 'CAN', 'desc': '20L bubble water top cans'},
-    {'name': 'Box', 'code': 'BOX', 'desc': 'Corrugated boxes for bottled water shipping'},
+    {
+      'name': 'Box',
+      'code': 'BOX',
+      'desc': 'Corrugated boxes for bottled water shipping'
+    },
   ];
 
   @override
@@ -46,7 +70,8 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.unit?.name ?? '');
     _codeController = TextEditingController(text: widget.unit?.code ?? '');
-    _descriptionController = TextEditingController(text: widget.unit?.description ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.unit?.description ?? '');
     _isActive = widget.unit?.isActive ?? true;
   }
 
@@ -78,7 +103,9 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
       final result = await widget.onSave(
         name: _nameController.text.trim(),
         code: _codeController.text.trim().toUpperCase(),
-        description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
         isActive: _isActive,
       );
       if (mounted) {
@@ -86,7 +113,10 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString().replaceFirst('ApiException: ', '').replaceFirst('Exception: ', '');
+        _errorMessage = e
+            .toString()
+            .replaceFirst('ApiException: ', '')
+            .replaceFirst('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -127,15 +157,18 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: kcAquaCyan.withOpacity(0.12),
+                              color: kcAquaCyan.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.straighten_rounded, color: kcAquaTeal, size: 22),
+                            child: const Icon(Icons.straighten_rounded,
+                                color: kcAquaTeal, size: 22),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              isEditing ? 'Edit Unit of Measurement' : 'Add Measurement Unit',
+                              isEditing
+                                  ? 'Edit Unit of Measurement'
+                                  : 'Add Measurement Unit',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -157,7 +190,10 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                 if (!isEditing) ...[
                   const Text(
                     'Quick Presets (Click to autofill):',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kcTextSecondary),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kcTextSecondary),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -169,12 +205,16 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                         label: Text('${preset['name']} (${preset['code']})'),
                         labelStyle: TextStyle(
                           fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected ? kcPrimaryDark : kcTextSecondary,
                         ),
-                        backgroundColor: isSelected ? kcPrimaryLight.withOpacity(0.2) : kcVeryLightGrey,
+                        backgroundColor: isSelected
+                            ? kcPrimaryLight.withValues(alpha: 0.2)
+                            : kcVeryLightGrey,
                         side: BorderSide(
-                          color: isSelected ? kcPrimaryColor : Colors.transparent,
+                          color:
+                              isSelected ? kcPrimaryColor : Colors.transparent,
                         ),
                         onPressed: () => _applyPreset(preset),
                       );
@@ -184,20 +224,24 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                 ],
                 if (_errorMessage != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: kcErrorColor.withOpacity(0.1),
+                      color: kcErrorColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: kcErrorColor.withOpacity(0.3)),
+                      border: Border.all(
+                          color: kcErrorColor.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                        const Icon(Icons.error_outline,
+                            color: kcErrorColor, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _errorMessage!,
-                            style: const TextStyle(color: kcErrorColor, fontSize: 13),
+                            style: const TextStyle(
+                                color: kcErrorColor, fontSize: 13),
                           ),
                         ),
                       ],
@@ -251,10 +295,13 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                 const SizedBox(height: 12),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: const Text('Make unit available in product dropdowns', style: TextStyle(fontSize: 12)),
+                  title: const Text('Active Status',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text(
+                      'Make unit available in product dropdowns',
+                      style: TextStyle(fontSize: 12)),
                   value: _isActive,
-                  activeColor: kcPrimaryColor,
+                  activeThumbColor: kcPrimaryColor,
                   onChanged: (val) => setState(() => _isActive = val),
                 ),
                 const SizedBox(height: 20),
@@ -265,22 +312,26 @@ class _UnitFormDialogState extends State<UnitFormDialog> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     TextButton(
-                      onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                      onPressed:
+                          _isSaving ? null : () => Navigator.of(context).pop(),
                       child: const Text('Cancel'),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kcPrimaryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: _isSaving ? null : _submit,
                       child: _isSaving
                           ? const SizedBox(
                               width: 18,
                               height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
                             )
                           : Text(isEditing ? 'Save Changes' : 'Create Unit'),
                     ),

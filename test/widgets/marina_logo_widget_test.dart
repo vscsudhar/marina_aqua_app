@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mockito/mockito.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
-import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/ui/views/login/login_view.dart';
 import 'package:marina_aqua/ui/widgets/marina_logo.dart';
 import '../helpers/test_helpers.dart';
@@ -18,7 +17,9 @@ void main() {
   tearDown(() => locator.reset());
 
   group('MarinaLogo Widget Tests', () {
-    testWidgets('When useCompanyLogo is false, it strictly renders MARINA AQUA brand and ignores company logo', (tester) async {
+    testWidgets(
+        'When useCompanyLogo is false, it strictly renders MARINA AQUA brand and ignores company logo',
+        (tester) async {
       final settingsService = getAndRegisterSettingsService();
       when(settingsService.settings).thenReturn(
         const CompanySettingModel(
@@ -50,7 +51,9 @@ void main() {
       expect(find.byType(Image), findsNothing);
     });
 
-    testWidgets('When useCompanyLogo is true, it renders company name from settings', (tester) async {
+    testWidgets(
+        'When useCompanyLogo is true, it renders company name from settings',
+        (tester) async {
       final settingsService = getAndRegisterSettingsService();
       when(settingsService.settings).thenReturn(
         const CompanySettingModel(
@@ -77,7 +80,9 @@ void main() {
       expect(find.text('DEALER SUITE'), findsOneWidget);
     });
 
-    testWidgets('LoginView renders with application brand logo (useCompanyLogo: false)', (tester) async {
+    testWidgets(
+        'LoginView renders with application brand logo (useCompanyLogo: false)',
+        (tester) async {
       final settingsService = getAndRegisterSettingsService();
       when(settingsService.settings).thenReturn(
         const CompanySettingModel(

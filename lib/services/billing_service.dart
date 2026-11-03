@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import '../app/app.locator.dart';
 import '../models/billing_models.dart';
@@ -78,6 +80,40 @@ class BillingService {
     return InvoiceModel.fromJson(response.data['data'] as Map<String, dynamic>);
   }
 
+  /// Get next lowest available invoice number (reusing deleted numbers)
+  Future<String> getNextInvoiceNumber({String? prefix}) async {
+    final response = await _apiService.client.get(
+      '/invoices/next-number',
+      queryParameters: prefix != null ? {'prefix': prefix} : null,
+    );
+    final data = response.data['data'] as Map<String, dynamic>;
+    return data['next_invoice_no']?.toString() ?? 'INV-1';
+  }
+
+  /// Validate if an invoice number is available
+  Future<Map<String, dynamic>> validateInvoiceNumber(String invoiceNo, {int? excludeId}) async {
+    final response = await _apiService.client.post(
+      '/invoices/validate-number',
+      data: {
+        'invoice_no': invoiceNo,
+        if (excludeId != null) 'exclude_id': excludeId,
+      },
+    );
+    return response.data['data'] as Map<String, dynamic>;
+  }
+
+  /// Change existing invoice number
+  Future<InvoiceModel> updateInvoiceNumber(int id, String newInvoiceNo, {String? reason}) async {
+    final response = await _apiService.client.patch(
+      '/invoices/$id/number',
+      data: {
+        'invoice_no': newInvoiceNo,
+        if (reason != null) 'reason': reason,
+      },
+    );
+    return InvoiceModel.fromJson(response.data['data'] as Map<String, dynamic>);
+  }
+
   /// Create invoice (draft or finalized)
   Future<InvoiceModel> createInvoice(Map<String, dynamic> data) async {
     final response = await _apiService.client.post(
@@ -106,7 +142,10 @@ class BillingService {
   Future<InvoiceModel> cancelInvoice(int id, String reason) async {
     final response = await _apiService.client.post(
       '/invoices/$id/cancel',
-      data: {'cancellation_reason': reason},
+      data: {
+        'reason': reason,
+        'cancellation_reason': reason,
+      },
     );
     return InvoiceModel.fromJson(response.data['data'] as Map<String, dynamic>);
   }
@@ -144,12 +183,34 @@ class BillingService {
     return '${_apiService.client.options.baseUrl}/invoices/$id/print';
   }
 
+  /// Get direct HTML view URL (accessible directly by any browser tab)
+  String getInvoiceHtmlUrl(int id) {
+    final base = _apiService.client.options.baseUrl;
+    final root = base.replaceAll(RegExp(r'/api/v1/?$'), '');
+    return '$root/invoices/$id';
+  }
+
+  /// Get public HTML view URL under /api/v1
+  String getPublicInvoiceHtmlUrl(int id) {
+    return '${_apiService.client.options.baseUrl}/public/invoices/$id/html';
+  }
+
   /// Download PDF raw bytes with auth header
   Future<List<int>> downloadPdfBytes(int id) async {
     final response = await _apiService.client.get(
       '/invoices/$id/pdf',
       options: Options(responseType: ResponseType.bytes),
     );
-    return response.data as List<int>;
+    final data = response.data;
+    if (data is Uint8List) {
+      return data.toList();
+    } else if (data is ByteBuffer) {
+      return data.asUint8List().toList();
+    } else if (data is List<int>) {
+      return data;
+    } else if (data is List) {
+      return List<int>.from(data);
+    }
+    return (data as List<dynamic>).cast<int>();
   }
 }

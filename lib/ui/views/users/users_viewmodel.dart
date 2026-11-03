@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import '../../../models/user_model.dart';
-import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_management_service.dart';
 import '../../../app/app.locator.dart';
@@ -25,19 +23,39 @@ class UsersViewModel extends BaseViewModel {
   UserModel? get currentUser => _authService.currentUser;
 
   int get maxUsers => (_planUsage['max_users'] as num?)?.toInt() ?? 5;
-  int get currentUsers => (_planUsage['current_users'] as num?)?.toInt() ?? _users.length;
-  int get remainingSlots => (_planUsage['remaining_slots'] as num?)?.toInt() ?? (maxUsers - currentUsers);
-  bool get isLimitReached => _planUsage['is_limit_reached'] == true || currentUsers >= maxUsers;
-  String get planName => _planUsage['plan_name'] as String? ?? (currentUser?.planName ?? 'Standard');
+  int get currentUsers =>
+      (_planUsage['current_users'] as num?)?.toInt() ?? _users.length;
+  int get remainingSlots =>
+      (_planUsage['remaining_slots'] as num?)?.toInt() ??
+      (maxUsers - currentUsers);
+  bool get isLimitReached =>
+      _planUsage['is_limit_reached'] == true || currentUsers >= maxUsers;
+  String get planName =>
+      _planUsage['plan_name'] as String? ??
+      (currentUser?.planName ?? 'Standard');
 
-  String? get rawExpiresAt => _planUsage['expires_at'] as String? ?? currentUser?.planExpiresAt;
+  String? get rawExpiresAt =>
+      _planUsage['expires_at'] as String? ?? currentUser?.planExpiresAt;
 
   String? get formattedExpiresAt {
     final raw = rawExpiresAt;
     if (raw == null || raw.isEmpty) return null;
     final dt = DateTime.tryParse(raw);
     if (dt == null) return raw;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return '${dt.day.toString().padLeft(2, '0')}-${months[dt.month - 1]}-${dt.year}';
   }
 

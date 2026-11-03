@@ -48,7 +48,9 @@ void main() {
   }
 
   group('Responsive Layout & Horizontal Scroll Tests -', () {
-    testWidgets('DealerLedgerView renders horizontally scrollable report table on mobile & desktop', (tester) async {
+    testWidgets(
+        'DealerLedgerView renders horizontally scrollable report table on mobile & desktop',
+        (tester) async {
       final ledgerService = locator<DealerLedgerReportService>();
       final dealerService = locator<DealerService>();
 
@@ -181,10 +183,13 @@ void main() {
             formatted: '01/10/2026',
             period: 1,
             dealers: {
-              1: LedgerDealerDayEntry(caneQty: 10, fillingAmount: 500, paymentsReceived: 0),
+              1: LedgerDealerDayEntry(
+                  caneQty: 10, fillingAmount: 500, paymentsReceived: 0),
             },
-            others: LedgerDayOthersEntry(caneQty: 0, fillingAmount: 0, paymentsReceived: 0),
-            totals: LedgerDayTotalsEntry(caneQty: 10, fillingAmount: 500, paymentsReceived: 0),
+            others: LedgerDayOthersEntry(
+                caneQty: 0, fillingAmount: 0, paymentsReceived: 0),
+            totals: LedgerDayTotalsEntry(
+                caneQty: 10, fillingAmount: 500, paymentsReceived: 0),
           ),
         ],
         period1Summary: testPeriod1Summary,
@@ -208,7 +213,8 @@ void main() {
                 isActive: true,
               )
             ],
-            meta: PaginationMeta(currentPage: 1, perPage: 100, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 100, total: 1, lastPage: 1),
           ));
 
       when(ledgerService.getMonthlyLedger(
@@ -220,7 +226,8 @@ void main() {
 
       // 1. Phone Viewport (375 x 812)
       await tester.binding.setSurfaceSize(const Size(375, 812));
-      await tester.pumpWidget(createTestWidget(const DealerLedgerView(), size: const Size(375, 812)));
+      await tester.pumpWidget(createTestWidget(const DealerLedgerView(),
+          size: const Size(375, 812)));
       await tester.pumpAndSettle();
 
       expect(find.text('Dealer Ledger Reports'), findsOneWidget);
@@ -228,13 +235,15 @@ void main() {
 
       // Verify horizontal scroll exists for wide reports
       final horizontalScroll = find.byWidgetPredicate(
-        (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
+        (w) =>
+            w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
       );
       expect(horizontalScroll, findsWidgets);
 
       // 2. Desktop Viewport (1280 x 800)
       await tester.binding.setSurfaceSize(const Size(1280, 800));
-      await tester.pumpWidget(createTestWidget(const DealerLedgerView(), size: const Size(1280, 800)));
+      await tester.pumpWidget(createTestWidget(const DealerLedgerView(),
+          size: const Size(1280, 800)));
       await tester.pumpAndSettle();
 
       expect(find.text('Dealer Ledger Reports'), findsOneWidget);
@@ -242,36 +251,58 @@ void main() {
       expect(find.text('Sri Murugan Aqua'), findsWidgets);
     });
 
-    testWidgets('InvoicesView renders responsive KPI cards and sales register actions', (tester) async {
+    testWidgets(
+        'InvoicesView renders responsive KPI cards and sales register actions',
+        (tester) async {
       final billingService = locator<BillingService>();
       final dealerService = locator<DealerService>();
       final productService = locator<ProductMasterService>();
 
-      when(billingService.getCompanySettings()).thenAnswer((_) async => const CompanySettingModel(id: 1, companyName: 'Marina Aqua Co.'));
-      when(dealerService.getDealers(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search'), isActive: anyNamed('isActive')))
-          .thenAnswer((_) async => const PaginatedList<DealerModel>(items: [], meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 0)));
+      when(billingService.getCompanySettings()).thenAnswer((_) async =>
+          const CompanySettingModel(id: 1, companyName: 'Marina Aqua Co.'));
+      when(dealerService.getDealers(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search'),
+              isActive: anyNamed('isActive')))
+          .thenAnswer((_) async => const PaginatedList<DealerModel>(
+              items: [],
+              meta: PaginationMeta(
+                  currentPage: 1, lastPage: 1, perPage: 15, total: 0)));
       when(productService.getAllProducts(activeOnly: true))
           .thenAnswer((_) async => <ProductModel>[]);
-      when(billingService.getInvoices(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search'), status: anyNamed('status'), paymentStatus: anyNamed('paymentStatus'), dealerId: anyNamed('dealerId'), startDate: anyNamed('startDate'), endDate: anyNamed('endDate')))
-          .thenAnswer((_) async => PaginatedList<InvoiceModel>(items: [
-                InvoiceModel(
-                  id: 1,
-                  invoiceNo: 'INV-2026-0001',
-                  invoiceDate: '2026-10-30',
-                  customerName: 'Grand Hotel',
-                  taxableAmount: 1000,
-                  taxTotal: 180,
-                  grandTotal: 1180,
-                  paidAmount: 500,
-                  balanceDue: 680,
-                  status: 'finalized',
-                  paymentStatus: 'partially_paid',
-                ),
-              ], meta: const PaginationMeta(total: 1, currentPage: 1, lastPage: 1, perPage: 15)));
+      when(billingService.getInvoices(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search'),
+              status: anyNamed('status'),
+              paymentStatus: anyNamed('paymentStatus'),
+              dealerId: anyNamed('dealerId'),
+              startDate: anyNamed('startDate'),
+              endDate: anyNamed('endDate')))
+          .thenAnswer((_) async => const PaginatedList<InvoiceModel>(
+                  items: [
+                    InvoiceModel(
+                      id: 1,
+                      invoiceNo: 'INV-2026-0001',
+                      invoiceDate: '2026-10-30',
+                      customerName: 'Grand Hotel',
+                      taxableAmount: 1000,
+                      taxTotal: 180,
+                      grandTotal: 1180,
+                      paidAmount: 500,
+                      balanceDue: 680,
+                      status: 'finalized',
+                      paymentStatus: 'partially_paid',
+                    ),
+                  ],
+                  meta: PaginationMeta(
+                      total: 1, currentPage: 1, lastPage: 1, perPage: 15)));
 
       // Test Tablet Viewport (768 x 1024)
       await tester.binding.setSurfaceSize(const Size(768, 1024));
-      await tester.pumpWidget(createTestWidget(const InvoicesView(), size: const Size(768, 1024)));
+      await tester.pumpWidget(
+          createTestWidget(const InvoicesView(), size: const Size(768, 1024)));
       await tester.pumpAndSettle();
 
       expect(find.text('Tax Invoices & Billing Management'), findsOneWidget);
@@ -286,16 +317,20 @@ void main() {
       expect(find.text('Print'), findsOneWidget);
     });
 
-    testWidgets('LoginView renders responsive card and validates required fields', (tester) async {
+    testWidgets(
+        'LoginView renders responsive card and validates required fields',
+        (tester) async {
       await tester.binding.setSurfaceSize(const Size(375, 812));
-      await tester.pumpWidget(createTestWidget(const LoginView(), size: const Size(375, 812)));
+      await tester.pumpWidget(
+          createTestWidget(const LoginView(), size: const Size(375, 812)));
       await tester.pumpAndSettle();
 
       expect(find.text('MARINA'), findsWidgets);
       expect(find.text('Sign in to your account'), findsOneWidget);
 
       // Trigger login without input to test validation
-      final signInButton = find.widgetWithText(ElevatedButton, 'Sign In to Portal');
+      final signInButton =
+          find.widgetWithText(ElevatedButton, 'Sign In to Portal');
       expect(signInButton, findsOneWidget);
       await tester.tap(signInButton);
       await tester.pumpAndSettle();
@@ -304,7 +339,9 @@ void main() {
       expect(find.text('Please enter your email or username.'), findsOneWidget);
     });
 
-    testWidgets('AppSidebar renders all quick action shortcuts and responds to clicks', (tester) async {
+    testWidgets(
+        'AppSidebar renders all quick action shortcuts and responds to clicks',
+        (tester) async {
       String? selectedModule;
       bool logoutClicked = false;
 
@@ -356,7 +393,9 @@ void main() {
       expect(logoutClicked, isTrue);
     });
 
-    testWidgets('Dealer Management and Contract Price module handles pricing tag onTap, action edit, and updates rate in DB', (tester) async {
+    testWidgets(
+        'Dealer Management and Contract Price module handles pricing tag onTap, action edit, and updates rate in DB',
+        (tester) async {
       final dealerService = locator<DealerService>();
       final productService = locator<ProductMasterService>();
 
@@ -402,7 +441,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       when(productService.getAllProducts(activeOnly: true))
@@ -424,18 +464,20 @@ void main() {
         'is_active': true,
       };
 
-      when(dealerService.setDealerPrice(1, expectedPayload)).thenAnswer((_) async => const DealerProductPriceModel(
-            id: 10,
-            dealerId: 1,
-            productId: 1,
-            customPrice: 42.0,
-            effectiveFrom: '2026-10-30',
-            isActive: true,
-          ));
+      when(dealerService.setDealerPrice(1, expectedPayload))
+          .thenAnswer((_) async => const DealerProductPriceModel(
+                id: 10,
+                dealerId: 1,
+                productId: 1,
+                customPrice: 42.0,
+                effectiveFrom: '2026-10-30',
+                isActive: true,
+              ));
 
       // 1. Mobile Phone Viewport (375 x 812) - Layout & Responsive Checks
       await tester.binding.setSurfaceSize(const Size(375, 812));
-      await tester.pumpWidget(createTestWidget(const DealersView(), size: const Size(375, 812)));
+      await tester.pumpWidget(
+          createTestWidget(const DealersView(), size: const Size(375, 812)));
       await tester.pumpAndSettle();
 
       // Check view header, metric strip, and cards rendered overflow-free on mobile
@@ -447,7 +489,8 @@ void main() {
       await tester.tap(find.text('Product Pricing'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sri Murugan Aqua — Custom Product Pricing'), findsOneWidget);
+      expect(find.text('Sri Murugan Aqua — Custom Product Pricing'),
+          findsOneWidget);
       expect(find.text('20-Litre Water Can'), findsWidgets);
 
       // Close mobile dialog
@@ -456,7 +499,8 @@ void main() {
 
       // 2. Desktop Viewport (1280 x 800) - Test Pricing Tag onTap and DB Update
       await tester.binding.setSurfaceSize(const Size(1280, 800));
-      await tester.pumpWidget(createTestWidget(const DealersView(), size: const Size(1280, 800)));
+      await tester.pumpWidget(
+          createTestWidget(const DealersView(), size: const Size(1280, 800)));
       await tester.pumpAndSettle();
 
       // Open Dealer Pricing Dialog from desktop table
@@ -468,7 +512,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify visible horizontal scroll helper bar and Left/Right navigation buttons
-      expect(find.text('Drag bar or scroll horizontally to view all columns (Product, Rate, Tag, Date, Action)'), findsOneWidget);
+      expect(
+          find.text(
+              'Drag bar or scroll horizontally to view all columns (Product, Rate, Tag, Date, Action)'),
+          findsOneWidget);
       expect(find.text('Left'), findsOneWidget);
       expect(find.text('Right'), findsOneWidget);
       await tester.tap(find.text('Right'));
@@ -486,14 +533,17 @@ void main() {
       expect(find.text('Dealer Contract Price (₹) *'), findsOneWidget);
 
       // 4. Edit the price to 42.00 and tap "Update Rate in DB"
-      final priceField = find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(TextFormField),
-      ).first;
+      final priceField = find
+          .descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(TextFormField),
+          )
+          .first;
       expect(priceField, findsOneWidget);
       await tester.enterText(priceField, '42.00');
 
-      final updateButton = find.widgetWithText(ElevatedButton, 'Update Rate in DB');
+      final updateButton =
+          find.widgetWithText(ElevatedButton, 'Update Rate in DB');
       expect(updateButton, findsOneWidget);
       await tester.tap(updateButton);
       await tester.pumpAndSettle();
@@ -502,10 +552,15 @@ void main() {
       verify(dealerService.setDealerPrice(1, expectedPayload)).called(1);
 
       // Verify success snackbar shown
-      expect(find.text('Contract rate for 20-Litre Water Can updated to ₹42.00 in database.'), findsOneWidget);
+      expect(
+          find.text(
+              'Contract rate for 20-Litre Water Can updated to ₹42.00 in database.'),
+          findsOneWidget);
     });
 
-    testWidgets('HomeView shell keeps AppSidebar constant on desktop and changes only the right side page', (tester) async {
+    testWidgets(
+        'HomeView shell keeps AppSidebar constant on desktop and changes only the right side page',
+        (tester) async {
       final authService = locator<AuthService>();
       final dashboardService = locator<DashboardService>();
       final dealerService = locator<DealerService>();
@@ -543,7 +598,8 @@ void main() {
           ));
 
       when(dashboardService.getCharts(days: 14, months: 6)).thenAnswer(
-          (_) async => const DashboardChartsModel(dailyCollections: [], monthlySales: [], paymentModes: []));
+          (_) async => const DashboardChartsModel(
+              dailyCollections: [], monthlySales: [], paymentModes: []));
 
       when(dealerService.getDealers(
         page: anyNamed('page'),
@@ -552,22 +608,29 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 0, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 0, lastPage: 1),
           ));
 
-      when(productService.getAllProducts(activeOnly: true)).thenAnswer((_) async => []);
+      when(productService.getAllProducts(activeOnly: true))
+          .thenAnswer((_) async => []);
 
       await tester.binding.setSurfaceSize(const Size(1280, 800));
-      await tester.pumpWidget(createTestWidget(const HomeView(), size: const Size(1280, 800)));
+      await tester.pumpWidget(
+          createTestWidget(const HomeView(), size: const Size(1280, 800)));
       await tester.pumpAndSettle();
 
       // 1. Sidebar is constant on desktop
       expect(find.byType(AppSidebar), findsOneWidget);
-      final sidebarDealers = find.descendant(of: find.byType(AppSidebar), matching: find.text('Dealers & Rates'));
+      final sidebarDealers = find.descendant(
+          of: find.byType(AppSidebar), matching: find.text('Dealers & Rates'));
       expect(sidebarDealers, findsOneWidget);
 
       // Initial page is Dashboard
-      expect(find.text('Real-Time Water Distribution & Dealer Financial Ledger Summary'), findsOneWidget);
+      expect(
+          find.text(
+              'Real-Time Water Distribution & Dealer Financial Ledger Summary'),
+          findsOneWidget);
 
       // 2. Click "Dealers & Rates" in constant Sidebar
       await tester.tap(sidebarDealers);
@@ -580,7 +643,8 @@ void main() {
       expect(find.text('Dealer Management & Contract Pricing'), findsOneWidget);
 
       // 3. Click "Dashboard" in constant Sidebar to return
-      final sidebarDashboard = find.descendant(of: find.byType(AppSidebar), matching: find.text('Dashboard'));
+      final sidebarDashboard = find.descendant(
+          of: find.byType(AppSidebar), matching: find.text('Dashboard'));
       expect(sidebarDashboard, findsOneWidget);
       await tester.tap(sidebarDashboard);
       await tester.pumpAndSettle();
@@ -589,10 +653,15 @@ void main() {
       expect(find.byType(AppSidebar), findsOneWidget);
 
       // Right side page has changed back to Dashboard
-      expect(find.text('Real-Time Water Distribution & Dealer Financial Ledger Summary'), findsOneWidget);
+      expect(
+          find.text(
+              'Real-Time Water Distribution & Dealer Financial Ledger Summary'),
+          findsOneWidget);
     });
 
-    testWidgets('HomeView switches to SettingsView without setState/markNeedsBuild called during build error', (tester) async {
+    testWidgets(
+        'HomeView switches to SettingsView without setState/markNeedsBuild called during build error',
+        (tester) async {
       final authService = locator<AuthService>();
       final dashboardService = locator<DashboardService>();
       final settingsService = locator<SettingsService>();
@@ -628,7 +697,8 @@ void main() {
           ));
 
       when(dashboardService.getCharts(days: 14, months: 6)).thenAnswer(
-          (_) async => const DashboardChartsModel(dailyCollections: [], monthlySales: [], paymentModes: []));
+          (_) async => const DashboardChartsModel(
+              dailyCollections: [], monthlySales: [], paymentModes: []));
 
       when(settingsService.settings).thenReturn(const CompanySettingModel(
         id: 1,
@@ -636,28 +706,35 @@ void main() {
         currencySymbol: '₹',
       ));
       when(settingsService.isInitialized).thenReturn(true);
-      when(settingsService.getCompanySettings()).thenAnswer((_) async => const CompanySettingModel(
-        id: 1,
-        companyName: 'Marina Aqua',
-        currencySymbol: '₹',
-      ));
+      when(settingsService.getCompanySettings())
+          .thenAnswer((_) async => const CompanySettingModel(
+                id: 1,
+                companyName: 'Marina Aqua',
+                currencySymbol: '₹',
+              ));
       when(settingsService.getTaxRates(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
         search: anyNamed('search'),
         isActive: anyNamed('isActive'),
         taxType: anyNamed('taxType'),
-      )).thenAnswer((_) async => const PaginatedList(items: [], meta: PaginationMeta(currentPage: 1, perPage: 15, total: 0, lastPage: 1)));
+      )).thenAnswer((_) async => const PaginatedList(
+          items: [],
+          meta: PaginationMeta(
+              currentPage: 1, perPage: 15, total: 0, lastPage: 1)));
 
       await tester.binding.setSurfaceSize(const Size(1280, 1000));
-      await tester.pumpWidget(createTestWidget(const HomeView(), size: const Size(1280, 1000)));
+      await tester.pumpWidget(
+          createTestWidget(const HomeView(), size: const Size(1280, 1000)));
       await tester.pumpAndSettle();
 
-      final sidebarSettings = find.descendant(of: find.byType(AppSidebar), matching: find.text('Settings & Taxes'));
+      final sidebarSettings = find.descendant(
+          of: find.byType(AppSidebar), matching: find.text('Settings & Taxes'));
       await tester.scrollUntilVisible(
         sidebarSettings,
         50,
-        scrollable: find.descendant(of: find.byType(AppSidebar), matching: find.byType(Scrollable)),
+        scrollable: find.descendant(
+            of: find.byType(AppSidebar), matching: find.byType(Scrollable)),
       );
       expect(sidebarSettings, findsOneWidget);
 

@@ -27,7 +27,7 @@ void main() {
 
     tearDown(() => locator.reset());
 
-    final testCompanySettings = CompanySettingModel(
+    const testCompanySettings = CompanySettingModel(
       id: 1,
       companyName: 'Marina Aqua Pure Water Co.',
       phone: '+91 94441 23456',
@@ -37,14 +37,14 @@ void main() {
       pan: 'AABCM1234F',
     );
 
-    final testDealer = DealerModel(
+    const testDealer = DealerModel(
       id: 10,
       code: 'DLR-001',
       name: 'Marina Grand Hotel',
       phone: '9876543210',
     );
 
-    final testProduct = ProductModel(
+    const testProduct = ProductModel(
       id: 5,
       name: '20L Packaged Water Can',
       sku: 'WTR-CAN-20L',
@@ -57,7 +57,7 @@ void main() {
     );
 
     final testInvoices = [
-      InvoiceModel(
+      const InvoiceModel(
         id: 101,
         invoiceNo: 'INV-20261029-0001',
         invoiceDate: '2026-10-29',
@@ -92,7 +92,7 @@ void main() {
           ),
         ],
       ),
-      InvoiceModel(
+      const InvoiceModel(
         id: 102,
         invoiceNo: 'INV-20261029-0002',
         invoiceDate: '2026-10-29',
@@ -108,10 +108,14 @@ void main() {
       ),
     ];
 
-    test('initialize loads company settings, dealers, products and invoices', () async {
-      when(billingService.getCompanySettings()).thenAnswer((_) async => testCompanySettings);
-      when(dealerService.getAllDealers(activeOnly: anyNamed('activeOnly'))).thenAnswer((_) async => [testDealer]);
-      when(productService.getAllProducts(activeOnly: anyNamed('activeOnly'))).thenAnswer((_) async => [testProduct]);
+    test('initialize loads company settings, dealers, products and invoices',
+        () async {
+      when(billingService.getCompanySettings())
+          .thenAnswer((_) async => testCompanySettings);
+      when(dealerService.getAllDealers(activeOnly: anyNamed('activeOnly')))
+          .thenAnswer((_) async => [testDealer]);
+      when(productService.getAllProducts(activeOnly: anyNamed('activeOnly')))
+          .thenAnswer((_) async => [testProduct]);
       when(billingService.getInvoices(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -123,7 +127,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: testInvoices,
-            meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = InvoicesViewModel(
@@ -135,7 +140,8 @@ void main() {
 
       await viewModel.initialize();
 
-      expect(viewModel.companySettings.companyName, 'Marina Aqua Pure Water Co.');
+      expect(
+          viewModel.companySettings.companyName, 'Marina Aqua Pure Water Co.');
       expect(viewModel.dealers.length, 1);
       expect(viewModel.products.length, 1);
       expect(viewModel.invoices.length, 2);
@@ -146,7 +152,8 @@ void main() {
     });
 
     test('createInvoice delegates to service and reloads list', () async {
-      when(billingService.createInvoice(any)).thenAnswer((_) async => testInvoices.first);
+      when(billingService.createInvoice(any))
+          .thenAnswer((_) async => testInvoices.first);
       when(billingService.getInvoices(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -158,7 +165,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: testInvoices,
-            meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = InvoicesViewModel(billingService: billingService);
@@ -169,7 +177,8 @@ void main() {
     });
 
     test('finalizeInvoice calls service and updates success message', () async {
-      when(billingService.finalizeInvoice(102)).thenAnswer((_) async => testInvoices.first);
+      when(billingService.finalizeInvoice(102))
+          .thenAnswer((_) async => testInvoices.first);
       when(billingService.getInvoices(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -181,7 +190,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: testInvoices,
-            meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = InvoicesViewModel(billingService: billingService);
@@ -192,7 +202,8 @@ void main() {
     });
 
     test('cancelInvoice calls service with reason and updates list', () async {
-      when(billingService.cancelInvoice(101, 'Duplicate billing')).thenAnswer((_) async => testInvoices.first);
+      when(billingService.cancelInvoice(101, 'Duplicate billing'))
+          .thenAnswer((_) async => testInvoices.first);
       when(billingService.getInvoices(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -204,7 +215,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: testInvoices,
-            meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = InvoicesViewModel(billingService: billingService);
@@ -235,7 +247,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: testInvoices,
-            meta: PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = InvoicesViewModel(billingService: billingService);
@@ -246,7 +259,8 @@ void main() {
     });
 
     test('downloadInvoicePdf gets raw bytes from service', () async {
-      when(billingService.downloadPdfBytes(101)).thenAnswer((_) async => [37, 80, 68, 70]);
+      when(billingService.downloadPdfBytes(101))
+          .thenAnswer((_) async => [37, 80, 68, 70]);
 
       final viewModel = InvoicesViewModel(billingService: billingService);
       await viewModel.downloadInvoicePdf(testInvoices.first);

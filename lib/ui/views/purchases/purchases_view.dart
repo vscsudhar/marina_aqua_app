@@ -471,57 +471,60 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade200),
               itemBuilder: (context, index) {
                 final p = viewModel.purchases[index];
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: CircleAvatar(
-                    backgroundColor: p.isCancelled ? Colors.red.shade50 : Colors.blue.shade50,
-                    child: Icon(
-                      p.isCancelled ? Icons.cancel_outlined : Icons.receipt_long,
-                      color: p.isCancelled ? Colors.red : AppColors.primary,
-                      size: 20,
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: p.isCancelled ? Colors.red.shade50 : Colors.blue.shade50,
+                      child: Icon(
+                        p.isCancelled ? Icons.cancel_outlined : Icons.receipt_long,
+                        color: p.isCancelled ? Colors.red : AppColors.primary,
+                        size: 20,
+                      ),
                     ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(p.purchaseNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(width: 8),
-                      _statusChip(p.status),
-                      const SizedBox(width: 6),
-                      _paymentChip(p.paymentStatus),
-                    ],
-                  ),
-                  subtitle: Text(
-                    'Supplier: ${p.supplierName} • Date: ${p.purchaseDate}${p.invoiceNo != null ? ' • Inv: ${p.invoiceNo}' : ''} • ${p.items.length} items',
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(currencyFormat.format(p.totalAmount),
-                              style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                          Text('Paid: ${currencyFormat.format(p.paidAmount)}',
-                              style: GoogleFonts.inter(fontSize: 11, color: Colors.green.shade800)),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        icon: const Icon(Icons.visibility, size: 20, color: AppColors.primary),
-                        tooltip: 'View details & movements',
-                        onPressed: () => viewModel.openPurchaseDetails(context, p),
-                      ),
-                      if (!p.isCancelled)
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
-                          tooltip: 'Edit purchase',
-                          onPressed: () => viewModel.openEditPurchase(context, p),
+                    title: Row(
+                      children: [
+                        Text(p.purchaseNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(width: 8),
+                        _statusChip(p.status),
+                        const SizedBox(width: 6),
+                        _paymentChip(p.paymentStatus),
+                      ],
+                    ),
+                    subtitle: Text(
+                      'Supplier: ${p.supplierName} • Date: ${p.purchaseDate}${p.invoiceNo != null ? ' • Inv: ${p.invoiceNo}' : ''} • ${p.items.length} items',
+                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(currencyFormat.format(p.totalAmount),
+                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                            Text('Paid: ${currencyFormat.format(p.paidAmount)}',
+                                style: GoogleFonts.inter(fontSize: 11, color: Colors.green.shade800)),
+                          ],
                         ),
-                    ],
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(Icons.visibility, size: 20, color: AppColors.primary),
+                          tooltip: 'View details & movements',
+                          onPressed: () => viewModel.openPurchaseDetails(context, p),
+                        ),
+                        if (!p.isCancelled)
+                          IconButton(
+                            icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
+                            tooltip: 'Edit purchase',
+                            onPressed: () => viewModel.openEditPurchase(context, p),
+                          ),
+                      ],
+                    ),
+                    onTap: () => viewModel.openPurchaseDetails(context, p),
                   ),
-                  onTap: () => viewModel.openPurchaseDetails(context, p),
                 );
               },
             ),
@@ -595,71 +598,74 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 final p = tracked[index];
                 final isLow = p.isLowStock;
 
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  leading: CircleAvatar(
-                    backgroundColor: isLow ? Colors.red.shade50 : Colors.teal.shade50,
-                    child: Icon(
-                      isLow ? Icons.warning_amber_rounded : Icons.check_circle_outline,
-                      color: isLow ? Colors.red.shade700 : Colors.teal.shade700,
-                    ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(p.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isLow ? Colors.red.shade100 : Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          isLow ? 'LOW STOCK' : 'IN STOCK',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: isLow ? Colors.red.shade900 : Colors.green.shade900,
-                          ),
-                        ),
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    leading: CircleAvatar(
+                      backgroundColor: isLow ? Colors.red.shade50 : Colors.teal.shade50,
+                      child: Icon(
+                        isLow ? Icons.warning_amber_rounded : Icons.check_circle_outline,
+                        color: isLow ? Colors.red.shade700 : Colors.teal.shade700,
                       ),
-                    ],
-                  ),
-                  subtitle: Text(
-                    'SKU: ${p.sku} • Min Level: ${p.minStockLevel.toStringAsFixed(0)} ${p.unitName} • Cost: ${currencyFormat.format(p.costPrice)} • Selling Price: ${currencyFormat.format(p.defaultPrice)}',
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${p.currentStock.toStringAsFixed(0)} ${p.unitName}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 18,
+                    ),
+                    title: Row(
+                      children: [
+                        Text(p.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isLow ? Colors.red.shade100 : Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isLow ? 'LOW STOCK' : 'IN STOCK',
+                            style: TextStyle(
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: isLow ? Colors.red.shade800 : AppColors.primary,
+                              color: isLow ? Colors.red.shade900 : Colors.green.shade900,
                             ),
                           ),
-                          Text(
-                            'Available Units',
-                            style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 14),
-                      OutlinedButton.icon(
-                        onPressed: () => viewModel.openStockAdjustment(context, p),
-                        icon: const Icon(Icons.tune, size: 14),
-                        label: const Text('Adjust'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    subtitle: Text(
+                      'SKU: ${p.sku} • Min Level: ${p.minStockLevel.toStringAsFixed(0)} ${p.unitName} • Cost: ${currencyFormat.format(p.costPrice)} • Selling Price: ${currencyFormat.format(p.defaultPrice)}',
+                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${p.currentStock.toStringAsFixed(0)} ${p.unitName}',
+                              style: GoogleFonts.outfit(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isLow ? Colors.red.shade800 : AppColors.primary,
+                              ),
+                            ),
+                            Text(
+                              'Available Units',
+                              style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 14),
+                        OutlinedButton.icon(
+                          onPressed: () => viewModel.openStockAdjustment(context, p),
+                          icon: const Icon(Icons.tune, size: 14),
+                          label: const Text('Adjust'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -713,51 +719,54 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 final m = movements[index];
                 final isIncoming = m.isIncoming;
 
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: CircleAvatar(
-                    backgroundColor: isIncoming ? Colors.green.shade50 : Colors.red.shade50,
-                    child: Icon(
-                      isIncoming ? Icons.south_west : Icons.north_east,
-                      color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
-                      size: 18,
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: isIncoming ? Colors.green.shade50 : Colors.red.shade50,
+                      child: Icon(
+                        isIncoming ? Icons.south_west : Icons.north_east,
+                        color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
+                        size: 18,
+                      ),
                     ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(m.movementNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(4),
+                    title: Row(
+                      children: [
+                        Text(m.movementNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(m.movementType.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
-                        child: Text(m.movementType.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                  subtitle: Text(
-                    '${m.productName} • Date: ${m.movementDate}${m.referenceNo != null ? ' • Ref: ${m.referenceNo}' : ''}${m.notes != null ? ' • ${m.notes}' : ''}',
-                    style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${isIncoming ? '+' : ''}${m.signedQuantity.toStringAsFixed(0)} ${m.unit}',
-                        style: GoogleFonts.outfit(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
+                      ],
+                    ),
+                    subtitle: Text(
+                      '${m.productName} • Date: ${m.movementDate}${m.referenceNo != null ? ' • Ref: ${m.referenceNo}' : ''}${m.notes != null ? ' • ${m.notes}' : ''}',
+                      style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${isIncoming ? '+' : ''}${m.signedQuantity.toStringAsFixed(0)} ${m.unit}',
+                          style: GoogleFonts.outfit(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Bal: ${m.balanceBefore.toStringAsFixed(0)} → ${m.balanceAfter.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
-                      ),
-                    ],
+                        Text(
+                          'Bal: ${m.balanceBefore.toStringAsFixed(0)} → ${m.balanceAfter.toStringAsFixed(0)}',
+                          style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -815,40 +824,43 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               itemBuilder: (context, index) {
                 final s = suppliers[index];
 
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text(s.code.split('-').last, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary)),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(s.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(width: 8),
-                      Text('(${s.code})', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
-                    ],
-                  ),
-                  subtitle: Text(
-                    'Phone: ${s.phone}${s.contactPerson != null ? ' • Contact: ${s.contactPerson}' : ''}${s.gstin != null ? ' • GSTIN: ${s.gstin}' : ''}',
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(currencyFormat.format(s.currentBalance), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                          Text('Outstanding', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
-                        onPressed: () => viewModel.openEditSupplier(context, s),
-                      ),
-                    ],
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                      child: Text(s.code.split('-').last, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary)),
+                    ),
+                    title: Row(
+                      children: [
+                        Text(s.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(width: 8),
+                        Text('(${s.code})', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                    subtitle: Text(
+                      'Phone: ${s.phone}${s.contactPerson != null ? ' • Contact: ${s.contactPerson}' : ''}${s.gstin != null ? ' • GSTIN: ${s.gstin}' : ''}',
+                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(currencyFormat.format(s.currentBalance), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                            Text('Outstanding', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
+                          ],
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
+                          onPressed: () => viewModel.openEditSupplier(context, s),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

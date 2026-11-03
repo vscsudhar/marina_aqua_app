@@ -26,11 +26,12 @@ class StockAdjustmentDialog extends StatefulWidget {
 class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
   ProductModel? _selectedProduct;
   String _adjustmentType = 'damage';
-  final TextEditingController _quantityController = TextEditingController(text: '1.0');
+  final TextEditingController _quantityController =
+      TextEditingController(text: '1.0');
   final TextEditingController _reasonController = TextEditingController();
   late final TextEditingController _authorizedByController;
   final TextEditingController _notesController = TextEditingController();
-  DateTime _adjustmentDate = DateTime.now();
+  final DateTime _adjustmentDate = DateTime.now();
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -47,8 +48,12 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedProduct = widget.initialProduct ?? (widget.trackedProducts.isNotEmpty ? widget.trackedProducts.first : null);
-    _authorizedByController = TextEditingController(text: widget.defaultAuthorizedBy ?? 'Admin');
+    _selectedProduct = widget.initialProduct ??
+        (widget.trackedProducts.isNotEmpty
+            ? widget.trackedProducts.first
+            : null);
+    _authorizedByController =
+        TextEditingController(text: widget.defaultAuthorizedBy ?? 'Admin');
   }
 
   bool get _isAddition => _adjustmentType == 'addition';
@@ -79,12 +84,14 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
     }
 
     if (_reasonController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Please specify a reason for this stock adjustment.');
+      setState(() =>
+          _errorMessage = 'Please specify a reason for this stock adjustment.');
       return;
     }
 
     if (_authorizedByController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Authorization name is required for stock adjustments.');
+      setState(() => _errorMessage =
+          'Authorization name is required for stock adjustments.');
       return;
     }
 
@@ -97,7 +104,9 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
       'cost_price': _selectedProduct!.costPrice,
       'reason': _reasonController.text.trim(),
       'authorized_by': _authorizedByController.text.trim(),
-      'notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      'notes': _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
     };
 
     setState(() => _isSaving = true);
@@ -141,7 +150,8 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                       color: Colors.amber.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.tune, color: Colors.amber.shade900, size: 22),
+                    child: Icon(Icons.tune,
+                        color: Colors.amber.shade900, size: 22),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -150,12 +160,14 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                       children: [
                         Text(
                           'Stock Adjustment',
-                          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.outfit(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Record damage, leakage or audit variance with authorized audit trail',
-                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: AppColors.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -186,7 +198,9 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.shade200),
                         ),
-                        child: Text(_errorMessage!, style: GoogleFonts.inter(color: Colors.red.shade900, fontSize: 13)),
+                        child: Text(_errorMessage!,
+                            style: GoogleFonts.inter(
+                                color: Colors.red.shade900, fontSize: 13)),
                       ),
 
                     // Product selector
@@ -223,7 +237,9 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                       items: _typeLabels.entries.map((e) {
                         return DropdownMenuItem(
                           value: e.key,
-                          child: Text(e.value, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                          child: Text(e.value,
+                              style: const TextStyle(fontSize: 13),
+                              overflow: TextOverflow.ellipsis),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -239,16 +255,19 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
 
                         final qtyField = TextFormField(
                           controller: _quantityController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: InputDecoration(
-                            labelText: 'Quantity (${_selectedProduct?.unitName ?? 'Units'}) *',
+                            labelText:
+                                'Quantity (${_selectedProduct?.unitName ?? 'Units'}) *',
                             border: const OutlineInputBorder(),
                           ),
                           onChanged: (_) => setState(() {}),
                         );
 
                         final previewBox = Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(8),
@@ -257,7 +276,10 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Stock Calculation:', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
+                              Text('Stock Calculation:',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary)),
                               const SizedBox(height: 2),
                               FittedBox(
                                 fit: BoxFit.scaleDown,
@@ -266,7 +288,9 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                                   style: GoogleFonts.outfit(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: _newStock < 0 ? Colors.red : AppColors.primary,
+                                    color: _newStock < 0
+                                        ? Colors.red
+                                        : AppColors.primary,
                                   ),
                                 ),
                               ),
@@ -301,7 +325,8 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                       controller: _reasonController,
                       decoration: const InputDecoration(
                         labelText: 'Reason for Adjustment *',
-                        hintText: 'e.g. Can neck cracked during transit, Physical audit discrepancy',
+                        hintText:
+                            'e.g. Can neck cracked during transit, Physical audit discrepancy',
                         prefixIcon: Icon(Icons.edit_note, size: 20),
                         border: OutlineInputBorder(),
                       ),
@@ -338,7 +363,8 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: Colors.grey.shade200)),
               ),
               child: Wrap(
@@ -348,19 +374,28 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isAddition ? AppColors.primary : Colors.amber.shade900,
+                      backgroundColor: _isAddition
+                          ? AppColors.primary
+                          : Colors.amber.shade900,
                       foregroundColor: Colors.white,
                     ),
                     icon: _isSaving
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
                         : const Icon(Icons.check, size: 18),
-                    label: Text(_isSaving ? 'Saving...' : 'Authorize & Adjust Stock', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text(
+                        _isSaving ? 'Saving...' : 'Authorize & Adjust Stock',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

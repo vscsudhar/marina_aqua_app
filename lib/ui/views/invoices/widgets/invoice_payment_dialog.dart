@@ -21,7 +21,8 @@ class InvoicePaymentDialog extends StatefulWidget {
 
 class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
   final _formKey = GlobalKey<FormState>();
-  final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final currencyFormat =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
   late TextEditingController _amountController;
   late DateTime _paymentDate;
@@ -35,7 +36,8 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(text: widget.invoice.balanceDue.toStringAsFixed(2));
+    _amountController = TextEditingController(
+        text: widget.invoice.balanceDue.toStringAsFixed(2));
     _paymentDate = DateTime.now();
   }
 
@@ -52,7 +54,8 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
 
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
     if (amount <= 0) {
-      setState(() => _errorMessage = 'Payment amount must be greater than zero');
+      setState(
+          () => _errorMessage = 'Payment amount must be greater than zero');
       return;
     }
 
@@ -114,12 +117,16 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                       children: [
                         Text(
                           'Record Invoice Payment',
-                          style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Invoice: ${widget.invoice.invoiceNo} • Due: ${currencyFormat.format(widget.invoice.balanceDue)}',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 12),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -139,18 +146,20 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: kcErrorColor.withOpacity(0.1),
+                  color: kcErrorColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: kcErrorColor),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                    const Icon(Icons.error_outline,
+                        color: kcErrorColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: GoogleFonts.inter(color: kcErrorColor, fontSize: 12),
+                        style: GoogleFonts.inter(
+                            color: kcErrorColor, fontSize: 12),
                       ),
                     ),
                   ],
@@ -167,14 +176,17 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                     children: [
                       TextFormField(
                         controller: _amountController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Payment Amount (₹) *',
-                          helperText: 'Current outstanding: ${currencyFormat.format(widget.invoice.balanceDue)}',
+                          helperText:
+                              'Current outstanding: ${currencyFormat.format(widget.invoice.balanceDue)}',
                           isDense: true,
                           border: const OutlineInputBorder(),
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                        validator: (v) =>
+                            v?.trim().isEmpty ?? true ? 'Required' : null,
                       ),
                       const SizedBox(height: 14),
                       InkWell(
@@ -194,18 +206,23 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                             border: OutlineInputBorder(),
                             suffixIcon: Icon(Icons.calendar_today, size: 18),
                           ),
-                          child: Text(DateFormat('dd-MMM-yyyy').format(_paymentDate)),
+                          child: Text(
+                              DateFormat('dd-MMM-yyyy').format(_paymentDate)),
                         ),
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _paymentMethod,
+                        initialValue: _paymentMethod,
                         isExpanded: true,
                         items: const [
-                          DropdownMenuItem(value: 'bank_transfer', child: Text('Bank Transfer (NEFT/RTGS/IMPS)')),
-                          DropdownMenuItem(value: 'upi', child: Text('UPI / QR / GPay')),
+                          DropdownMenuItem(
+                              value: 'bank_transfer',
+                              child: Text('Bank Transfer (NEFT/RTGS/IMPS)')),
+                          DropdownMenuItem(
+                              value: 'upi', child: Text('UPI / QR / GPay')),
                           DropdownMenuItem(value: 'cash', child: Text('Cash')),
-                          DropdownMenuItem(value: 'cheque', child: Text('Cheque / DD')),
+                          DropdownMenuItem(
+                              value: 'cheque', child: Text('Cheque / DD')),
                         ],
                         onChanged: (val) {
                           if (val != null) setState(() => _paymentMethod = val);
@@ -244,9 +261,10 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
             // Actions
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -256,8 +274,10 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-                    child: Text('Cancel', style: GoogleFonts.inter(color: kcTextSecondary)),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
+                    child: Text('Cancel',
+                        style: GoogleFonts.inter(color: kcTextSecondary)),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _handleSave,
@@ -265,14 +285,18 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
-                        : const Icon(Icons.check, size: 18, color: Colors.white),
+                        : const Icon(Icons.check,
+                            size: 18, color: Colors.white),
                     label: Text(
                       _isSaving ? 'Saving...' : 'Record Payment',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, color: Colors.white),
                     ),
-                    style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: kcPrimaryColor),
                   ),
                 ],
               ),

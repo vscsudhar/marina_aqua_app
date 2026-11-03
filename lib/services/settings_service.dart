@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:stacked/stacked.dart';
@@ -73,7 +72,8 @@ class SettingsService with ListenableServiceMixin {
   Future<CompanySettingModel> getCompanySettings() => loadCompanySettings();
 
   /// Load company profile and configuration from API
-  Future<CompanySettingModel> loadCompanySettings({bool forceRefresh = false}) async {
+  Future<CompanySettingModel> loadCompanySettings(
+      {bool forceRefresh = false}) async {
     if (_isLoading && !forceRefresh) return _settings;
 
     _isLoading = true;
@@ -97,7 +97,8 @@ class SettingsService with ListenableServiceMixin {
   }
 
   /// Update company profile, numbering rules and currency
-  Future<CompanySettingModel> updateCompanySettings(Map<String, dynamic> data) async {
+  Future<CompanySettingModel> updateCompanySettings(
+      Map<String, dynamic> data) async {
     _isLoading = true;
     _errorMessage = null;
 
@@ -122,7 +123,8 @@ class SettingsService with ListenableServiceMixin {
   }
 
   /// Upload company logo with multipart form data
-  Future<CompanySettingModel> uploadCompanyLogo(List<int> bytes, String filename) async {
+  Future<CompanySettingModel> uploadCompanyLogo(
+      List<int> bytes, String filename) async {
     _isLoading = true;
     _errorMessage = null;
 
@@ -167,7 +169,8 @@ class SettingsService with ListenableServiceMixin {
     _errorMessage = null;
 
     try {
-      final response = await _apiService.client.delete('/company-settings/logo');
+      final response =
+          await _apiService.client.delete('/company-settings/logo');
       final resData = response.data['data'] as Map<String, dynamic>;
       _settings = CompanySettingModel.fromJson(resData);
       _isInitialized = true;
@@ -244,7 +247,9 @@ class SettingsService with ListenableServiceMixin {
     );
 
     final list = response.data['data'] as List? ?? [];
-    return list.map((item) => TaxRateModel.fromJson(item as Map<String, dynamic>)).toList();
+    return list
+        .map((item) => TaxRateModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   /// Single tax rate details
@@ -273,7 +278,8 @@ class SettingsService with ListenableServiceMixin {
 
   /// Toggle active/inactive status
   Future<TaxRateModel> toggleTaxRateStatus(int id) async {
-    final response = await _apiService.client.patch('/tax-rates/$id/toggle-status');
+    final response =
+        await _apiService.client.patch('/tax-rates/$id/toggle-status');
     return TaxRateModel.fromJson(response.data['data'] as Map<String, dynamic>);
   }
 

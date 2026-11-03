@@ -21,7 +21,8 @@ class CreditNoteDialog extends StatefulWidget {
 
 class _CreditNoteDialogState extends State<CreditNoteDialog> {
   final _formKey = GlobalKey<FormState>();
-  final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final currencyFormat =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
   late TextEditingController _subtotalController;
   late TextEditingController _taxController;
@@ -35,9 +36,12 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
   void initState() {
     super.initState();
     // Default to invoice amounts
-    _subtotalController = TextEditingController(text: widget.invoice.taxableAmount.toStringAsFixed(2));
-    _taxController = TextEditingController(text: widget.invoice.taxTotal.toStringAsFixed(2));
-    _reasonController = TextEditingController(text: 'Return of goods / Billing adjustment');
+    _subtotalController = TextEditingController(
+        text: widget.invoice.taxableAmount.toStringAsFixed(2));
+    _taxController =
+        TextEditingController(text: widget.invoice.taxTotal.toStringAsFixed(2));
+    _reasonController =
+        TextEditingController(text: 'Return of goods / Billing adjustment');
   }
 
   @override
@@ -49,7 +53,8 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
     super.dispose();
   }
 
-  double get _subtotal => double.tryParse(_subtotalController.text.trim()) ?? 0.0;
+  double get _subtotal =>
+      double.tryParse(_subtotalController.text.trim()) ?? 0.0;
   double get _tax => double.tryParse(_taxController.text.trim()) ?? 0.0;
   double get _total => _subtotal + _tax;
 
@@ -57,7 +62,8 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_total <= 0) {
-      setState(() => _errorMessage = 'Credit note total must be greater than zero');
+      setState(
+          () => _errorMessage = 'Credit note total must be greater than zero');
       return;
     }
 
@@ -105,17 +111,22 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFB45309), Color(0xFFD97706), Color(0xFFF59E0B)],
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFFB45309),
+                    Color(0xFFD97706),
+                    Color(0xFFF59E0B)
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.assignment_return, color: Colors.white, size: 24),
+                  const Icon(Icons.assignment_return,
+                      color: Colors.white, size: 24),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -123,12 +134,16 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                       children: [
                         Text(
                           'Issue GST Credit Note',
-                          style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Invoice: ${widget.invoice.invoiceNo} • Grand Total: ${currencyFormat.format(widget.invoice.grandTotal)}',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 12),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -147,18 +162,20 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: kcErrorColor.withOpacity(0.1),
+                  color: kcErrorColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: kcErrorColor),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                    const Icon(Icons.error_outline,
+                        color: kcErrorColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: GoogleFonts.inter(color: kcErrorColor, fontSize: 12),
+                        style: GoogleFonts.inter(
+                            color: kcErrorColor, fontSize: 12),
                       ),
                     ),
                   ],
@@ -178,35 +195,42 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                           Expanded(
                             child: TextFormField(
                               controller: _subtotalController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: const InputDecoration(
                                 labelText: 'Taxable Subtotal (₹) *',
                                 isDense: true,
                                 border: OutlineInputBorder(),
                               ),
                               onChanged: (_) => setState(() {}),
-                              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                              validator: (v) =>
+                                  v?.trim().isEmpty ?? true ? 'Required' : null,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: TextFormField(
                               controller: _taxController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: const InputDecoration(
                                 labelText: 'GST Tax (₹) *',
                                 isDense: true,
                                 border: OutlineInputBorder(),
                               ),
                               onChanged: (_) => setState(() {}),
-                              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                              validator: (v) =>
+                                  v?.trim().isEmpty ?? true ? 'Required' : null,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
                           color: kcVeryLightGrey,
                           borderRadius: BorderRadius.circular(6),
@@ -214,10 +238,15 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Credit Note Total:', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                            Text('Credit Note Total:',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600)),
                             Text(
                               currencyFormat.format(_total),
-                              style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 16, color: kcDeepNavy),
+                              style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: kcDeepNavy),
                             ),
                           ],
                         ),
@@ -227,11 +256,13 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                         controller: _reasonController,
                         decoration: const InputDecoration(
                           labelText: 'Reason for Credit Note *',
-                          hintText: 'e.g. Return of 20 cans, damaged goods, price reduction',
+                          hintText:
+                              'e.g. Return of 20 cans, damaged goods, price reduction',
                           isDense: true,
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                        validator: (v) =>
+                            v?.trim().isEmpty ?? true ? 'Required' : null,
                       ),
                       const SizedBox(height: 14),
                       TextFormField(
@@ -252,9 +283,10 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
             // Actions
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -264,8 +296,10 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-                    child: Text('Cancel', style: GoogleFonts.inter(color: kcTextSecondary)),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
+                    child: Text('Cancel',
+                        style: GoogleFonts.inter(color: kcTextSecondary)),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _handleSave,
@@ -273,14 +307,18 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
-                        : const Icon(Icons.check, size: 18, color: Colors.white),
+                        : const Icon(Icons.check,
+                            size: 18, color: Colors.white),
                     label: Text(
                       _isSaving ? 'Issuing...' : 'Issue Credit Note',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, color: Colors.white),
                     ),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD97706)),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD97706)),
                   ),
                 ],
               ),

@@ -122,7 +122,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testSupply],
-            meta: PaginationMeta(currentPage: 1, perPage: 25, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 25, total: 1, lastPage: 1),
           ));
 
       when(colService.getPayments(
@@ -133,11 +134,14 @@ void main() {
         paymentMethod: anyNamed('paymentMethod'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testPayment],
-            meta: PaginationMeta(currentPage: 1, perPage: 25, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 25, total: 1, lastPage: 1),
           ));
     }
 
-    test('init calls getAllProducts, getDailySummary, getDailyDealers, getSupplies, and getPayments', () async {
+    test(
+        'init calls getAllProducts, getDailySummary, getDailyDealers, getSupplies, and getPayments',
+        () async {
       setupMockSuccess();
       final model = DailyCollectionViewModel();
 
@@ -189,7 +193,8 @@ void main() {
       expect(model.selectedTabIndex, 2);
     });
 
-    test('setStatusFilter updates selectedStatusFilter and fetches dealers', () async {
+    test('setStatusFilter updates selectedStatusFilter and fetches dealers',
+        () async {
       setupMockSuccess();
       final model = DailyCollectionViewModel();
 
@@ -199,11 +204,13 @@ void main() {
       expect(model.selectedStatusFilter, 'pending');
     });
 
-    test('createSupply calls collectionService.createSupply and returns true', () async {
+    test('createSupply calls collectionService.createSupply and returns true',
+        () async {
       setupMockSuccess();
       final colService = locator<DailyCollectionService>();
       final payload = {'dealer_id': 1, 'items': []};
-      when(colService.createSupply(payload)).thenAnswer((_) async => testSupply);
+      when(colService.createSupply(payload))
+          .thenAnswer((_) async => testSupply);
 
       final model = DailyCollectionViewModel();
       final success = await model.createSupply(payload);
@@ -212,11 +219,13 @@ void main() {
       verify(colService.createSupply(payload)).called(1);
     });
 
-    test('updateSupply calls collectionService.updateSupply and returns true', () async {
+    test('updateSupply calls collectionService.updateSupply and returns true',
+        () async {
       setupMockSuccess();
       final colService = locator<DailyCollectionService>();
       final updatePayload = {'notes': 'updated'};
-      when(colService.updateSupply(1, updatePayload)).thenAnswer((_) async => testSupply);
+      when(colService.updateSupply(1, updatePayload))
+          .thenAnswer((_) async => testSupply);
 
       final model = DailyCollectionViewModel();
       final success = await model.updateSupply(1, updatePayload);
@@ -225,11 +234,13 @@ void main() {
       verify(colService.updateSupply(1, updatePayload)).called(1);
     });
 
-    test('recordPayment calls collectionService.recordPayment and returns true', () async {
+    test('recordPayment calls collectionService.recordPayment and returns true',
+        () async {
       setupMockSuccess();
       final colService = locator<DailyCollectionService>();
       final payPayload = {'dealer_id': 1, 'amount': 500};
-      when(colService.recordPayment(payPayload)).thenAnswer((_) async => testPayment);
+      when(colService.recordPayment(payPayload))
+          .thenAnswer((_) async => testPayment);
 
       final model = DailyCollectionViewModel();
       final success = await model.recordPayment(payPayload);
@@ -238,7 +249,8 @@ void main() {
       verify(colService.recordPayment(payPayload)).called(1);
     });
 
-    test('fetchSupplyDetails delegates to collectionService.getSupplyDetails', () async {
+    test('fetchSupplyDetails delegates to collectionService.getSupplyDetails',
+        () async {
       setupMockSuccess();
       final colService = locator<DailyCollectionService>();
       when(colService.getSupplyDetails(1)).thenAnswer((_) async => testSupply);
@@ -262,11 +274,13 @@ void main() {
       expect(model.errorMessage, 'Network timeout error');
     });
 
-    test('getSuppliesForDealer returns all deliveries for a specific dealer sorted chronologically', () async {
+    test(
+        'getSuppliesForDealer returns all deliveries for a specific dealer sorted chronologically',
+        () async {
       setupMockSuccess();
       final colService = locator<DailyCollectionService>();
 
-      final delivery1 = DealerSupplyModel(
+      const delivery1 = DealerSupplyModel(
         id: 101,
         supplyNo: 'DS-20261029-0001',
         dealerId: 1,
@@ -297,7 +311,7 @@ void main() {
         ],
       );
 
-      final delivery2 = DealerSupplyModel(
+      const delivery2 = DealerSupplyModel(
         id: 102,
         supplyNo: 'DS-20261029-0002',
         dealerId: 1,
@@ -328,7 +342,7 @@ void main() {
         ],
       );
 
-      final otherDealerDelivery = DealerSupplyModel(
+      const otherDealerDelivery = DealerSupplyModel(
         id: 103,
         supplyNo: 'DS-20261029-0003',
         dealerId: 2,
@@ -358,7 +372,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: [delivery2, otherDealerDelivery, delivery1],
-            meta: const PaginationMeta(currentPage: 1, perPage: 100, total: 3, lastPage: 1),
+            meta: const PaginationMeta(
+                currentPage: 1, perPage: 100, total: 3, lastPage: 1),
           ));
 
       final model = DailyCollectionViewModel();

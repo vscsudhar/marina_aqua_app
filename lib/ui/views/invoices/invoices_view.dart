@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 
+import 'package:marina_aqua/app/app.locator.dart';
+import 'package:marina_aqua/services/billing_service.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_viewmodel.dart';
@@ -85,7 +88,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: kcSuccessColor.withOpacity(0.12),
+                        color: kcSuccessColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: kcSuccessColor),
                       ),
@@ -111,7 +114,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: kcErrorColor.withOpacity(0.12),
+                        color: kcErrorColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: kcErrorColor),
                       ),
@@ -215,7 +218,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         border: Border.all(color: kcBorderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -226,7 +229,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -313,7 +316,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                 width: 145,
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
-                  value: viewModel.statusFilter ?? 'all',
+                  initialValue: viewModel.statusFilter ?? 'all',
                   items: const [
                     DropdownMenuItem(value: 'all', child: Text('All Statuses')),
                     DropdownMenuItem(value: 'draft', child: Text('Draft')),
@@ -338,7 +341,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                 width: 155,
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
-                  value: viewModel.paymentStatusFilter ?? 'all',
+                  initialValue: viewModel.paymentStatusFilter ?? 'all',
                   items: const [
                     DropdownMenuItem(value: 'all', child: Text('All Payments')),
                     DropdownMenuItem(value: 'paid', child: Text('Paid')),
@@ -362,7 +365,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                 width: 180,
                 child: DropdownButtonFormField<int?>(
                   isExpanded: true,
-                  value: viewModel.dealerFilter,
+                  initialValue: viewModel.dealerFilter,
                   items: [
                     const DropdownMenuItem(
                         value: null, child: Text('All Dealers')),
@@ -504,7 +507,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              headingRowColor: MaterialStateProperty.all(kcVeryLightGrey),
+              headingRowColor: WidgetStateProperty.all(kcVeryLightGrey),
               dataRowMinHeight: 56,
               dataRowMaxHeight: 64,
               columns: const [
@@ -682,6 +685,17 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                             onSelected: (val) =>
                                 _handleMenuAction(context, viewModel, inv, val),
                             itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'open_html',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.open_in_browser,
+                                        size: 18, color: kcPrimaryColor),
+                                    SizedBox(width: 8),
+                                    Text('View HTML Invoice (URL)'),
+                                  ],
+                                ),
+                              ),
                               if (inv.isDraft) ...[
                                 const PopupMenuItem(
                                   value: 'edit',
@@ -706,10 +720,21 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                                   ),
                                 ),
                                 const PopupMenuItem(
+                                  value: 'change_number',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.tag,
+                                          size: 18, color: kcPrimaryDark),
+                                      SizedBox(width: 8),
+                                      Text('Change Invoice Number'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
                                   value: 'delete',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.delete,
+                                      Icon(Icons.delete_forever,
                                           size: 18, color: kcErrorColor),
                                       SizedBox(width: 8),
                                       Text('Delete Draft'),
@@ -751,6 +776,51 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                                     ],
                                   ),
                                 ),
+                                const PopupMenuItem(
+                                  value: 'change_number',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.tag,
+                                          size: 18, color: kcPrimaryDark),
+                                      SizedBox(width: 8),
+                                      Text('Change Invoice Number'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete_forever,
+                                          size: 18, color: kcErrorColor),
+                                      SizedBox(width: 8),
+                                      Text('Delete Invoice'),
+                                    ],
+                                  ),
+                                ),
+                              ] else if (inv.isCancelled) ...[
+                                const PopupMenuItem(
+                                  value: 'change_number',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.tag,
+                                          size: 18, color: kcPrimaryDark),
+                                      SizedBox(width: 8),
+                                      Text('Change Invoice Number'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete_forever,
+                                          size: 18, color: kcErrorColor),
+                                      SizedBox(width: 8),
+                                      Text('Delete Cancelled Invoice'),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ],
                           ),
@@ -766,7 +836,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
           // Pagination Footer
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: kcBorderColor)),
             ),
             child: Row(
@@ -810,15 +880,15 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     Color fg;
     switch (status.toLowerCase()) {
       case 'finalized':
-        bg = kcSuccessColor.withOpacity(0.14);
+        bg = kcSuccessColor.withValues(alpha: 0.14);
         fg = kcSuccessColor;
         break;
       case 'cancelled':
-        bg = kcErrorColor.withOpacity(0.14);
+        bg = kcErrorColor.withValues(alpha: 0.14);
         fg = kcErrorColor;
         break;
       default:
-        bg = const Color(0xFFD97706).withOpacity(0.14);
+        bg = const Color(0xFFD97706).withValues(alpha: 0.14);
         fg = const Color(0xFFD97706);
     }
     return Container(
@@ -838,15 +908,15 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     Color fg;
     switch (status.toLowerCase()) {
       case 'paid':
-        bg = kcSuccessColor.withOpacity(0.14);
+        bg = kcSuccessColor.withValues(alpha: 0.14);
         fg = kcSuccessColor;
         break;
       case 'partially_paid':
-        bg = kcPrimaryColor.withOpacity(0.14);
+        bg = kcPrimaryColor.withValues(alpha: 0.14);
         fg = kcPrimaryDark;
         break;
       default:
-        bg = kcErrorColor.withOpacity(0.14);
+        bg = kcErrorColor.withValues(alpha: 0.14);
         fg = kcErrorColor;
     }
     return Container(
@@ -863,8 +933,8 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   // Dialog Handlers
 
-  void _openCreateInvoice(BuildContext context, InvoicesViewModel viewModel) {
-    showDialog(
+  void _openCreateInvoice(BuildContext context, InvoicesViewModel viewModel) async {
+    final result = await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => InvoiceFormDialog(
@@ -874,6 +944,10 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         onSave: (payload, isFinal) => viewModel.createInvoice(payload, isFinal),
       ),
     );
+
+    if (result is InvoiceModel) {
+      viewModel.openInvoiceInBrowser(result.id);
+    }
   }
 
   void _openInvoicePreview(
@@ -885,6 +959,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         companySettings: viewModel.companySettings,
         onDownloadPdf: () => viewModel.downloadInvoicePdf(invoice),
         onPrint: () => viewModel.printInvoice(invoice),
+        onOpenBrowser: () => viewModel.openInvoiceInBrowser(invoice.id),
         onFinalize: invoice.isDraft
             ? () {
                 Navigator.of(ctx).pop();
@@ -915,13 +990,21 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                 _openCancelInvoice(context, viewModel, invoice);
               }
             : null,
+        onDelete: () {
+          Navigator.of(ctx).pop();
+          _confirmDeleteInvoice(context, viewModel, invoice);
+        },
+        onChangeNumber: () {
+          Navigator.of(ctx).pop();
+          _openChangeInvoiceNumberDialog(context, viewModel, invoice);
+        },
       ),
     );
   }
 
   void _openEditDraft(
-      BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
-    showDialog(
+      BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) async {
+    final result = await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => InvoiceFormDialog(
@@ -933,6 +1016,10 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
             viewModel.updateInvoice(invoice.id, payload, isFinal),
       ),
     );
+
+    if (result is InvoiceModel) {
+      viewModel.openInvoiceInBrowser(result.id);
+    }
   }
 
   void _openRecordPayment(
@@ -989,6 +1076,9 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     String action,
   ) {
     switch (action) {
+      case 'open_html':
+        viewModel.openInvoiceInBrowser(invoice.id);
+        break;
       case 'edit':
         _openEditDraft(context, viewModel, invoice);
         break;
@@ -996,7 +1086,10 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         viewModel.finalizeInvoice(invoice.id);
         break;
       case 'delete':
-        viewModel.deleteDraftInvoice(invoice.id);
+        _confirmDeleteInvoice(context, viewModel, invoice);
+        break;
+      case 'change_number':
+        _openChangeInvoiceNumberDialog(context, viewModel, invoice);
         break;
       case 'payment':
         _openRecordPayment(context, viewModel, invoice);
@@ -1008,6 +1101,277 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         _openCancelInvoice(context, viewModel, invoice);
         break;
     }
+  }
+
+  void _openChangeInvoiceNumberDialog(
+      BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    final controller = TextEditingController(text: invoice.invoiceNo);
+    final reasonController = TextEditingController();
+    String? validationMessage;
+    bool isValid = true;
+    bool isLoading = false;
+    Timer? debounceTimer;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) {
+          void validate(String val) {
+            debounceTimer?.cancel();
+            debounceTimer = Timer(const Duration(milliseconds: 300), () async {
+              final trimmed = val.trim();
+              if (trimmed.isEmpty) {
+                setState(() {
+                  isValid = false;
+                  validationMessage = 'Invoice number cannot be empty';
+                });
+                return;
+              }
+              if (trimmed == invoice.invoiceNo) {
+                setState(() {
+                  isValid = true;
+                  validationMessage = null;
+                });
+                return;
+              }
+              try {
+                final billingService = locator<BillingService>();
+                final res = await billingService.validateInvoiceNumber(
+                  trimmed,
+                  excludeId: invoice.id,
+                );
+                final avail =
+                    (res['available'] == true) || (res['is_available'] == true);
+                setState(() {
+                  isValid = avail;
+                  validationMessage = avail
+                      ? null
+                      : (res['message']?.toString() ?? 'Already in use');
+                });
+              } catch (_) {
+                setState(() {
+                  isValid = true;
+                  validationMessage = null;
+                });
+              }
+            });
+          }
+
+          Future<void> fetchNext() async {
+            setState(() => isLoading = true);
+            try {
+              final billingService = locator<BillingService>();
+              final next = await billingService.getNextInvoiceNumber();
+              controller.text = next;
+              validate(next);
+            } catch (_) {}
+            setState(() => isLoading = false);
+          }
+
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: Row(
+              children: [
+                const Icon(Icons.tag, color: kcPrimaryDark, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  'Change Invoice Number',
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700, fontSize: 16),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: 420,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Current Number: ${invoice.invoiceNo}',
+                    style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: kcTextSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      labelText: 'New Invoice Number *',
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                      prefixIcon:
+                          const Icon(Icons.edit, size: 18, color: kcPrimaryDark),
+                      suffixIcon: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.refresh, size: 18),
+                              tooltip: 'Suggest next available number',
+                              onPressed: fetchNext,
+                            ),
+                      errorText: validationMessage,
+                      helperText: 'Must be unique within the company series',
+                    ),
+                    onChanged: validate,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: reasonController,
+                    decoration: const InputDecoration(
+                      labelText: 'Reason for Change (Optional)',
+                      hintText: 'e.g. Series correction, gap filling',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  debounceTimer?.cancel();
+                  controller.dispose();
+                  reasonController.dispose();
+                  Navigator.of(ctx).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kcPrimaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: (!isValid || controller.text.trim().isEmpty)
+                    ? null
+                    : () async {
+                        final newNo = controller.text.trim();
+                        if (newNo == invoice.invoiceNo) {
+                          Navigator.of(ctx).pop();
+                          return;
+                        }
+                        debounceTimer?.cancel();
+                        Navigator.of(ctx).pop();
+                        await viewModel.updateInvoiceNumber(
+                          invoice.id,
+                          newNo,
+                          reason: reasonController.text.trim().isNotEmpty
+                              ? reasonController.text.trim()
+                              : null,
+                        );
+                        controller.dispose();
+                        reasonController.dispose();
+                      },
+                child: const Text('Update Number'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _confirmDeleteInvoice(
+      BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: kcErrorColor, size: 28),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Delete Invoice ${invoice.invoiceNo}?',
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Are you sure you want to permanently delete invoice ${invoice.invoiceNo}?',
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kcVeryLightGrey,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: kcBorderColor),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '• Status: ${invoice.status.toUpperCase()}',
+                    style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kcDeepNavy),
+                  ),
+                  Text(
+                    '• Total Amount: ₹${invoice.grandTotal.toStringAsFixed(2)}',
+                    style:
+                        GoogleFonts.inter(fontSize: 12, color: kcDeepNavy),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '• The invoice number (${invoice.invoiceNo}) will be released immediately and reused for your next invoice.',
+                    style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: kcSuccessColor,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '• All line items and associated ledger entries will be completely removed.',
+                    style: GoogleFonts.inter(
+                        fontSize: 11, color: kcTextSecondary),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kcErrorColor,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              viewModel.deleteInvoice(invoice.id);
+            },
+            icon: const Icon(Icons.delete_forever, size: 18),
+            label: const Text('Permanently Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

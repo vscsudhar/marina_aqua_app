@@ -91,7 +91,7 @@ void main() {
       paymentStatus: 'paid',
       status: 'delivered',
       items: [
-        DealerSupplyItemModel(
+        const DealerSupplyItemModel(
           id: 1,
           productId: 1,
           productName: '20L Drinking Water Jar',
@@ -126,7 +126,7 @@ void main() {
       paymentStatus: 'unpaid',
       status: 'delivered',
       items: [
-        DealerSupplyItemModel(
+        const DealerSupplyItemModel(
           id: 2,
           productId: 1,
           productName: '20L Drinking Water Jar',
@@ -191,7 +191,8 @@ void main() {
         search: anyNamed('search'),
       )).thenAnswer((_) async => PaginatedList(
             items: [delivery1, delivery2],
-            meta: const PaginationMeta(currentPage: 1, perPage: 100, total: 2, lastPage: 1),
+            meta: const PaginationMeta(
+                currentPage: 1, perPage: 100, total: 2, lastPage: 1),
           ));
 
       when(colService.getPayments(
@@ -202,10 +203,12 @@ void main() {
         paymentMethod: anyNamed('paymentMethod'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [],
-            meta: PaginationMeta(currentPage: 1, perPage: 100, total: 0, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 100, total: 0, lastPage: 1),
           ));
 
-      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date'))).thenAnswer(
+      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date')))
+          .thenAnswer(
         (_) async => {
           'price': 10.0,
           'catalog_price': 10.0,
@@ -214,7 +217,9 @@ void main() {
       );
     }
 
-    testWidgets('DailyCollectionView displays multiple deliveries on the same page with product, rate, qty, and line total', (tester) async {
+    testWidgets(
+        'DailyCollectionView displays multiple deliveries on the same page with product, rate, qty, and line total',
+        (tester) async {
       setupMocks();
 
       await tester.binding.setSurfaceSize(const Size(1280, 900));
@@ -233,7 +238,8 @@ void main() {
       expect(find.text('Delivery #1'), findsOneWidget);
       expect(find.text('01:00 PM'), findsOneWidget);
       expect(find.text('65 Cane'), findsOneWidget);
-      expect(find.text('@ ₹10.00'), findsNWidgets(2)); // both deliveries have rate @ ₹10.00
+      expect(find.text('@ ₹10.00'),
+          findsNWidgets(2)); // both deliveries have rate @ ₹10.00
       expect(find.text('₹650'), findsWidgets);
 
       // 4. Check Delivery #2 itemized line (60 Cane @ ₹10.00 = ₹600)
@@ -258,11 +264,14 @@ void main() {
       expect(find.textContaining('60 Cane'), findsWidgets);
     });
 
-    testWidgets('Tapping Record Another Collection opens dialog with existing supplies displayed', (tester) async {
+    testWidgets(
+        'Tapping Record Another Collection opens dialog with existing supplies displayed',
+        (tester) async {
       setupMocks();
 
       await tester.binding.setSurfaceSize(const Size(1280, 1200));
-      await tester.pumpWidget(createTestWidget(const DailyCollectionView(), size: const Size(1280, 1200)));
+      await tester.pumpWidget(createTestWidget(const DailyCollectionView(),
+          size: const Size(1280, 1200)));
       await tester.pumpAndSettle();
 
       // Ensure button is visible and tap
@@ -278,7 +287,9 @@ void main() {
       expect(find.textContaining('60 Cane @ ₹10 = ₹600'), findsOneWidget);
     });
 
-    testWidgets('PaymentEntryDialog displays earlier deliveries when recording another collection', (tester) async {
+    testWidgets(
+        'PaymentEntryDialog displays earlier deliveries when recording another collection',
+        (tester) async {
       setupMocks();
 
       await tester.binding.setSurfaceSize(const Size(1280, 900));

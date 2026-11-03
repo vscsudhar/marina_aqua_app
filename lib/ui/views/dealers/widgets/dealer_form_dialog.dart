@@ -45,7 +45,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
     _nameController = TextEditingController(text: d?.name ?? '');
     _codeController = TextEditingController(text: d?.code ?? '');
     _phoneController = TextEditingController(text: d?.phone ?? '');
-    _contactPersonController = TextEditingController(text: d?.contactPerson ?? '');
+    _contactPersonController =
+        TextEditingController(text: d?.contactPerson ?? '');
     _emailController = TextEditingController(text: d?.email ?? '');
     _addressController = TextEditingController(text: d?.address ?? '');
     _gstinController = TextEditingController(text: d?.gstin ?? '');
@@ -80,15 +81,20 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
   }
 
   void _onNameChanged(String val) {
-    if (widget.dealer == null && _codeController.text.isEmpty && val.isNotEmpty) {
+    if (widget.dealer == null &&
+        _codeController.text.isEmpty &&
+        val.isNotEmpty) {
       final words = val.trim().split(RegExp(r'\s+'));
       String prefix = 'DLR-';
       if (words.length >= 2) {
-        prefix += (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+        prefix +=
+            (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
       } else if (words[0].length >= 3) {
         prefix += words[0].substring(0, 3).toUpperCase();
       }
-      final randomSuffix = (DateTime.now().millisecondsSinceEpoch % 1000).toString().padLeft(3, '0');
+      final randomSuffix = (DateTime.now().millisecondsSinceEpoch % 1000)
+          .toString()
+          .padLeft(3, '0');
       _codeController.text = '$prefix-$randomSuffix';
     }
   }
@@ -117,14 +123,26 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
       'name': _nameController.text.trim(),
       'code': _codeController.text.trim().toUpperCase(),
       'phone': _phoneController.text.trim(),
-      'contact_person': _contactPersonController.text.trim().isEmpty ? null : _contactPersonController.text.trim(),
-      'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-      'address': _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-      'gstin': _gstinController.text.trim().isEmpty ? null : _gstinController.text.trim().toUpperCase(),
-      'credit_limit': double.tryParse(_creditLimitController.text.trim()) ?? 0.0,
-      'opening_balance': double.tryParse(_openingBalanceController.text.trim()) ?? 0.0,
+      'contact_person': _contactPersonController.text.trim().isEmpty
+          ? null
+          : _contactPersonController.text.trim(),
+      'email': _emailController.text.trim().isEmpty
+          ? null
+          : _emailController.text.trim(),
+      'address': _addressController.text.trim().isEmpty
+          ? null
+          : _addressController.text.trim(),
+      'gstin': _gstinController.text.trim().isEmpty
+          ? null
+          : _gstinController.text.trim().toUpperCase(),
+      'credit_limit':
+          double.tryParse(_creditLimitController.text.trim()) ?? 0.0,
+      'opening_balance':
+          double.tryParse(_openingBalanceController.text.trim()) ?? 0.0,
       'opening_date': DateFormat('yyyy-MM-dd').format(_selectedOpeningDate),
-      'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      'notes': _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
       'is_active': _isActive,
     };
 
@@ -135,7 +153,10 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString().replaceFirst('ApiException: ', '').replaceFirst('Exception: ', '');
+        _errorMessage = e
+            .toString()
+            .replaceFirst('ApiException: ', '')
+            .replaceFirst('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -178,10 +199,11 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: kcPrimaryColor.withOpacity(0.12),
+                            color: kcPrimaryColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.storefront_rounded, color: kcPrimaryColor, size: 22),
+                          child: const Icon(Icons.storefront_rounded,
+                              color: kcPrimaryColor, size: 22),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -189,7 +211,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isEditing ? 'Edit Dealer Details' : 'Onboard New Dealer / Agency',
+                                isEditing
+                                    ? 'Edit Dealer Details'
+                                    : 'Onboard New Dealer / Agency',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -198,8 +222,11 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                isEditing ? 'Update contact, credit limit and opening ledger terms' : 'Register dealer code, contact and opening balance ledger entry',
-                                style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+                                isEditing
+                                    ? 'Update contact, credit limit and opening ledger terms'
+                                    : 'Register dealer code, contact and opening balance ledger entry',
+                                style: const TextStyle(
+                                    fontSize: 12, color: kcTextSecondary),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -223,20 +250,24 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                     children: [
                       if (_errorMessage != null) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: kcErrorColor.withOpacity(0.1),
+                            color: kcErrorColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: kcErrorColor.withOpacity(0.3)),
+                            border: Border.all(
+                                color: kcErrorColor.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                              const Icon(Icons.error_outline,
+                                  color: kcErrorColor, size: 18),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   _errorMessage!,
-                                  style: const TextStyle(color: kcErrorColor, fontSize: 13),
+                                  style: const TextStyle(
+                                      color: kcErrorColor, fontSize: 13),
                                 ),
                               ),
                             ],
@@ -260,7 +291,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                               ),
                               onChanged: _onNameChanged,
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty) return 'Dealer name is required';
+                                if (val == null || val.trim().isEmpty)
+                                  return 'Dealer name is required';
                                 return null;
                               },
                             ),
@@ -278,7 +310,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                               ),
                               textCapitalization: TextCapitalization.characters,
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty) return 'Dealer code is required';
+                                if (val == null || val.trim().isEmpty)
+                                  return 'Dealer code is required';
                                 return null;
                               },
                             ),
@@ -301,7 +334,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                                 prefixIcon: Icon(Icons.phone),
                               ),
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty) return 'Phone number is required';
+                                if (val == null || val.trim().isEmpty)
+                                  return 'Phone number is required';
                                 return null;
                               },
                             ),
@@ -360,16 +394,21 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                           Expanded(
                             child: TextFormField(
                               controller: _openingBalanceController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: const InputDecoration(
                                 labelText: 'Opening Balance (₹)',
                                 hintText: '0.00 (Positive: dealer owes us)',
                                 border: OutlineInputBorder(),
                                 prefixText: '₹ ',
-                                prefixIcon: Icon(Icons.account_balance_wallet_outlined),
+                                prefixIcon:
+                                    Icon(Icons.account_balance_wallet_outlined),
                               ),
                               validator: (val) {
-                                if (val != null && val.isNotEmpty && double.tryParse(val) == null) {
+                                if (val != null &&
+                                    val.isNotEmpty &&
+                                    double.tryParse(val) == null) {
                                   return 'Invalid amount';
                                 }
                                 return null;
@@ -397,7 +436,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                           Expanded(
                             child: TextFormField(
                               controller: _creditLimitController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: const InputDecoration(
                                 labelText: 'Credit Limit (₹)',
                                 hintText: '50000.00',
@@ -416,7 +457,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Delivery / Agency Address',
-                          hintText: 'Shop / Warehouse address for supply deliveries',
+                          hintText:
+                              'Shop / Warehouse address for supply deliveries',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.location_on_outlined),
                         ),
@@ -428,7 +470,8 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Internal Notes / Route Terms',
-                          hintText: 'Route details, delivery timing preferences, empty can deposit notes',
+                          hintText:
+                              'Route details, delivery timing preferences, empty can deposit notes',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.notes),
                         ),
@@ -436,10 +479,14 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                       const SizedBox(height: 12),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        subtitle: const Text('Allow supply delivery orders and receipt collections for this dealer', style: TextStyle(fontSize: 12)),
+                        title: const Text('Active Status',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 14)),
+                        subtitle: const Text(
+                            'Allow supply delivery orders and receipt collections for this dealer',
+                            style: TextStyle(fontSize: 12)),
                         value: _isActive,
-                        activeColor: kcPrimaryColor,
+                        activeThumbColor: kcPrimaryColor,
                         onChanged: (val) => setState(() => _isActive = val),
                       ),
                     ],
@@ -455,24 +502,29 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kcPrimaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     icon: _isSaving
                         ? const SizedBox(
                             width: 18,
                             height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : const Icon(Icons.check, size: 18),
-                    label: Text(isEditing ? 'Update Dealer' : 'Save & Onboard Dealer'),
+                    label: Text(
+                        isEditing ? 'Update Dealer' : 'Save & Onboard Dealer'),
                     onPressed: _isSaving ? null : _submit,
                   ),
                 ],

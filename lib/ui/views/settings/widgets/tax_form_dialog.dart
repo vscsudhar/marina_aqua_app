@@ -47,8 +47,10 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
       _descriptionController = TextEditingController(text: t.description ?? '');
       _taxType = t.taxType;
       _applicability = t.applicability;
-      _effectiveFrom = t.effectiveFrom != null ? DateTime.tryParse(t.effectiveFrom!) : null;
-      _effectiveTo = t.effectiveTo != null ? DateTime.tryParse(t.effectiveTo!) : null;
+      _effectiveFrom =
+          t.effectiveFrom != null ? DateTime.tryParse(t.effectiveFrom!) : null;
+      _effectiveTo =
+          t.effectiveTo != null ? DateTime.tryParse(t.effectiveTo!) : null;
       _isActive = t.isActive;
       _isDefault = t.isDefault;
     } else {
@@ -71,12 +73,16 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
 
     final rate = double.tryParse(_rateController.text.trim()) ?? 0.0;
     if (rate < 0 || rate > 100) {
-      setState(() => _errorMessage = 'Tax rate percentage must be between 0 and 100%');
+      setState(() =>
+          _errorMessage = 'Tax rate percentage must be between 0 and 100%');
       return;
     }
 
-    if (_effectiveFrom != null && _effectiveTo != null && _effectiveTo!.isBefore(_effectiveFrom!)) {
-      setState(() => _errorMessage = 'Effective To date cannot be earlier than Effective From date.');
+    if (_effectiveFrom != null &&
+        _effectiveTo != null &&
+        _effectiveTo!.isBefore(_effectiveFrom!)) {
+      setState(() => _errorMessage =
+          'Effective To date cannot be earlier than Effective From date.');
       return;
     }
 
@@ -91,8 +97,12 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
         'rate': rate,
         'tax_type': _taxType,
         'applicability': _applicability,
-        'effective_from': _effectiveFrom != null ? DateFormat('yyyy-MM-dd').format(_effectiveFrom!) : null,
-        'effective_to': _effectiveTo != null ? DateFormat('yyyy-MM-dd').format(_effectiveTo!) : null,
+        'effective_from': _effectiveFrom != null
+            ? DateFormat('yyyy-MM-dd').format(_effectiveFrom!)
+            : null,
+        'effective_to': _effectiveTo != null
+            ? DateFormat('yyyy-MM-dd').format(_effectiveTo!)
+            : null,
         'is_active': _isActive,
         'is_default': _isDefault,
         'description': _descriptionController.text.trim(),
@@ -144,12 +154,16 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                       children: [
                         Text(
                           isEdit ? 'Edit Tax Slab' : 'Create New Tax Slab',
-                          style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Configure GST rate, applicability, and default preference',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 12),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -175,12 +189,14 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: kcErrorColor, size: 18),
+                    const Icon(Icons.error_outline,
+                        color: kcErrorColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: GoogleFonts.inter(color: kcErrorColor, fontSize: 12),
+                        style: GoogleFonts.inter(
+                            color: kcErrorColor, fontSize: 12),
                       ),
                     ),
                   ],
@@ -199,7 +215,8 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
 
                       final rateField = TextFormField(
                         controller: _rateController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'Rate Percentage (%) *',
                           hintText: '18.00',
@@ -207,17 +224,21 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                           border: OutlineInputBorder(),
                           suffixText: '%',
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
+                        validator: (v) =>
+                            v?.trim().isEmpty ?? true ? 'Required' : null,
                       );
 
                       final taxTypeField = DropdownButtonFormField<String>(
-                        value: _taxType,
+                        initialValue: _taxType,
                         isExpanded: true,
                         items: const [
-                          DropdownMenuItem(value: 'gst', child: Text('GST (India)')),
+                          DropdownMenuItem(
+                              value: 'gst', child: Text('GST (India)')),
                           DropdownMenuItem(value: 'vat', child: Text('VAT')),
-                          DropdownMenuItem(value: 'exempt', child: Text('Zero / Exempted')),
-                          DropdownMenuItem(value: 'custom', child: Text('Custom')),
+                          DropdownMenuItem(
+                              value: 'exempt', child: Text('Zero / Exempted')),
+                          DropdownMenuItem(
+                              value: 'custom', child: Text('Custom')),
                         ],
                         onChanged: (val) {
                           if (val != null) setState(() => _taxType = val);
@@ -230,8 +251,10 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                       );
 
                       DateTime initialFrom = _effectiveFrom ?? DateTime.now();
-                      if (initialFrom.isBefore(DateTime(2000))) initialFrom = DateTime(2000);
-                      if (initialFrom.isAfter(DateTime(2050))) initialFrom = DateTime(2050);
+                      if (initialFrom.isBefore(DateTime(2000)))
+                        initialFrom = DateTime(2000);
+                      if (initialFrom.isAfter(DateTime(2050)))
+                        initialFrom = DateTime(2050);
 
                       final fromDateField = InkWell(
                         onTap: () async {
@@ -252,22 +275,27 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                                 ? IconButton(
                                     icon: const Icon(Icons.clear, size: 16),
                                     tooltip: 'Clear Date (Immediate)',
-                                    onPressed: () => setState(() => _effectiveFrom = null),
+                                    onPressed: () =>
+                                        setState(() => _effectiveFrom = null),
                                   )
                                 : const Icon(Icons.calendar_today, size: 16),
                           ),
                           child: Text(
                             _effectiveFrom != null
-                                ? DateFormat('dd-MMM-yyyy').format(_effectiveFrom!)
+                                ? DateFormat('dd-MMM-yyyy')
+                                    .format(_effectiveFrom!)
                                 : 'Immediate',
                             style: GoogleFonts.inter(fontSize: 13),
                           ),
                         ),
                       );
 
-                      DateTime initialTo = _effectiveTo ?? DateTime.now().add(const Duration(days: 365));
-                      if (initialTo.isBefore(DateTime(2000))) initialTo = DateTime(2000);
-                      if (initialTo.isAfter(DateTime(2050))) initialTo = DateTime(2050);
+                      DateTime initialTo = _effectiveTo ??
+                          DateTime.now().add(const Duration(days: 365));
+                      if (initialTo.isBefore(DateTime(2000)))
+                        initialTo = DateTime(2000);
+                      if (initialTo.isAfter(DateTime(2050)))
+                        initialTo = DateTime(2050);
 
                       final toDateField = InkWell(
                         onTap: () async {
@@ -288,13 +316,15 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                                 ? IconButton(
                                     icon: const Icon(Icons.clear, size: 16),
                                     tooltip: 'Clear Date (Perpetual)',
-                                    onPressed: () => setState(() => _effectiveTo = null),
+                                    onPressed: () =>
+                                        setState(() => _effectiveTo = null),
                                   )
                                 : const Icon(Icons.event, size: 16),
                           ),
                           child: Text(
                             _effectiveTo != null
-                                ? DateFormat('dd-MMM-yyyy').format(_effectiveTo!)
+                                ? DateFormat('dd-MMM-yyyy')
+                                    .format(_effectiveTo!)
                                 : 'Perpetual',
                             style: GoogleFonts.inter(fontSize: 13),
                           ),
@@ -311,7 +341,9 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                               isDense: true,
                               border: OutlineInputBorder(),
                             ),
-                            validator: (v) => v?.trim().isEmpty ?? true ? 'Tax name is required' : null,
+                            validator: (v) => v?.trim().isEmpty ?? true
+                                ? 'Tax name is required'
+                                : null,
                           ),
                           const SizedBox(height: 14),
                           if (isNarrow) ...[
@@ -329,15 +361,24 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                           ],
                           const SizedBox(height: 14),
                           DropdownButtonFormField<String>(
-                            value: _applicability,
+                            initialValue: _applicability,
                             isExpanded: true,
                             items: const [
-                              DropdownMenuItem(value: 'all', child: Text('All (Goods & Services)')),
-                              DropdownMenuItem(value: 'goods', child: Text('Goods Only (Water Cans, Bottles, PET)')),
-                              DropdownMenuItem(value: 'services', child: Text('Services Only (Delivery, Maintenance)')),
+                              DropdownMenuItem(
+                                  value: 'all',
+                                  child: Text('All (Goods & Services)')),
+                              DropdownMenuItem(
+                                  value: 'goods',
+                                  child: Text(
+                                      'Goods Only (Water Cans, Bottles, PET)')),
+                              DropdownMenuItem(
+                                  value: 'services',
+                                  child: Text(
+                                      'Services Only (Delivery, Maintenance)')),
                             ],
                             onChanged: (val) {
-                              if (val != null) setState(() => _applicability = val);
+                              if (val != null)
+                                setState(() => _applicability = val);
                             },
                             decoration: const InputDecoration(
                               labelText: 'Applicability',
@@ -365,7 +406,8 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                             maxLines: 2,
                             decoration: const InputDecoration(
                               labelText: 'Description / HSN Mapping Notes',
-                              hintText: 'e.g. Standard rate for 20L cans (HSN 2201)',
+                              hintText:
+                                  'e.g. Standard rate for 20L cans (HSN 2201)',
                               isDense: true,
                               border: OutlineInputBorder(),
                             ),
@@ -374,25 +416,30 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                           SwitchListTile(
                             title: Text(
                               'Set as Default System Tax',
-                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.inter(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
                             ),
                             subtitle: Text(
                               'Pre-selected when creating new products or manual tax invoices',
-                              style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                              style: GoogleFonts.inter(
+                                  fontSize: 12, color: kcMediumGrey),
                             ),
                             value: _isDefault,
-                            onChanged: (val) => setState(() => _isDefault = val),
+                            onChanged: (val) =>
+                                setState(() => _isDefault = val),
                             activeThumbColor: kcPrimaryColor,
                             contentPadding: EdgeInsets.zero,
                           ),
                           SwitchListTile(
                             title: Text(
                               'Active Status',
-                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.inter(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
                             ),
                             subtitle: Text(
                               'Available in dropdowns across invoices and products catalog',
-                              style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                              style: GoogleFonts.inter(
+                                  fontSize: 12, color: kcMediumGrey),
                             ),
                             value: _isActive,
                             onChanged: (val) => setState(() => _isActive = val),
@@ -412,7 +459,8 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: const BoxDecoration(
                 color: kcVeryLightGrey,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: kcBorderColor)),
               ),
               child: Wrap(
@@ -422,8 +470,10 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-                    child: Text('Cancel', style: GoogleFonts.inter(color: kcTextSecondary)),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
+                    child: Text('Cancel',
+                        style: GoogleFonts.inter(color: kcTextSecondary)),
                   ),
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _handleSave,
@@ -431,14 +481,18 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
-                        : const Icon(Icons.check, size: 18, color: Colors.white),
+                        : const Icon(Icons.check,
+                            size: 18, color: Colors.white),
                     label: Text(
                       _isSaving ? 'Saving...' : 'Save Tax Slab',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, color: Colors.white),
                     ),
-                    style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: kcPrimaryColor),
                   ),
                 ],
               ),

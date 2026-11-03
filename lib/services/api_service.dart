@@ -30,15 +30,22 @@ class ApiService {
   ApiService([StorageService? storageService])
       : _storageService = storageService ?? locator<StorageService>() {
     // Base URL using system IP for cross-device & network access
-    const defaultBaseUrl = 'http://192.168.0.174:8000/api/v1';
-    const baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: defaultBaseUrl);
+    String defaultBaseUrl = 'http://192.168.0.174:8000/api/v1';
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host.isNotEmpty && host != '0.0.0.0') {
+        defaultBaseUrl = 'http://$host:8000/api/v1';
+      }
+    }
+    const envUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
+    final baseUrl = envUrl.isNotEmpty ? envUrl : defaultBaseUrl;
 
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 12),
-        receiveTimeout: const Duration(seconds: 12),
-        sendTimeout: kIsWeb ? null : const Duration(seconds: 12),
+        connectTimeout: const Duration(seconds: 45),
+        receiveTimeout: const Duration(seconds: 45),
+        sendTimeout: kIsWeb ? null : const Duration(seconds: 45),
         headers: {
           'Accept': 'application/json',
         },
@@ -98,6 +105,12 @@ class ApiService {
     final trimmed = rawUrl.trim();
 
     String baseOrigin = 'http://192.168.0.174:8000';
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host.isNotEmpty && host != '0.0.0.0') {
+        baseOrigin = 'http://$host:8000';
+      }
+    }
     try {
       if (locator.isRegistered<ApiService>()) {
         final clientUrl = locator<ApiService>().client.options.baseUrl;
@@ -134,6 +147,12 @@ class ApiService {
     final trimmed = rawUrl.trim();
 
     String baseOrigin = 'http://192.168.0.174:8000';
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host.isNotEmpty && host != '0.0.0.0') {
+        baseOrigin = 'http://$host:8000';
+      }
+    }
     try {
       if (locator.isRegistered<ApiService>()) {
         final clientUrl = locator<ApiService>().client.options.baseUrl;
@@ -152,8 +171,15 @@ class ApiService {
     }
 
     // If it's a logo file or contains logos path, always route to CORS-enabled public endpoint
-    if (filename.startsWith('company_logo') || trimmed.contains('logos/')) {
+    if (filename.startsWith('company_logo') ||
+        trimmed.contains('logos/') ||
+        trimmed.contains('/logo-file/')) {
       return '$baseOrigin/api/v1/public/logo-file/$filename';
+    }
+
+    if (trimmed.contains('/public/company-logo/')) {
+      final compId = filename;
+      return '$baseOrigin/api/v1/public/company-logo/$compId';
     }
 
     final resolved = resolveImageUrl(rawUrl);

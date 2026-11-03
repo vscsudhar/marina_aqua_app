@@ -60,7 +60,8 @@ class PaymentEntryDialog extends StatefulWidget {
 
 class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
   final DealerService _dealerService = locator<DealerService>();
-  final NumberFormat currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final NumberFormat currencyFormat =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
   final _formKey = GlobalKey<FormState>();
   late DateTime _paymentDate;
@@ -83,7 +84,10 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     if (widget.products.isNotEmpty && widget.linkedSupplyId == null) {
       _addNewProductRow();
     } else {
-      final defaultAmt = widget.suggestedAmount ?? (widget.dealer.currentOutstanding > 0 ? widget.dealer.currentOutstanding : 0.0);
+      final defaultAmt = widget.suggestedAmount ??
+          (widget.dealer.currentOutstanding > 0
+              ? widget.dealer.currentOutstanding
+              : 0.0);
       if (defaultAmt > 0) {
         _amountController.text = defaultAmt.toStringAsFixed(0);
       }
@@ -117,7 +121,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     });
   }
 
-  Future<void> _resolveDealerPriceForItem(CollectionProductItem item, int productId) async {
+  Future<void> _resolveDealerPriceForItem(
+      CollectionProductItem item, int productId) async {
     setState(() => item.isResolvingPrice = true);
     try {
       final res = await _dealerService.resolveEffectivePrice(
@@ -127,7 +132,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
       );
       if (mounted) {
         setState(() {
-          item.appliedPrice = (res['price'] as num?)?.toDouble() ?? (item.product?.defaultPrice ?? 0.0);
+          item.appliedPrice = (res['price'] as num?)?.toDouble() ??
+              (item.product?.defaultPrice ?? 0.0);
           item.isResolvingPrice = false;
           _syncSuggestedAmount();
         });
@@ -147,17 +153,21 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     if (!_userEditedAmount) {
       if (_totalActualSupplyAmount > 0) {
         _amountController.text = _totalActualSupplyAmount.toStringAsFixed(0);
-      } else if (widget.suggestedAmount != null && widget.suggestedAmount! > 0) {
+      } else if (widget.suggestedAmount != null &&
+          widget.suggestedAmount! > 0) {
         _amountController.text = widget.suggestedAmount!.toStringAsFixed(0);
       }
     }
   }
 
-  double get _totalActualSupplyAmount => _items.fold(0.0, (sum, it) => sum + it.lineTotal);
+  double get _totalActualSupplyAmount =>
+      _items.fold(0.0, (sum, it) => sum + it.lineTotal);
 
-  double get _collectedAmount => double.tryParse(_amountController.text.trim()) ?? 0.0;
+  double get _collectedAmount =>
+      double.tryParse(_amountController.text.trim()) ?? 0.0;
 
-  double get _balanceAddedToLedger => _totalActualSupplyAmount - _collectedAmount;
+  double get _balanceAddedToLedger =>
+      _totalActualSupplyAmount - _collectedAmount;
 
   @override
   void dispose() {
@@ -210,7 +220,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                       if (_items.isEmpty)
                         _buildEmptyProductsCard()
                       else
-                        ..._items.asMap().entries.map((entry) => _buildProductCard(entry.key, entry.value)),
+                        ..._items.asMap().entries.map((entry) =>
+                            _buildProductCard(entry.key, entry.value)),
                       const SizedBox(height: 8),
                       _buildAddProductButton(),
                       const SizedBox(height: 22),
@@ -251,7 +262,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     color: kcSuccessColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.payments_rounded, color: kcSuccessColor, size: 22),
+                  child: const Icon(Icons.payments_rounded,
+                      color: kcSuccessColor, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -260,12 +272,16 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     children: [
                       Text(
                         'Record Collection & Supply',
-                        style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: kcTextPrimary),
+                        style: GoogleFonts.outfit(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: kcTextPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         'Record delivered products, collected amount & update dealer ledger',
-                        style: GoogleFonts.inter(fontSize: 11, color: kcTextMuted),
+                        style:
+                            GoogleFonts.inter(fontSize: 11, color: kcTextMuted),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -286,7 +302,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
   }
 
   Widget _buildDealerBanner() {
-    final hasTodayActivity = widget.dealer.todayCollectedAmount > 0 || widget.dealer.hasSupplyToday;
+    final hasTodayActivity =
+        widget.dealer.todayCollectedAmount > 0 || widget.dealer.hasSupplyToday;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -308,12 +325,16 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                   children: [
                     Text(
                       widget.dealer.name,
-                      style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: kcTextPrimary),
+                      style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: kcTextPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Code: ${widget.dealer.code}  •  ${widget.dealer.phone}',
-                      style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
+                      style: GoogleFonts.inter(
+                          fontSize: 11, color: kcTextSecondary),
                     ),
                   ],
                 ),
@@ -322,14 +343,18 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Current Outstanding Due', style: GoogleFonts.inter(fontSize: 10, color: kcTextMuted)),
+                  Text('Current Outstanding Due',
+                      style:
+                          GoogleFonts.inter(fontSize: 10, color: kcTextMuted)),
                   const SizedBox(height: 2),
                   Text(
                     widget.dealer.outstandingFormatted,
                     style: GoogleFonts.outfit(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: widget.dealer.currentOutstanding > 0 ? kcErrorColor : kcSuccessColor,
+                      color: widget.dealer.currentOutstanding > 0
+                          ? kcErrorColor
+                          : kcSuccessColor,
                     ),
                   ),
                 ],
@@ -350,11 +375,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.history_rounded, size: 14, color: kcPrimaryDark),
+                      const Icon(Icons.history_rounded,
+                          size: 14, color: kcPrimaryDark),
                       const SizedBox(width: 6),
                       Text(
                         "Earlier Deliveries Today (${widget.existingSupplies.length}):",
-                        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: kcPrimaryDark),
+                        style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: kcPrimaryDark),
                       ),
                     ],
                   ),
@@ -362,36 +391,51 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                   ...widget.existingSupplies.asMap().entries.map((e) {
                     final idx = e.key;
                     final s = e.value;
-                    final timeStr = s.formattedTime.isNotEmpty ? s.formattedTime : s.supplyNo;
+                    final timeStr = s.formattedTime.isNotEmpty
+                        ? s.formattedTime
+                        : s.supplyNo;
                     final itemsSummary = s.items.isNotEmpty
-                        ? s.items.map((it) => '${it.quantity % 1 == 0 ? it.quantity.toInt() : it.quantity} ${it.unit ?? 'Can'} @ ₹${it.appliedPrice.toStringAsFixed(0)} = ₹${it.lineTotal.toStringAsFixed(0)}').join(', ')
+                        ? s.items
+                            .map((it) =>
+                                '${it.quantity % 1 == 0 ? it.quantity.toInt() : it.quantity} ${it.unit ?? 'Can'} @ ₹${it.appliedPrice.toStringAsFixed(0)} = ₹${it.lineTotal.toStringAsFixed(0)}')
+                            .join(', ')
                         : '${s.itemsCount} items • ₹${s.totalAmount.toStringAsFixed(0)}';
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1.5),
                             decoration: BoxDecoration(
                               color: kcPrimaryDark.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               '#${idx + 1} $timeStr',
-                              style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: kcPrimaryDark),
+                              style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: kcPrimaryDark),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               itemsSummary,
-                              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: kcTextPrimary),
+                              style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: kcTextPrimary),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
                             '₹${s.totalAmount.toStringAsFixed(0)}',
-                            style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w800, color: kcPrimaryDark),
+                            style: GoogleFonts.outfit(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: kcPrimaryDark),
                           ),
                         ],
                       ),
@@ -406,30 +450,41 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               spacing: 8,
               runSpacing: 4,
               children: [
-                if (widget.dealer.hasSupplyToday && widget.dealer.todaySupply != null)
+                if (widget.dealer.hasSupplyToday &&
+                    widget.dealer.todaySupply != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: kcPrimaryDark.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: kcPrimaryDark.withValues(alpha: 0.2)),
+                      border: Border.all(
+                          color: kcPrimaryDark.withValues(alpha: 0.2)),
                     ),
                     child: Text(
                       "Today's Supplies: ₹${widget.dealer.todaySupply!.totalAmount.toStringAsFixed(0)}",
-                      style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w600, color: kcPrimaryDark),
+                      style: GoogleFonts.inter(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: kcPrimaryDark),
                     ),
                   ),
                 if (widget.dealer.todayCollectedAmount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: kcSuccessColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: kcSuccessColor.withValues(alpha: 0.2)),
+                      border: Border.all(
+                          color: kcSuccessColor.withValues(alpha: 0.2)),
                     ),
                     child: Text(
                       'Collected Today: ${widget.dealer.collectedFormatted}',
-                      style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w600, color: kcSuccessColor),
+                      style: GoogleFonts.inter(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: kcSuccessColor),
                     ),
                   ),
               ],
@@ -475,15 +530,20 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Collection / Supply Date', style: GoogleFonts.inter(fontSize: 10, color: kcTextMuted)),
+                Text('Collection / Supply Date',
+                    style: GoogleFonts.inter(fontSize: 10, color: kcTextMuted)),
                 const SizedBox(height: 2),
                 Text(
                   DateFormat('dd MMMM yyyy (EEEE)').format(_paymentDate),
-                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: kcTextPrimary),
+                  style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: kcTextPrimary),
                 ),
               ],
             ),
-            const Icon(Icons.calendar_today_rounded, size: 18, color: kcPrimaryDark),
+            const Icon(Icons.calendar_today_rounded,
+                size: 18, color: kcPrimaryDark),
           ],
         ),
       ),
@@ -501,12 +561,16 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         Expanded(
           child: Row(
             children: [
-              const Icon(Icons.water_drop_rounded, size: 18, color: kcPrimaryColor),
+              const Icon(Icons.water_drop_rounded,
+                  size: 18, color: kcPrimaryColor),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'Delivered Products (Against Dealer Price)',
-                  style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: kcTextPrimary),
+                  style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: kcTextPrimary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -516,7 +580,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         const SizedBox(width: 8),
         Text(
           '${_items.length} ${_items.length == 1 ? 'item' : 'items'}',
-          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w500, color: kcTextMuted),
+          style: GoogleFonts.inter(
+              fontSize: 11, fontWeight: FontWeight.w500, color: kcTextMuted),
         ),
       ],
     );
@@ -565,13 +630,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<ProductModel>(
-                      value: item.product,
+                      initialValue: item.product,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Select Product *',
                         labelStyle: GoogleFonts.inter(fontSize: 12),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                         filled: true,
                         fillColor: Colors.white,
                       ),
@@ -580,7 +647,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                           value: prod,
                           child: Text(
                             '${prod.name} (${prod.unitName})',
-                            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+                            style: GoogleFonts.inter(
+                                fontSize: 13, fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
                         );
@@ -598,7 +666,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: kcErrorColor, size: 22),
+                    icon: const Icon(Icons.delete_outline_rounded,
+                        color: kcErrorColor, size: 22),
                     tooltip: 'Remove Product',
                     onPressed: () => _removeProductRow(index),
                   ),
@@ -608,17 +677,21 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               if (isNarrow) ...[
                 TextFormField(
                   controller: item.quantityController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: 'Count / Qty *',
                     labelStyle: GoogleFonts.inter(fontSize: 11),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     filled: true,
                     fillColor: Colors.white,
                     isDense: true,
                   ),
-                  style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.outfit(
+                      fontSize: 14, fontWeight: FontWeight.w700),
                   onChanged: (val) {
                     final qty = double.tryParse(val) ?? 0.0;
                     setState(() {
@@ -639,7 +712,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -648,13 +722,22 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dealer Price', style: GoogleFonts.inter(fontSize: 9.5, color: kcTextMuted)),
+                            Text('Dealer Price',
+                                style: GoogleFonts.inter(
+                                    fontSize: 9.5, color: kcTextMuted)),
                             const SizedBox(height: 1),
                             item.isResolvingPrice
-                                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5))
+                                ? const SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 1.5))
                                 : Text(
                                     currencyFormat.format(item.appliedPrice),
-                                    style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: kcPrimaryDark),
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: kcPrimaryDark),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                           ],
@@ -664,20 +747,27 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
                         decoration: BoxDecoration(
                           color: kcPrimaryColor.withValues(alpha: 0.07),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: kcPrimaryColor.withValues(alpha: 0.2)),
+                          border: Border.all(
+                              color: kcPrimaryColor.withValues(alpha: 0.2)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('Actual Amount', style: GoogleFonts.inter(fontSize: 9.5, color: kcPrimaryDark)),
+                            Text('Actual Amount',
+                                style: GoogleFonts.inter(
+                                    fontSize: 9.5, color: kcPrimaryDark)),
                             const SizedBox(height: 1),
                             Text(
                               currencyFormat.format(item.lineTotal),
-                              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w800, color: kcPrimaryDark),
+                              style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: kcPrimaryDark),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
@@ -694,17 +784,21 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: item.quantityController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Count / Qty *',
                           labelStyle: GoogleFonts.inter(fontSize: 11),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8)),
                           filled: true,
                           fillColor: Colors.white,
                           isDense: true,
                         ),
-                        style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.outfit(
+                            fontSize: 14, fontWeight: FontWeight.w700),
                         onChanged: (val) {
                           final qty = double.tryParse(val) ?? 0.0;
                           setState(() {
@@ -726,7 +820,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     Expanded(
                       flex: 3,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -735,13 +830,22 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dealer Price', style: GoogleFonts.inter(fontSize: 9.5, color: kcTextMuted)),
+                            Text('Dealer Price',
+                                style: GoogleFonts.inter(
+                                    fontSize: 9.5, color: kcTextMuted)),
                             const SizedBox(height: 1),
                             item.isResolvingPrice
-                                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5))
+                                ? const SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 1.5))
                                 : Text(
                                     currencyFormat.format(item.appliedPrice),
-                                    style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: kcPrimaryDark),
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: kcPrimaryDark),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                           ],
@@ -753,20 +857,27 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     Expanded(
                       flex: 3,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
                         decoration: BoxDecoration(
                           color: kcPrimaryColor.withValues(alpha: 0.07),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: kcPrimaryColor.withValues(alpha: 0.2)),
+                          border: Border.all(
+                              color: kcPrimaryColor.withValues(alpha: 0.2)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('Actual Amount', style: GoogleFonts.inter(fontSize: 9.5, color: kcPrimaryDark)),
+                            Text('Actual Amount',
+                                style: GoogleFonts.inter(
+                                    fontSize: 9.5, color: kcPrimaryDark)),
                             const SizedBox(height: 1),
                             Text(
                               currencyFormat.format(item.lineTotal),
-                              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w800, color: kcPrimaryDark),
+                              style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: kcPrimaryDark),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
@@ -787,7 +898,9 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     return OutlinedButton.icon(
       onPressed: _addNewProductRow,
       icon: const Icon(Icons.add_rounded, size: 18, color: kcPrimaryDark),
-      label: Text('Add Another Product', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: kcPrimaryDark)),
+      label: Text('Add Another Product',
+          style: GoogleFonts.inter(
+              fontSize: 12, fontWeight: FontWeight.w600, color: kcPrimaryDark)),
       style: OutlinedButton.styleFrom(
         side: const BorderSide(color: kcPrimaryColor, width: 1.2),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -825,10 +938,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total Actual Supply Amount:', style: GoogleFonts.inter(fontSize: 12.5, color: kcTextSecondary)),
+              Text('Total Actual Supply Amount:',
+                  style: GoogleFonts.inter(
+                      fontSize: 12.5, color: kcTextSecondary)),
               Text(
                 currencyFormat.format(actual),
-                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: kcTextPrimary),
+                style: GoogleFonts.outfit(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: kcTextPrimary),
               ),
             ],
           ),
@@ -836,10 +954,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Collection Amount (Paid):', style: GoogleFonts.inter(fontSize: 12.5, color: kcTextSecondary)),
+              Text('Collection Amount (Paid):',
+                  style: GoogleFonts.inter(
+                      fontSize: 12.5, color: kcTextSecondary)),
               Text(
                 currencyFormat.format(collected),
-                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: kcSuccessColor),
+                style: GoogleFonts.outfit(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: kcSuccessColor),
               ),
             ],
           ),
@@ -851,15 +974,22 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                 child: Row(
                   children: [
                     Icon(
-                      balance > 0 ? Icons.account_balance_wallet_outlined : Icons.check_circle_outline_rounded,
+                      balance > 0
+                          ? Icons.account_balance_wallet_outlined
+                          : Icons.check_circle_outline_rounded,
                       size: 18,
-                      color: balance > 0 ? const Color(0xFFD97706) : kcSuccessColor,
+                      color: balance > 0
+                          ? const Color(0xFFD97706)
+                          : kcSuccessColor,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'Balance Added to Ledger:',
-                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: kcTextPrimary),
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: kcTextPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -891,9 +1021,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             child: Row(
               children: [
                 Icon(
-                  balance > 0 ? Icons.info_outline_rounded : Icons.check_circle_rounded,
+                  balance > 0
+                      ? Icons.info_outline_rounded
+                      : Icons.check_circle_rounded,
                   size: 15,
-                  color: balance > 0 ? const Color(0xFF92400E) : (balance == 0 && actual > 0 ? const Color(0xFF065F46) : kcTextMuted),
+                  color: balance > 0
+                      ? const Color(0xFF92400E)
+                      : (balance == 0 && actual > 0
+                          ? const Color(0xFF065F46)
+                          : kcTextMuted),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -908,7 +1044,11 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: balance > 0 ? const Color(0xFF92400E) : (balance == 0 && actual > 0 ? const Color(0xFF065F46) : kcTextSecondary),
+                      color: balance > 0
+                          ? const Color(0xFF92400E)
+                          : (balance == 0 && actual > 0
+                              ? const Color(0xFF065F46)
+                              : kcTextSecondary),
                     ),
                   ),
                 ),
@@ -931,12 +1071,15 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             decoration: InputDecoration(
               labelText: 'Collection Amount (₹) *',
               labelStyle: GoogleFonts.inter(fontSize: 12),
-              prefixIcon: const Icon(Icons.currency_rupee_rounded, size: 20, color: kcSuccessColor),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              prefixIcon: const Icon(Icons.currency_rupee_rounded,
+                  size: 20, color: kcSuccessColor),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               filled: true,
               fillColor: Colors.white,
             ),
-            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700),
+            style:
+                GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700),
             onChanged: (val) {
               _userEditedAmount = true;
               setState(() {});
@@ -958,17 +1101,23 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               onPressed: () {
                 _userEditedAmount = false;
                 setState(() {
-                  _amountController.text = _totalActualSupplyAmount.toStringAsFixed(0);
+                  _amountController.text =
+                      _totalActualSupplyAmount.toStringAsFixed(0);
                 });
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 side: const BorderSide(color: kcSuccessColor),
               ),
               child: Text(
                 'Full Amount',
-                style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w600, color: kcSuccessColor),
+                style: GoogleFonts.inter(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: kcSuccessColor),
               ),
             ),
           ),
@@ -983,7 +1132,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
       children: [
         Text(
           'Payment Mode *',
-          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: kcTextPrimary),
+          style: GoogleFonts.inter(
+              fontSize: 12, fontWeight: FontWeight.w600, color: kcTextPrimary),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -993,7 +1143,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             _buildModeChip('cash', 'Cash', Icons.money_rounded),
             _buildModeChip('upi', 'UPI / QR', Icons.qr_code_rounded),
             _buildModeChip('cheque', 'Cheque', Icons.article_rounded),
-            _buildModeChip('bank_transfer', 'Bank Transfer', Icons.account_balance_rounded),
+            _buildModeChip('bank_transfer', 'Bank Transfer',
+                Icons.account_balance_rounded),
           ],
         ),
       ],
@@ -1010,7 +1161,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         color: isSelected ? kcSuccessColor : kcBorderColor,
         width: isSelected ? 1.5 : 1.0,
       ),
-      avatar: Icon(icon, size: 16, color: isSelected ? kcSuccessColor : kcMediumGrey),
+      avatar: Icon(icon,
+          size: 16, color: isSelected ? kcSuccessColor : kcMediumGrey),
       label: Text(
         label,
         style: GoogleFonts.inter(
@@ -1068,9 +1220,11 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             onPressed: () => Navigator.of(context).pop(),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text('Cancel', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            child: Text('Cancel',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           ),
           ElevatedButton.icon(
             onPressed: _submit,
@@ -1083,7 +1237,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               backgroundColor: kcSuccessColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ],
@@ -1102,13 +1257,16 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         final it = _items[i];
         if (it.product == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please select a product for row #${i + 1}')),
+            SnackBar(
+                content: Text('Please select a product for row #${i + 1}')),
           );
           return;
         }
         if (it.quantity <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Count for "${it.product!.name}" must be greater than zero.')),
+            SnackBar(
+                content: Text(
+                    'Count for "${it.product!.name}" must be greater than zero.')),
           );
           return;
         }
@@ -1118,18 +1276,25 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         '_is_supply': true,
         'dealer_id': widget.dealer.id,
         'supply_date': DateFormat('yyyy-MM-dd').format(_paymentDate),
-        'items': _items.map((it) => {
-          'product_id': it.product!.id,
-          'quantity': it.quantity,
-          'unit': it.product!.unitName,
-          'custom_price': it.appliedPrice,
-        }).toList(),
+        'items': _items
+            .map((it) => {
+                  'product_id': it.product!.id,
+                  'quantity': it.quantity,
+                  'unit': it.product!.unitName,
+                  'custom_price': it.appliedPrice,
+                })
+            .toList(),
         'payment_amount': amount,
         'payment_method': _paymentMethod,
         'payment_date': DateFormat('yyyy-MM-dd').format(_paymentDate),
-        'payment_reference': _referenceController.text.trim().isNotEmpty ? _referenceController.text.trim() : null,
-        'payment_notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
-        'idempotency_key': 'COL-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
+        'payment_reference': _referenceController.text.trim().isNotEmpty
+            ? _referenceController.text.trim()
+            : null,
+        'payment_notes': _notesController.text.trim().isNotEmpty
+            ? _notesController.text.trim()
+            : null,
+        'idempotency_key':
+            'COL-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
       };
 
       widget.onSave(payload);
@@ -1141,9 +1306,14 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         'payment_date': DateFormat('yyyy-MM-dd').format(_paymentDate),
         'amount': amount,
         'payment_method': _paymentMethod,
-        'reference_no': _referenceController.text.trim().isNotEmpty ? _referenceController.text.trim() : null,
-        'notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
-        'idempotency_key': 'PAY-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
+        'reference_no': _referenceController.text.trim().isNotEmpty
+            ? _referenceController.text.trim()
+            : null,
+        'notes': _notesController.text.trim().isNotEmpty
+            ? _notesController.text.trim()
+            : null,
+        'idempotency_key':
+            'PAY-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
       };
 
       widget.onSave(payload);
