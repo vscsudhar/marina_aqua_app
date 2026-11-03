@@ -10,6 +10,7 @@ class CompanySettingModel {
   final String stateCode;
   final String gstin;
   final String pan;
+  final String? fssaiNo;
   final String bankName;
   final String bankBranch;
   final String accountNumber;
@@ -37,6 +38,7 @@ class CompanySettingModel {
     this.stateCode = '33',
     this.gstin = '33AABCM1234F1Z9',
     this.pan = 'AABCM1234F',
+    this.fssaiNo,
     this.bankName = 'State Bank of India',
     this.bankBranch = 'Thoraipakkam, Chennai',
     this.accountNumber = '38992010045',
@@ -47,10 +49,10 @@ class CompanySettingModel {
     this.defaultTaxRate = 18.0,
     this.logoPath,
     this.logoUrl,
-    this.invoicePrefix = 'INV',
+    this.invoicePrefix = '',
     this.invoiceNumberPadding = 4,
     this.nextInvoiceNumber = 1,
-    this.invoiceFooterNotes = '1. Goods once sold will not be taken back.\n2. Payment terms: 15 days.\n3. Subject to Chennai jurisdiction.',
+    this.invoiceFooterNotes = 'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
   });
 
   factory CompanySettingModel.fromJson(Map<String, dynamic> json) {
@@ -66,6 +68,7 @@ class CompanySettingModel {
       stateCode: json['state_code'] as String? ?? '33',
       gstin: json['gstin'] as String? ?? '',
       pan: json['pan'] as String? ?? '',
+      fssaiNo: json['fssai_no'] as String?,
       bankName: json['bank_name'] as String? ?? '',
       bankBranch: json['bank_branch'] as String? ?? '',
       accountNumber: json['account_number'] as String? ?? '',
@@ -78,7 +81,7 @@ class CompanySettingModel {
           : 18.0,
       logoPath: json['logo_path'] as String?,
       logoUrl: json['logo_url'] as String?,
-      invoicePrefix: json['invoice_prefix'] as String? ?? 'INV',
+      invoicePrefix: json['invoice_prefix'] as String? ?? '',
       invoiceNumberPadding: json['invoice_number_padding'] is int
           ? json['invoice_number_padding']
           : int.tryParse(json['invoice_number_padding']?.toString() ?? '') ?? 4,
@@ -101,6 +104,7 @@ class CompanySettingModel {
     String? stateCode,
     String? gstin,
     String? pan,
+    String? fssaiNo,
     String? bankName,
     String? bankBranch,
     String? accountNumber,
@@ -128,6 +132,7 @@ class CompanySettingModel {
       stateCode: stateCode ?? this.stateCode,
       gstin: gstin ?? this.gstin,
       pan: pan ?? this.pan,
+      fssaiNo: fssaiNo ?? this.fssaiNo,
       bankName: bankName ?? this.bankName,
       bankBranch: bankBranch ?? this.bankBranch,
       accountNumber: accountNumber ?? this.accountNumber,
@@ -157,6 +162,7 @@ class CompanySettingModel {
         'state_code': stateCode,
         'gstin': gstin,
         'pan': pan,
+        'fssai_no': fssaiNo,
         'bank_name': bankName,
         'bank_branch': bankBranch,
         'account_number': accountNumber,
@@ -482,3 +488,98 @@ class InvoiceModel {
     );
   }
 }
+
+class GstSupplyCode {
+  final String code;
+  final String stateName;
+  final String displayName;
+  final String placeOfSupply;
+
+  const GstSupplyCode({
+    required this.code,
+    required this.stateName,
+    required this.displayName,
+    required this.placeOfSupply,
+  });
+}
+
+const List<GstSupplyCode> kGstSupplyCodes = [
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu (Coimbatore)',
+    placeOfSupply: '33-Tamil Nadu (Coimbatore)',
+  ),
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu',
+    placeOfSupply: '33-Tamil Nadu',
+  ),
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu (Chennai)',
+    placeOfSupply: '33-Tamil Nadu (Chennai)',
+  ),
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu (Madurai)',
+    placeOfSupply: '33-Tamil Nadu (Madurai)',
+  ),
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu (Tirupur)',
+    placeOfSupply: '33-Tamil Nadu (Tirupur)',
+  ),
+  GstSupplyCode(
+    code: '33',
+    stateName: 'Tamil Nadu',
+    displayName: '33 - Tamil Nadu (Salem)',
+    placeOfSupply: '33-Tamil Nadu (Salem)',
+  ),
+  GstSupplyCode(
+    code: '32',
+    stateName: 'Kerala',
+    displayName: '32 - Kerala',
+    placeOfSupply: '32-Kerala',
+  ),
+  GstSupplyCode(
+    code: '29',
+    stateName: 'Karnataka',
+    displayName: '29 - Karnataka',
+    placeOfSupply: '29-Karnataka',
+  ),
+  GstSupplyCode(
+    code: '37',
+    stateName: 'Andhra Pradesh',
+    displayName: '37 - Andhra Pradesh',
+    placeOfSupply: '37-Andhra Pradesh',
+  ),
+  GstSupplyCode(
+    code: '36',
+    stateName: 'Telangana',
+    displayName: '36 - Telangana',
+    placeOfSupply: '36-Telangana',
+  ),
+  GstSupplyCode(
+    code: '34',
+    stateName: 'Puducherry',
+    displayName: '34 - Puducherry',
+    placeOfSupply: '34-Puducherry',
+  ),
+  GstSupplyCode(
+    code: '27',
+    stateName: 'Maharashtra',
+    displayName: '27 - Maharashtra',
+    placeOfSupply: '27-Maharashtra',
+  ),
+  GstSupplyCode(
+    code: '07',
+    stateName: 'Delhi',
+    displayName: '07 - Delhi',
+    placeOfSupply: '07-Delhi',
+  ),
+];

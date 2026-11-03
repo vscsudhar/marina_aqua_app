@@ -707,7 +707,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                   controller: _invoiceNoController,
                   decoration: InputDecoration(
                     labelText: 'Invoice Number *',
-                    hintText: 'e.g. INV-33',
+                    hintText: 'e.g. 101 or INV-101',
                     isDense: true,
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.tag, size: 20, color: kcPrimaryDark),
@@ -813,6 +813,19 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     ),
                     isDense: true,
                     border: const OutlineInputBorder(),
+                    suffixIcon: PopupMenuButton<String>(
+                      icon: const Icon(Icons.arrow_drop_down_circle_outlined, color: kcPrimaryColor, size: 20),
+                      tooltip: 'Select Supply Code (e.g. Coimbatore)',
+                      onSelected: (val) {
+                        setState(() {
+                          _placeOfSupplyController.text = val;
+                        });
+                      },
+                      itemBuilder: (ctx) => kGstSupplyCodes.map((c) => PopupMenuItem(
+                        value: c.placeOfSupply,
+                        child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 12)),
+                      )).toList(),
+                    ),
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
@@ -1362,7 +1375,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 controller: _termsController,
                 maxLines: 2,
                 decoration: const InputDecoration(
-                  labelText: 'Invoice Terms & Conditions',
+                  labelText: 'Declaration',
+                  hintText: 'We declare that this invoice shows the actual price of the goods...',
                   isDense: true,
                   border: OutlineInputBorder(),
                 ),

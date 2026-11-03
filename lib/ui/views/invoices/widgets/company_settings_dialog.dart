@@ -35,6 +35,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
   late TextEditingController _stateCodeController;
   late TextEditingController _gstinController;
   late TextEditingController _panController;
+  late TextEditingController _fssaiController;
   late TextEditingController _bankNameController;
   late TextEditingController _bankBranchController;
   late TextEditingController _accountNumberController;
@@ -63,6 +64,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     _stateCodeController = TextEditingController(text: s.stateCode);
     _gstinController = TextEditingController(text: s.gstin);
     _panController = TextEditingController(text: s.pan);
+    _fssaiController = TextEditingController(text: s.fssaiNo ?? '');
     _bankNameController = TextEditingController(text: s.bankName);
     _bankBranchController = TextEditingController(text: s.bankBranch);
     _accountNumberController = TextEditingController(text: s.accountNumber);
@@ -85,6 +87,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     _stateCodeController.dispose();
     _gstinController.dispose();
     _panController.dispose();
+    _fssaiController.dispose();
     _bankNameController.dispose();
     _bankBranchController.dispose();
     _accountNumberController.dispose();
@@ -115,6 +118,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         'state_code': _stateCodeController.text.trim(),
         'gstin': _gstinController.text.trim().toUpperCase(),
         'pan': _panController.text.trim().toUpperCase(),
+        'fssai_no': _fssaiController.text.trim(),
         'bank_name': _bankNameController.text.trim(),
         'bank_branch': _bankBranchController.text.trim(),
         'account_number': _accountNumberController.text.trim(),
@@ -360,9 +364,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           Expanded(
                             child: _buildTextField(
                               controller: _invoicePrefixController,
-                              label: 'Invoice Prefix (e.g. INV)',
-                              validator: (v) =>
-                                  v?.trim().isEmpty ?? true ? 'Required' : null,
+                              label: 'Invoice Prefix (Optional)',
+                              hintText: 'Leave blank for numbers only (e.g. 101)',
                             ),
                           ),
                         ],
@@ -425,6 +428,41 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             v?.trim().isEmpty ?? true ? 'Required' : null,
                       ),
                       const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: kcVeryLightGrey,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: kcBorderColor),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: kGstSupplyCodes.any((c) => c.code == _stateCodeController.text.trim())
+                                ? kGstSupplyCodes.firstWhere((c) => c.code == _stateCodeController.text.trim()).displayName
+                                : null,
+                            decoration: const InputDecoration(
+                              labelText: 'Supply / State Code (Dropdown Selection)',
+                              border: InputBorder.none,
+                              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+                            ),
+                            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
+                            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
+                                  value: c.displayName,
+                                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
+                                )).toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                                setState(() {
+                                  _stateCodeController.text = matched.code;
+                                  _stateNameController.text = matched.stateName;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -444,6 +482,12 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildTextField(
+                        controller: _fssaiController,
+                        label: 'FSSAI License / Registration No (Optional)',
+                        hintText: 'e.g. 12421008000123',
                       ),
                       const SizedBox(height: 24),
                       _sectionHeader('Tax & Regulatory Credentials',
@@ -475,6 +519,12 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildTextField(
+                        controller: _fssaiController,
+                        label: 'FSSAI License / Registration No (Optional)',
+                        hintText: 'e.g. 12421008000123',
                       ),
                       const SizedBox(height: 24),
                       _sectionHeader('Bank Account & Remittance Details',
@@ -542,14 +592,14 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      _sectionHeader('Default Terms & Conditions',
+                      _sectionHeader('Default Declaration',
                           Icons.description_outlined),
                       const SizedBox(height: 12),
                       _buildTextField(
                         controller: _invoiceFooterNotesController,
                         label:
-                            'Standard Terms & Conditions on Printed Invoices',
-                        maxLines: 4,
+                            'Standard Declaration on Printed Invoices',
+                        maxLines: 3,
                       ),
                     ],
                   ),

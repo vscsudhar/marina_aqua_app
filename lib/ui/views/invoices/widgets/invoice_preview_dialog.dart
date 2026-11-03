@@ -86,7 +86,6 @@ class InvoicePreviewDialog extends StatelessWidget {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        _buildStatusChip(invoice.status),
                         _buildPaymentStatusChip(invoice.paymentStatus),
                       ],
                     ),
@@ -269,6 +268,16 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   color: kcTextPrimary,
                                 ),
                               ),
+                              if (companySettings.fssaiNo != null &&
+                                  companySettings.fssaiNo!.isNotEmpty)
+                                Text(
+                                  'FSSAI Lic. No: ${companySettings.fssaiNo}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: kcPrimaryColor,
+                                  ),
+                                ),
                               Text(
                                 'Phone: ${companySettings.phone} | Email: ${companySettings.email}',
                                 style: GoogleFonts.inter(
@@ -303,10 +312,14 @@ class InvoicePreviewDialog extends StatelessWidget {
                               _metaRow('Invoice No:', invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              if (invoice.dueDate != null)
-                                _metaRow('Due Date:', invoice.dueDate!),
-                              _metaRow(
-                                  'Place of Supply:', invoice.placeOfSupply),
+                              _metaRow('Phone:', companySettings.phone),
+                              if (companySettings.email.isNotEmpty)
+                                _metaRow('Email:', companySettings.email),
+                              if (companySettings.fssaiNo != null &&
+                                  companySettings.fssaiNo!.isNotEmpty)
+                                _metaRow('FSSAI NO:', companySettings.fssaiNo!),
+                              if (companySettings.gstin.isNotEmpty)
+                                _metaRow('GSTIN:', companySettings.gstin),
                               if (invoice.dealerSupplyNo != null)
                                 _metaRow(
                                     'Supply Ref:', invoice.dealerSupplyNo!),
@@ -412,19 +425,6 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     ),
                                   ),
                                 ],
-                                const SizedBox(height: 4),
-                                Text(
-                                  invoice.isInterstate
-                                      ? 'Interstate Supply (IGST)'
-                                      : 'Intrastate Supply (CGST+SGST)',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: invoice.isInterstate
-                                        ? kcWarningColor
-                                        : kcSuccessColor,
-                                  ),
-                                ),
                               ],
                             );
 
@@ -931,36 +931,6 @@ class InvoicePreviewDialog extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  static Widget _buildStatusChip(String status) {
-    Color bg;
-    Color fg;
-    switch (status.toLowerCase()) {
-      case 'finalized':
-        bg = kcSuccessColor.withValues(alpha: 0.18);
-        fg = kcSuccessColor;
-        break;
-      case 'cancelled':
-        bg = kcErrorColor.withValues(alpha: 0.18);
-        fg = kcErrorColor;
-        break;
-      default:
-        bg = kcWarningColor.withValues(alpha: 0.18);
-        fg = kcWarningColor;
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        status.toUpperCase(),
-        style: GoogleFonts.inter(
-            fontSize: 11, fontWeight: FontWeight.w700, color: fg),
       ),
     );
   }

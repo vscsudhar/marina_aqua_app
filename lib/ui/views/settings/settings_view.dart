@@ -208,6 +208,7 @@ class SettingsView extends StackedView<SettingsViewModel> {
     final stateCodeController = TextEditingController(text: s.stateCode);
     final gstinController = TextEditingController(text: s.gstin);
     final panController = TextEditingController(text: s.pan);
+    final fssaiController = TextEditingController(text: s.fssaiNo ?? '');
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -334,6 +335,30 @@ class SettingsView extends StackedView<SettingsViewModel> {
           const SizedBox(height: 14),
           _buildTextField(controller: addressController, label: 'Registered Business Address *', maxLines: 2),
           const SizedBox(height: 14),
+          DropdownButtonFormField<String>(
+            initialValue: kGstSupplyCodes.any((c) => c.code == stateCodeController.text.trim())
+                ? kGstSupplyCodes.firstWhere((c) => c.code == stateCodeController.text.trim()).displayName
+                : null,
+            decoration: const InputDecoration(
+              labelText: 'Supply / State Code (Dropdown Selection)',
+              border: OutlineInputBorder(),
+              isDense: true,
+              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+            ),
+            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
+            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
+                  value: c.displayName,
+                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
+                )).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                stateCodeController.text = matched.code;
+                stateNameController.text = matched.stateName;
+              }
+            },
+          ),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(flex: 2, child: _buildTextField(controller: stateNameController, label: 'State Name *')),
@@ -362,6 +387,13 @@ class SettingsView extends StackedView<SettingsViewModel> {
             ],
           ),
 
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: fssaiController,
+            label: 'FSSAI License / Registration No (Optional)',
+            hint: 'e.g. 12421008000123',
+          ),
+
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -378,6 +410,7 @@ class SettingsView extends StackedView<SettingsViewModel> {
                   'state_code': stateCodeController.text.trim(),
                   'gstin': gstinController.text.trim().toUpperCase(),
                   'pan': panController.text.trim().toUpperCase(),
+                  'fssai_no': fssaiController.text.trim(),
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
@@ -419,7 +452,7 @@ class SettingsView extends StackedView<SettingsViewModel> {
           _sectionHeader('Invoice Numbering Sequence & Rules', Icons.tag),
           const SizedBox(height: 8),
           Text(
-            'Invoices are generated automatically in the format: {PREFIX}-{YYYYMMDD}-{SEQUENCE}',
+            'Invoices are generated automatically in the format: {PREFIX}-{SEQUENCE} or pure sequence numbers ({SEQUENCE}) if prefix is empty.',
             style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
           ),
           const SizedBox(height: 16),
@@ -428,8 +461,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
               Expanded(
                 child: _buildTextField(
                   controller: prefixController,
-                  label: 'Invoice Prefix *',
-                  hint: 'e.g. INV or MAQ',
+                  label: 'Invoice Prefix (Optional)',
+                  hint: 'Optional (leave empty for numbers only)',
                 ),
               ),
               const SizedBox(width: 16),
@@ -484,12 +517,12 @@ class SettingsView extends StackedView<SettingsViewModel> {
           ),
 
           const SizedBox(height: 24),
-          _sectionHeader('Invoice Footer Terms & Conditions', Icons.description_outlined),
+          _sectionHeader('Invoice Declaration', Icons.description_outlined),
           const SizedBox(height: 16),
           _buildTextField(
             controller: termsController,
-            label: 'Standard Terms & Conditions on Invoices',
-            maxLines: 4,
+            label: 'Standard Declaration on Invoices',
+            maxLines: 3,
           ),
 
           const SizedBox(height: 24),
@@ -956,6 +989,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
   late final TextEditingController _stateCodeController;
   late final TextEditingController _gstinController;
   late final TextEditingController _panController;
+  late final TextEditingController _fssaiController;
 
   @override
   void initState() {
@@ -971,6 +1005,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
     _stateCodeController = TextEditingController(text: s.stateCode);
     _gstinController = TextEditingController(text: s.gstin);
     _panController = TextEditingController(text: s.pan);
+    _fssaiController = TextEditingController(text: s.fssaiNo ?? '');
   }
 
   @override
@@ -987,6 +1022,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
       _syncIfChanged(_stateCodeController, widget.settings.stateCode);
       _syncIfChanged(_gstinController, widget.settings.gstin);
       _syncIfChanged(_panController, widget.settings.pan);
+      _syncIfChanged(_fssaiController, widget.settings.fssaiNo);
     }
   }
 
@@ -1009,6 +1045,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
     _stateCodeController.dispose();
     _gstinController.dispose();
     _panController.dispose();
+    _fssaiController.dispose();
     super.dispose();
   }
 
@@ -1206,6 +1243,30 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
             maxLines: 2,
           ),
           const SizedBox(height: 14),
+          DropdownButtonFormField<String>(
+            initialValue: kGstSupplyCodes.any((c) => c.code == _stateCodeController.text.trim())
+                ? kGstSupplyCodes.firstWhere((c) => c.code == _stateCodeController.text.trim()).displayName
+                : null,
+            decoration: const InputDecoration(
+              labelText: 'Supply / State Code (Dropdown Selection)',
+              border: OutlineInputBorder(),
+              isDense: true,
+              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+            ),
+            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
+            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
+                  value: c.displayName,
+                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
+                )).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                _stateCodeController.text = matched.code;
+                _stateNameController.text = matched.stateName;
+              }
+            },
+          ),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
@@ -1238,6 +1299,13 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
             ],
           ),
 
+          const SizedBox(height: 16),
+          SettingsView._buildTextField(
+            controller: _fssaiController,
+            label: 'FSSAI License / Registration No (Optional)',
+            hint: 'e.g. 12421008000123',
+          ),
+
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -1254,6 +1322,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                   'state_code': _stateCodeController.text.trim(),
                   'gstin': _gstinController.text.trim().toUpperCase(),
                   'pan': _panController.text.trim().toUpperCase(),
+                  'fssai_no': _fssaiController.text.trim(),
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
@@ -1359,7 +1428,7 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
           SettingsView._sectionHeader('Invoice Numbering Sequence & Rules', Icons.tag),
           const SizedBox(height: 8),
           Text(
-            'Invoices are generated automatically in the format: {PREFIX}-{YYYYMMDD}-{SEQUENCE}',
+            'Invoices are generated automatically in the format: {PREFIX}-{SEQUENCE} or pure sequence numbers ({SEQUENCE}) if prefix is empty.',
             style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
           ),
           const SizedBox(height: 16),
@@ -1368,8 +1437,8 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
               Expanded(
                 child: SettingsView._buildTextField(
                   controller: _prefixController,
-                  label: 'Invoice Prefix *',
-                  hint: 'e.g. INV or MAQ',
+                  label: 'Invoice Prefix (Optional)',
+                  hint: 'Optional (leave empty for numbers only)',
                 ),
               ),
               const SizedBox(width: 16),
@@ -1424,12 +1493,12 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
           ),
 
           const SizedBox(height: 24),
-          SettingsView._sectionHeader('Invoice Footer Terms & Conditions', Icons.description_outlined),
+          SettingsView._sectionHeader('Invoice Declaration', Icons.description_outlined),
           const SizedBox(height: 16),
           SettingsView._buildTextField(
             controller: _termsController,
-            label: 'Standard Terms & Conditions on Invoices',
-            maxLines: 4,
+            label: 'Standard Declaration on Invoices',
+            maxLines: 3,
           ),
 
           const SizedBox(height: 24),
