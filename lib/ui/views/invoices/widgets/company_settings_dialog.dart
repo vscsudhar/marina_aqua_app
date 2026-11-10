@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:marina_aqua/services/file_picker_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -144,16 +144,11 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
 
   Future<void> _pickLogo() async {
     try {
-      final files = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'],
-      );
-      if (files.isNotEmpty) {
+      final file = await pickImageFile();
+      if (file != null) {
         setState(() => _isUploadingLogo = true);
-        final file = files.first;
-        final bytes = await file.xFile.readAsBytes();
         final updated = await locator<SettingsService>()
-            .uploadCompanyLogo(bytes, file.name);
+            .uploadCompanyLogo(file.bytes, file.name);
         if (mounted) {
           setState(() {
             _logoUrl = updated.logoUrl ?? updated.logoPath;

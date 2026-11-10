@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:marina_aqua/services/file_picker_helper.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/models/tax_rate_model.dart';
 import 'package:marina_aqua/services/api_service.dart';
@@ -1086,19 +1086,12 @@ class SettingsView extends StackedView<SettingsViewModel> {
 
   Future<void> _pickAndUploadLogo(SettingsViewModel viewModel) async {
     try {
-      final files = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'],
-      );
-
-      if (files.isNotEmpty) {
-        final file = files.first;
-        final bytes = await file.xFile.readAsBytes();
-        final size = await file.xFile.length();
+      final file = await pickImageFile();
+      if (file != null) {
         await viewModel.pickAndUploadLogo(
-          bytes,
+          file.bytes,
           file.name,
-          size,
+          file.size,
         );
       }
     } catch (e) {

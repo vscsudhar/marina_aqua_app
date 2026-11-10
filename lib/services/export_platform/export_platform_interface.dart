@@ -12,4 +12,8 @@ abstract class ExportPlatform {
   static Future<String?> saveFile(List<int> bytes, String fileName) async {
     throw UnsupportedError('Cannot save file without platform implementation');
   }
+
+  static void printPdf(List<int> bytes, {String title = 'Document'}) {
+    throw UnsupportedError('Cannot print without platform implementation');
+  }
 }

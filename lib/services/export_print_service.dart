@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:excel/excel.dart';
 import 'package:pdf/pdf.dart';
@@ -81,13 +81,22 @@ class ExportPrintService {
     ExportPlatform.downloadFile(bytes, fileName, mimeType);
   }
 
-  /// Launch native/browser print preview using `Printing.layoutPdf`.
+  /// Launch native/browser print preview using `Printing.layoutPdf`
+  /// with automatic fallback to browser print if plugin is unavailable on Web.
   Future<void> printPdfBytes(List<int> bytes,
       {String title = 'Document'}) async {
-    await Printing.layoutPdf(
-      name: title,
-      onLayout: (PdfPageFormat format) async => Uint8List.fromList(bytes),
-    );
+    try {
+      await Printing.layoutPdf(
+        name: title,
+        onLayout: (PdfPageFormat format) async => Uint8List.fromList(bytes),
+      );
+    } catch (e) {
+      if (kIsWeb) {
+        ExportPlatform.printPdf(bytes, title: title);
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// Open external URL in browser (e.g. printable web view stream).

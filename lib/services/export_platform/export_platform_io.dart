@@ -42,4 +42,8 @@ class ExportPlatform {
       return currentFile.path;
     }
   }
+
+  static void printPdf(List<int> bytes, {String title = 'Document'}) {
+    // Printing.layoutPdf handles native printing on desktop/mobile
+  }
 }

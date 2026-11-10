@@ -4,12 +4,14 @@ import 'package:marina_aqua/app/app.bottomsheets.dart';
 import 'package:marina_aqua/app/app.dialogs.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/app/app.router.dart';
+import 'package:marina_aqua/services/file_picker_helper.dart';
 import 'package:marina_aqua/services/storage_service.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  initializeFilePicker();
   await setupLocator();
   await locator<StorageService>().init();
   setupDialogUi();

@@ -40,4 +40,17 @@ class ExportPlatform {
     downloadFile(bytes, fileName, 'application/octet-stream');
     return fileName;
   }
+
+  static void printPdf(List<int> bytes, {String title = 'Document'}) {
+    try {
+      final blob = html.Blob([bytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.window.open(url, '_blank');
+      Future.delayed(const Duration(minutes: 2), () {
+        html.Url.revokeObjectUrl(url);
+      });
+    } catch (_) {
+      downloadFile(bytes, '$title.pdf', 'application/pdf');
+    }
+  }
 }
