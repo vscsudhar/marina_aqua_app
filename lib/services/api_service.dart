@@ -69,7 +69,9 @@ class ApiService {
           if (kIsWeb && options.data == null) {
             options.sendTimeout = null;
           }
-          if (options.data != null && options.data is! FormData && !options.headers.containsKey('Content-Type')) {
+          if (options.data != null &&
+              options.data is! FormData &&
+              !options.headers.containsKey('Content-Type')) {
             options.headers['Content-Type'] = 'application/json';
           }
           final token = await _storageService.getToken();
@@ -130,7 +132,10 @@ class ApiService {
         final baseUri = Uri.parse(baseOrigin);
         if (urlUri.host != baseUri.host || urlUri.port != baseUri.port) {
           return urlUri
-              .replace(scheme: baseUri.scheme, host: baseUri.host, port: baseUri.port)
+              .replace(
+                  scheme: baseUri.scheme,
+                  host: baseUri.host,
+                  port: baseUri.port)
               .toString();
         }
       }
@@ -197,7 +202,8 @@ class ApiService {
         path,
         queryParameters: queryParameters,
       );
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, fromData);
+      return ApiResponse.fromJson(
+          response.data as Map<String, dynamic>, fromData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -218,7 +224,8 @@ class ApiService {
         data: data,
         queryParameters: queryParameters,
       );
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, fromData);
+      return ApiResponse.fromJson(
+          response.data as Map<String, dynamic>, fromData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -239,7 +246,8 @@ class ApiService {
         data: data,
         queryParameters: queryParameters,
       );
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, fromData);
+      return ApiResponse.fromJson(
+          response.data as Map<String, dynamic>, fromData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -260,7 +268,8 @@ class ApiService {
         data: data,
         queryParameters: queryParameters,
       );
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, fromData);
+      return ApiResponse.fromJson(
+          response.data as Map<String, dynamic>, fromData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -281,7 +290,8 @@ class ApiService {
         data: data,
         queryParameters: queryParameters,
       );
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, fromData);
+      return ApiResponse.fromJson(
+          response.data as Map<String, dynamic>, fromData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -318,12 +328,14 @@ class ApiService {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         return ApiException(
-          message: 'Connection timed out. Please check your network and try again.',
+          message:
+              'Connection timed out. Please check your network and try again.',
           statusCode: 408,
         );
       case DioExceptionType.connectionError:
         return ApiException(
-          message: 'Unable to connect to Marina Aqua server. Ensure the API is running.',
+          message:
+              'Unable to connect to Marina Aqua server. Ensure the API is running.',
           statusCode: 503,
         );
       default:

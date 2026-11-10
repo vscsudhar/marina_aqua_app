@@ -5,6 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'dart:async' as _i21;
+import 'dart:typed_data' as _i33;
 import 'dart:ui' as _i22;
 
 import 'package:dio/dio.dart' as _i3;
@@ -33,7 +34,7 @@ import 'package:marina_aqua/services/dealer_ledger_report_service.dart' as _i30;
 import 'package:marina_aqua/services/dealer_service.dart' as _i28;
 import 'package:marina_aqua/services/inventory_service.dart' as _i31;
 import 'package:marina_aqua/services/product_master_service.dart' as _i27;
-import 'package:marina_aqua/services/settings_service.dart' as _i33;
+import 'package:marina_aqua/services/settings_service.dart' as _i34;
 import 'package:marina_aqua/services/storage_service.dart' as _i24;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i19;
@@ -4092,20 +4093,21 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
       ) as String);
 
   @override
-  _i21.Future<List<int>> downloadPdfBytes(int? id) => (super.noSuchMethod(
+  _i21.Future<_i33.Uint8List> downloadPdfBytes(int? id) => (super.noSuchMethod(
         Invocation.method(
           #downloadPdfBytes,
           [id],
         ),
-        returnValue: _i21.Future<List<int>>.value(<int>[]),
-        returnValueForMissingStub: _i21.Future<List<int>>.value(<int>[]),
-      ) as _i21.Future<List<int>>);
+        returnValue: _i21.Future<_i33.Uint8List>.value(_i33.Uint8List(0)),
+        returnValueForMissingStub:
+            _i21.Future<_i33.Uint8List>.value(_i33.Uint8List(0)),
+      ) as _i21.Future<_i33.Uint8List>);
 }
 
 /// A class which mocks [SettingsService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSettingsService extends _i1.Mock implements _i33.SettingsService {
+class MockSettingsService extends _i1.Mock implements _i34.SettingsService {
   @override
   _i16.CompanySettingModel get settings => (super.noSuchMethod(
         Invocation.getter(#settings),

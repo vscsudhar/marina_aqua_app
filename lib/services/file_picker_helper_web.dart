@@ -34,7 +34,8 @@ Future<AppPickedFile?> pickImageFile({
   initializeFilePicker();
 
   final completer = Completer<AppPickedFile?>();
-  final uploadInput = web.document.createElement('input') as web.HTMLInputElement;
+  final uploadInput =
+      web.document.createElement('input') as web.HTMLInputElement;
   uploadInput.type = 'file';
   uploadInput.accept = allowedExtensions.map((e) => '.$e').join(',');
   uploadInput.style.display = 'none';

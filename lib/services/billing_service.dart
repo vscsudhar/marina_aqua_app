@@ -203,21 +203,23 @@ class BillingService {
   }
 
   /// Download PDF raw bytes with auth header
-  Future<List<int>> downloadPdfBytes(int id) async {
+  Future<Uint8List> downloadPdfBytes(int id) async {
     final response = await _apiService.client.get(
       '/invoices/$id/pdf',
       options: Options(responseType: ResponseType.bytes),
     );
     final data = response.data;
     if (data is Uint8List) {
-      return data.toList();
-    } else if (data is ByteBuffer) {
-      return data.asUint8List().toList();
-    } else if (data is List<int>) {
       return data;
+    } else if (data is ByteBuffer) {
+      return data.asUint8List();
+    } else if (data is List<int>) {
+      return Uint8List.fromList(data);
     } else if (data is List) {
-      return List<int>.from(data);
+      return Uint8List.fromList(List<int>.from(data));
+    } else if (data is String) {
+      return Uint8List.fromList(data.codeUnits);
     }
-    return (data as List<dynamic>).cast<int>();
+    return Uint8List.fromList((data as List<dynamic>).cast<int>());
   }
 }
