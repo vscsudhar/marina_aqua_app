@@ -48,7 +48,8 @@ class SupplyEntryDialog extends StatefulWidget {
 
 class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
   final DealerService _dealerService = locator<DealerService>();
-  final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final currencyFormat =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
   late DateTime _supplyDate;
   late List<SupplyRowItem> _rows;
@@ -58,7 +59,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
 
   // Immediate payment fields
   bool _recordImmediatePayment = false;
-  final TextEditingController _paymentAmountController = TextEditingController();
+  final TextEditingController _paymentAmountController =
+      TextEditingController();
   final TextEditingController _paymentRefController = TextEditingController();
   final TextEditingController _paymentNotesController = TextEditingController();
   String _paymentMethod = 'cash';
@@ -70,14 +72,17 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
   void initState() {
     super.initState();
     _supplyDate = widget.existingSupply != null
-        ? DateTime.tryParse(widget.existingSupply!.supplyDate) ?? widget.initialDate
+        ? DateTime.tryParse(widget.existingSupply!.supplyDate) ??
+            widget.initialDate
         : widget.initialDate;
     _paymentDate = _supplyDate;
 
     if (widget.existingSupply != null) {
       _notesController.text = widget.existingSupply!.notes ?? '';
-      _discountController.text = widget.existingSupply!.discountAmount.toString();
-      _adjustmentController.text = widget.existingSupply!.adjustmentAmount.toString();
+      _discountController.text =
+          widget.existingSupply!.discountAmount.toString();
+      _adjustmentController.text =
+          widget.existingSupply!.adjustmentAmount.toString();
 
       _rows = widget.existingSupply!.items.map((item) {
         final prod = widget.products.cast<ProductModel?>().firstWhere(
@@ -147,19 +152,25 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
   }
 
   double get _subtotal => _rows.fold(0.0, (sum, r) => sum + r.lineTotal);
-  double get _discount => double.tryParse(_discountController.text.trim()) ?? 0.0;
-  double get _adjustment => double.tryParse(_adjustmentController.text.trim()) ?? 0.0;
-  double get _grandTotal => (_subtotal + _adjustment - _discount).clamp(0.0, double.infinity);
+  double get _discount =>
+      double.tryParse(_discountController.text.trim()) ?? 0.0;
+  double get _adjustment =>
+      double.tryParse(_adjustmentController.text.trim()) ?? 0.0;
+  double get _grandTotal =>
+      (_subtotal + _adjustment - _discount).clamp(0.0, double.infinity);
 
   void _updatePaymentAmountDefault() {
-    if (_recordImmediatePayment && (_paymentAmountController.text.isEmpty || _paymentAmountController.text == '0')) {
+    if (_recordImmediatePayment &&
+        (_paymentAmountController.text.isEmpty ||
+            _paymentAmountController.text == '0')) {
       _paymentAmountController.text = _grandTotal.toStringAsFixed(0);
     }
   }
 
   String get _derivedPaymentStatus {
     if (!_recordImmediatePayment) return 'unpaid';
-    final payAmount = double.tryParse(_paymentAmountController.text.trim()) ?? 0.0;
+    final payAmount =
+        double.tryParse(_paymentAmountController.text.trim()) ?? 0.0;
     if (payAmount <= 0) return 'unpaid';
     if (payAmount >= _grandTotal && _grandTotal > 0) return 'paid';
     return 'partially_paid';
@@ -211,7 +222,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     const SizedBox(height: 24),
                     _buildProductsSectionHeader(),
                     const SizedBox(height: 12),
-                    ..._rows.asMap().entries.map((entry) => _buildProductRow(entry.key, entry.value)),
+                    ..._rows.asMap().entries.map(
+                        (entry) => _buildProductRow(entry.key, entry.value)),
                     const SizedBox(height: 8),
                     _buildAddRowButton(),
                     const SizedBox(height: 24),
@@ -219,7 +231,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     const SizedBox(height: 24),
                     _buildGrandTotalCard(),
                     const SizedBox(height: 24),
-                    if (widget.existingSupply == null) _buildImmediatePaymentSection(),
+                    if (widget.existingSupply == null)
+                      _buildImmediatePaymentSection(),
                   ],
                 ),
               ),
@@ -247,7 +260,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     color: kcPrimaryColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.local_shipping_rounded, color: kcPrimaryDark, size: 22),
+                  child: const Icon(Icons.local_shipping_rounded,
+                      color: kcPrimaryDark, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -255,7 +269,9 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.existingSupply != null ? 'Edit Supply Delivery' : 'Record Dealer Supply Delivery',
+                        widget.existingSupply != null
+                            ? 'Edit Supply Delivery'
+                            : 'Record Dealer Supply Delivery',
                         style: GoogleFonts.outfit(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -265,7 +281,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                       ),
                       Text(
                         'Contract rate snapshots applied automatically',
-                        style: GoogleFonts.inter(fontSize: 12, color: kcTextMuted),
+                        style:
+                            GoogleFonts.inter(fontSize: 12, color: kcTextMuted),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -304,8 +321,11 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             radius: 20,
             backgroundColor: kcPrimaryDark,
             child: Text(
-              widget.dealer.name.isNotEmpty ? widget.dealer.name[0].toUpperCase() : 'D',
-              style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
+              widget.dealer.name.isNotEmpty
+                  ? widget.dealer.name[0].toUpperCase()
+                  : 'D',
+              style: GoogleFonts.outfit(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 14),
@@ -328,7 +348,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: kcDeepNavy.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(6),
@@ -347,7 +368,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                 const SizedBox(height: 4),
                 Text(
                   'Phone: ${widget.dealer.phone}  •  Current Outstanding: ${widget.dealer.outstandingFormatted}',
-                  style: GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
+                  style:
+                      GoogleFonts.inter(fontSize: 12, color: kcTextSecondary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -367,7 +389,10 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             children: [
               Text(
                 'Supply Date',
-                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: kcTextPrimary),
+                style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: kcTextPrimary),
               ),
               const SizedBox(height: 6),
               InkWell(
@@ -392,7 +417,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                 },
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: kcSurfaceWhite,
                     borderRadius: BorderRadius.circular(10),
@@ -403,9 +429,13 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     children: [
                       Text(
                         DateFormat('dd MMMM yyyy').format(_supplyDate),
-                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: kcTextPrimary),
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: kcTextPrimary),
                       ),
-                      const Icon(Icons.calendar_today_rounded, size: 16, color: kcPrimaryDark),
+                      const Icon(Icons.calendar_today_rounded,
+                          size: 16, color: kcPrimaryDark),
                     ],
                   ),
                 ),
@@ -423,7 +453,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
       children: [
         Text(
           'Products & Quantities Delivered',
-          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: kcTextPrimary),
+          style: GoogleFonts.outfit(
+              fontSize: 15, fontWeight: FontWeight.w700, color: kcTextPrimary),
         ),
         if (_isResolvingPrice)
           Row(
@@ -431,7 +462,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
               const SizedBox(
                 width: 14,
                 height: 14,
-                child: CircularProgressIndicator(strokeWidth: 2, color: kcPrimaryColor),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: kcPrimaryColor),
               ),
               const SizedBox(width: 8),
               Text(
@@ -462,8 +494,10 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             decoration: InputDecoration(
               labelText: 'Product',
               labelStyle: GoogleFonts.inter(fontSize: 11),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white,
             ),
@@ -472,7 +506,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                 value: p.id,
                 child: Text(
                   '${p.name} (${p.unit})',
-                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.inter(
+                      fontSize: 12, fontWeight: FontWeight.w600),
                   overflow: TextOverflow.ellipsis,
                 ),
               );
@@ -495,8 +530,10 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             decoration: InputDecoration(
               labelText: 'Rate (₹)',
               labelStyle: GoogleFonts.inter(fontSize: 11),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white,
             ),
@@ -515,8 +552,10 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             decoration: InputDecoration(
               labelText: 'Quantity',
               labelStyle: GoogleFonts.inter(fontSize: 11),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white,
             ),
@@ -543,7 +582,10 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     currencyFormat.format(row.lineTotal),
-                    style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: kcDeepNavy),
+                    style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: kcDeepNavy),
                   ),
                 ),
               ],
@@ -552,7 +594,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
 
           final removeBtn = _rows.length > 1
               ? IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, color: kcErrorColor, size: 20),
+                  icon: const Icon(Icons.delete_outline_rounded,
+                      color: kcErrorColor, size: 20),
                   tooltip: 'Remove Row',
                   onPressed: () {
                     setState(() {
@@ -617,10 +660,12 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
           _addNewRow();
         });
       },
-      icon: const Icon(Icons.add_circle_outline_rounded, size: 18, color: kcPrimaryDark),
+      icon: const Icon(Icons.add_circle_outline_rounded,
+          size: 18, color: kcPrimaryDark),
       label: Text(
         'Add Another Product Line',
-        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: kcPrimaryDark),
+        style: GoogleFonts.inter(
+            fontSize: 13, fontWeight: FontWeight.w600, color: kcPrimaryDark),
       ),
     );
   }
@@ -634,12 +679,14 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             Expanded(
               child: TextFormField(
                 controller: _discountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   labelText: 'Discount (₹)',
                   labelStyle: GoogleFonts.inter(fontSize: 12),
                   prefixIcon: const Icon(Icons.discount_outlined, size: 18),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   filled: true,
                   fillColor: Colors.white,
                 ),
@@ -653,12 +700,14 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             Expanded(
               child: TextFormField(
                 controller: _adjustmentController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   labelText: 'Adjustments / Deposit (₹)',
                   labelStyle: GoogleFonts.inter(fontSize: 12),
                   prefixIcon: const Icon(Icons.tune_rounded, size: 18),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   filled: true,
                   fillColor: Colors.white,
                 ),
@@ -701,8 +750,12 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Subtotal Base:', style: GoogleFonts.inter(fontSize: 13, color: kcTextSecondary)),
-              Text(currencyFormat.format(_subtotal), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+              Text('Subtotal Base:',
+                  style:
+                      GoogleFonts.inter(fontSize: 13, color: kcTextSecondary)),
+              Text(currencyFormat.format(_subtotal),
+                  style: GoogleFonts.inter(
+                      fontSize: 13, fontWeight: FontWeight.w600)),
             ],
           ),
           if (_discount > 0) ...[
@@ -710,8 +763,14 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Discount Applied:', style: GoogleFonts.inter(fontSize: 13, color: kcErrorColor)),
-                Text('- ${currencyFormat.format(_discount)}', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: kcErrorColor)),
+                Text('Discount Applied:',
+                    style:
+                        GoogleFonts.inter(fontSize: 13, color: kcErrorColor)),
+                Text('- ${currencyFormat.format(_discount)}',
+                    style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: kcErrorColor)),
               ],
             ),
           ],
@@ -720,8 +779,12 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Adjustments:', style: GoogleFonts.inter(fontSize: 13, color: kcTextSecondary)),
-                Text(currencyFormat.format(_adjustment), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('Adjustments:',
+                    style: GoogleFonts.inter(
+                        fontSize: 13, color: kcTextSecondary)),
+                Text(currencyFormat.format(_adjustment),
+                    style: GoogleFonts.inter(
+                        fontSize: 13, fontWeight: FontWeight.w600)),
               ],
             ),
           ],
@@ -731,11 +794,17 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             children: [
               Text(
                 'Grand Total Due:',
-                style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w800, color: kcDeepNavy),
+                style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: kcDeepNavy),
               ),
               Text(
                 currencyFormat.format(_grandTotal),
-                style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w800, color: kcPrimaryDark),
+                style: GoogleFonts.outfit(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: kcPrimaryDark),
               ),
             ],
           ),
@@ -769,7 +838,9 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                   children: [
                     Icon(
                       Icons.payments_rounded,
-                      color: _recordImmediatePayment ? kcSuccessColor : kcTextMuted,
+                      color: _recordImmediatePayment
+                          ? kcSuccessColor
+                          : kcTextMuted,
                       size: 22,
                     ),
                     const SizedBox(width: 10),
@@ -779,7 +850,9 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: _recordImmediatePayment ? kcSuccessColor : kcTextPrimary,
+                          color: _recordImmediatePayment
+                              ? kcSuccessColor
+                              : kcTextPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -795,14 +868,14 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                   setState(() {
                     _recordImmediatePayment = val;
                     if (val && _paymentAmountController.text.isEmpty) {
-                      _paymentAmountController.text = _grandTotal.toStringAsFixed(0);
+                      _paymentAmountController.text =
+                          _grandTotal.toStringAsFixed(0);
                     }
                   });
                 },
               ),
             ],
           ),
-
           if (_recordImmediatePayment) ...[
             const SizedBox(height: 16),
             Row(
@@ -810,22 +883,27 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                 Expanded(
                   child: TextFormField(
                     controller: _paymentAmountController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       labelText: 'Collection Amount (₹)',
                       labelStyle: GoogleFonts.inter(fontSize: 12),
-                      prefixIcon: const Icon(Icons.currency_rupee_rounded, size: 18),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      prefixIcon:
+                          const Icon(Icons.currency_rupee_rounded, size: 18),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.inter(
+                        fontSize: 13, fontWeight: FontWeight.w700),
                     onChanged: (_) => setState(() {}),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: _derivedPaymentStatus == 'paid'
                         ? kcSuccessColor.withValues(alpha: 0.15)
@@ -837,7 +915,9 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: _derivedPaymentStatus == 'paid' ? kcSuccessColor : kcWarningColor,
+                      color: _derivedPaymentStatus == 'paid'
+                          ? kcSuccessColor
+                          : kcWarningColor,
                     ),
                   ),
                 ),
@@ -848,16 +928,21 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             // Payment method chips
             Text(
               'Payment Method',
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: kcTextPrimary),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: kcTextPrimary),
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 _buildMethodChip('cash', 'Cash', Icons.money_rounded),
-                _buildMethodChip('upi', 'UPI / GPay / PhonePe', Icons.qr_code_rounded),
+                _buildMethodChip(
+                    'upi', 'UPI / GPay / PhonePe', Icons.qr_code_rounded),
                 _buildMethodChip('cheque', 'Cheque', Icons.article_rounded),
-                _buildMethodChip('bank_transfer', 'NEFT / IMPS', Icons.account_balance_rounded),
+                _buildMethodChip('bank_transfer', 'NEFT / IMPS',
+                    Icons.account_balance_rounded),
               ],
             ),
             const SizedBox(height: 14),
@@ -870,7 +955,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
                     decoration: InputDecoration(
                       labelText: 'Reference # (UPI Ref, Cheque #, UTR)',
                       labelStyle: GoogleFonts.inter(fontSize: 12),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
                       filled: true,
                       fillColor: Colors.white,
                     ),
@@ -895,7 +981,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
         color: isSelected ? kcPrimaryDark : kcBorderColor,
         width: isSelected ? 1.5 : 1.0,
       ),
-      avatar: Icon(icon, size: 16, color: isSelected ? kcPrimaryDark : kcMediumGrey),
+      avatar: Icon(icon,
+          size: 16, color: isSelected ? kcPrimaryDark : kcMediumGrey),
       label: Text(
         label,
         style: GoogleFonts.inter(
@@ -925,22 +1012,28 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
             onPressed: () => Navigator.of(context).pop(),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text('Cancel', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            child: Text('Cancel',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           ),
           ElevatedButton.icon(
             onPressed: _submit,
             icon: const Icon(Icons.check_circle_rounded, size: 18),
             label: Text(
-              widget.existingSupply != null ? 'Update Supply' : 'Confirm & Deliver',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
+              widget.existingSupply != null
+                  ? 'Update Supply'
+                  : 'Confirm & Deliver',
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: kcPrimaryDark,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
               elevation: 2,
             ),
           ),
@@ -951,10 +1044,13 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
 
   void _submit() {
     // Validate rows
-    final validRows = _rows.where((r) => r.product != null && r.quantity > 0).toList();
+    final validRows =
+        _rows.where((r) => r.product != null && r.quantity > 0).toList();
     if (validRows.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add at least one product with quantity > 0.')),
+        const SnackBar(
+            content:
+                Text('Please add at least one product with quantity > 0.')),
       );
       return;
     }
@@ -962,10 +1058,13 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
     final payload = <String, dynamic>{
       'dealer_id': widget.dealer.id,
       'supply_date': DateFormat('yyyy-MM-dd').format(_supplyDate),
-      'idempotency_key': 'SUPPLY-${widget.dealer.id}-${DateTime.now().millisecondsSinceEpoch}',
+      'idempotency_key':
+          'SUPPLY-${widget.dealer.id}-${DateTime.now().millisecondsSinceEpoch}',
       'discount_amount': _discount,
       'adjustment_amount': _adjustment,
-      'notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      'notes': _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
       'items': validRows.map((r) {
         return {
           'product_id': r.product!.id,
@@ -978,7 +1077,8 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
     };
 
     if (_recordImmediatePayment && widget.existingSupply == null) {
-      final payAmt = double.tryParse(_paymentAmountController.text.trim()) ?? 0.0;
+      final payAmt =
+          double.tryParse(_paymentAmountController.text.trim()) ?? 0.0;
       if (payAmt > 0) {
         payload['payment_amount'] = payAmt;
         payload['payment_method'] = _paymentMethod;

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/common/ui_helpers.dart';
 
 class CreditNoteDialog extends StatefulWidget {
   final InvoiceModel invoice;
@@ -22,7 +23,7 @@ class CreditNoteDialog extends StatefulWidget {
 class _CreditNoteDialogState extends State<CreditNoteDialog> {
   final _formKey = GlobalKey<FormState>();
   final currencyFormat =
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   late TextEditingController _subtotalController;
   late TextEditingController _taxController;
@@ -141,7 +142,7 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          'Invoice: ${widget.invoice.invoiceNo} • Grand Total: ${currencyFormat.format(widget.invoice.grandTotal)}',
+                          'Invoice: ${widget.invoice.invoiceNo} • Grand Total: ${formatAmount(widget.invoice.grandTotal)}',
                           style: GoogleFonts.inter(
                               color: Colors.white70, fontSize: 12),
                           overflow: TextOverflow.ellipsis,
@@ -242,7 +243,7 @@ class _CreditNoteDialogState extends State<CreditNoteDialog> {
                                 style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w600)),
                             Text(
-                              currencyFormat.format(_total),
+                              formatAmount(_total),
                               style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 16,

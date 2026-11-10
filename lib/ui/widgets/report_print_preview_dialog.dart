@@ -70,7 +70,8 @@ class ReportPrintPreviewDialog extends StatefulWidget {
   }
 
   @override
-  State<ReportPrintPreviewDialog> createState() => _ReportPrintPreviewDialogState();
+  State<ReportPrintPreviewDialog> createState() =>
+      _ReportPrintPreviewDialogState();
 }
 
 class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
@@ -100,7 +101,9 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Print preview failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Print preview failed: $e'),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -127,18 +130,24 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
         isLandscape: widget.isLandscape,
       );
 
-      final safeName = '${widget.title.replaceAll(' ', '_')}_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-      _exportService.downloadBytes(pdfBytes, safeName, ExportPrintService.mimePdf);
+      final safeName =
+          '${widget.title.replaceAll(' ', '_')}_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      _exportService.downloadBytes(
+          pdfBytes, safeName, ExportPrintService.mimePdf);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('PDF downloaded: $safeName'), backgroundColor: Colors.green),
+          SnackBar(
+              content: Text('PDF downloaded: $safeName'),
+              backgroundColor: Colors.green),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Download failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Download failed: $e'),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -164,18 +173,24 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
         summaryRow: widget.summaryRow,
       );
 
-      final safeName = '${widget.title.replaceAll(' ', '_')}_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
-      _exportService.downloadBytes(excelBytes, safeName, ExportPrintService.mimeExcel);
+      final safeName =
+          '${widget.title.replaceAll(' ', '_')}_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
+      _exportService.downloadBytes(
+          excelBytes, safeName, ExportPrintService.mimeExcel);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Excel downloaded: $safeName'), backgroundColor: Colors.green),
+          SnackBar(
+              content: Text('Excel downloaded: $safeName'),
+              backgroundColor: Colors.green),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export Excel failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Export Excel failed: $e'),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -193,7 +208,8 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
     } catch (_) {}
     final settings = settingsService?.settings;
     final companyName = settings?.companyName ?? 'Marina Aqua Private Limited';
-    final address = settings?.address ?? 'No. 42 Water Works Road, Guindy, Chennai - 600032';
+    final address = settings?.address ??
+        'No. 42 Water Works Road, Guindy, Chennai - 600032';
     final gstin = settings?.gstin ?? '33AABCM9876C1Z8';
     final phone = settings?.phone ?? '+91 44 2233 4455';
     final media = MediaQuery.of(context).size;
@@ -224,12 +240,16 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
 
                   final titleSection = Row(
                     children: [
-                      const Icon(Icons.print_outlined, color: Colors.white, size: 20),
+                      const Icon(Icons.print_outlined,
+                          color: Colors.white, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Print Preview: ${widget.title}',
-                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -251,33 +271,48 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                         const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
                         ),
                       OutlinedButton.icon(
                         onPressed: _isProcessing ? null : _handleDownloadPdf,
-                        icon: const Icon(Icons.picture_as_pdf, size: 15, color: Color(0xFFF87171)),
-                        label: const Text('PDF', style: TextStyle(color: Colors.white, fontSize: 12)),
+                        icon: const Icon(Icons.picture_as_pdf,
+                            size: 15, color: Color(0xFFF87171)),
+                        label: const Text('PDF',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12)),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFF475569)),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                         ),
                       ),
                       OutlinedButton.icon(
                         onPressed: _isProcessing ? null : _handleDownloadExcel,
-                        icon: const Icon(Icons.table_chart, size: 15, color: Color(0xFF4ADE80)),
-                        label: const Text('Excel', style: TextStyle(color: Colors.white, fontSize: 12)),
+                        icon: const Icon(Icons.table_chart,
+                            size: 15, color: Color(0xFF4ADE80)),
+                        label: const Text('Excel',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12)),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFF475569)),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                         ),
                       ),
                       ElevatedButton.icon(
                         onPressed: _isProcessing ? null : _handlePrint,
-                        icon: const Icon(Icons.print, size: 16, color: Colors.white),
-                        label: const Text('Print Document', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                        icon: const Icon(Icons.print,
+                            size: 16, color: Colors.white),
+                        label: const Text('Print Document',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
                         ),
                       ),
                       if (!isNarrow) ...[
@@ -326,7 +361,10 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: const [
-                        BoxShadow(color: Color(0x22000000), offset: Offset(0, 4), blurRadius: 16),
+                        BoxShadow(
+                            color: Color(0x22000000),
+                            offset: Offset(0, 4),
+                            blurRadius: 16),
                       ],
                     ),
                     padding: const EdgeInsets.all(28),
@@ -351,25 +389,35 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                                 children: [
                                   Text(
                                     companyName,
-                                    style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary),
                                   ),
                                   if (address.isNotEmpty)
                                     Text(
                                       address,
-                                      style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
+                                      style: GoogleFonts.inter(
+                                          fontSize: 10,
+                                          color: AppColors.textSecondary),
                                     ),
                                   Text(
                                     [
                                       if (gstin.isNotEmpty) 'GSTIN: $gstin',
                                       if (phone.isNotEmpty) 'Phone: $phone',
                                     ].join(' | '),
-                                    style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
+                                    style: GoogleFonts.inter(
+                                        fontSize: 10,
+                                        color: AppColors.textSecondary),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          const Divider(height: 24, thickness: 1.5, color: Color(0xFF003366)),
+                          const Divider(
+                              height: 24,
+                              thickness: 1.5,
+                              color: Color(0xFF003366)),
 
                           // Centered Title
                           Center(
@@ -388,7 +436,10 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                                   const SizedBox(height: 2),
                                   Text(
                                     widget.subtitle!,
-                                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.accent),
+                                    style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.accent),
                                   ),
                                 ],
                               ],
@@ -397,14 +448,17 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                           const SizedBox(height: 12),
 
                           // Metadata Strip
-                          if (widget.metadata != null && widget.metadata!.isNotEmpty)
+                          if (widget.metadata != null &&
+                              widget.metadata!.isNotEmpty)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                               margin: const EdgeInsets.only(bottom: 14),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF1F5F9),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: const Color(0xFFCBD5E1)),
+                                border:
+                                    Border.all(color: const Color(0xFFCBD5E1)),
                               ),
                               child: Wrap(
                                 spacing: 16,
@@ -413,8 +467,15 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                                   return Text.rich(
                                     TextSpan(
                                       children: [
-                                        TextSpan(text: '${e.key}: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                        TextSpan(text: e.value, style: const TextStyle(fontSize: 11)),
+                                        TextSpan(
+                                            text: '${e.key}: ',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11)),
+                                        TextSpan(
+                                            text: e.value,
+                                            style:
+                                                const TextStyle(fontSize: 11)),
                                       ],
                                     ),
                                   );
@@ -423,33 +484,46 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                             ),
 
                           // KPI Cards Strip
-                          if (widget.kpiMetrics != null && widget.kpiMetrics!.isNotEmpty) ...[
+                          if (widget.kpiMetrics != null &&
+                              widget.kpiMetrics!.isNotEmpty) ...[
                             LayoutBuilder(
                               builder: (context, constraints) {
                                 return Wrap(
                                   spacing: 10,
                                   runSpacing: 10,
-                                  children: widget.kpiMetrics!.entries.map((entry) {
-                                    final cardWidth = (constraints.maxWidth - 30) / widget.kpiMetrics!.length;
+                                  children:
+                                      widget.kpiMetrics!.entries.map((entry) {
+                                    final cardWidth =
+                                        (constraints.maxWidth - 30) /
+                                            widget.kpiMetrics!.length;
                                     return Container(
                                       width: cardWidth.clamp(140.0, 240.0),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 10),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFF8FAFC),
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                                        border: Border.all(
+                                            color: const Color(0xFFE2E8F0)),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             entry.key.toUpperCase(),
-                                            style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                                            style: GoogleFonts.inter(
+                                                fontSize: 10,
+                                                color: AppColors.textSecondary,
+                                                fontWeight: FontWeight.w600),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             entry.value,
-                                            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF003366)),
+                                            style: GoogleFonts.outfit(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFF003366)),
                                           ),
                                         ],
                                       ),
@@ -466,14 +540,17 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                             scrollDirection: Axis.horizontal,
                             child: Table(
                               defaultColumnWidth: const IntrinsicColumnWidth(),
-                              border: TableBorder.all(color: const Color(0xFFCBD5E1), width: 0.8),
+                              border: TableBorder.all(
+                                  color: const Color(0xFFCBD5E1), width: 0.8),
                               children: [
                                 // Table Header
                                 TableRow(
-                                  decoration: const BoxDecoration(color: Color(0xFF003366)),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xFF003366)),
                                   children: widget.tableHeaders.map((header) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 8),
                                       child: Text(
                                         header,
                                         style: GoogleFonts.inter(
@@ -487,19 +564,28 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                                   }).toList(),
                                 ),
                                 // Table Rows
-                                ...widget.tableRows.asMap().entries.map((entry) {
+                                ...widget.tableRows
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
                                   final idx = entry.key;
                                   final row = entry.value;
                                   final isZebra = idx % 2 == 1;
 
                                   return TableRow(
-                                    decoration: BoxDecoration(color: isZebra ? const Color(0xFFF8FAFC) : Colors.white),
+                                    decoration: BoxDecoration(
+                                        color: isZebra
+                                            ? const Color(0xFFF8FAFC)
+                                            : Colors.white),
                                     children: row.map((cell) {
                                       return Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 7),
                                         child: Text(
                                           cell,
-                                          style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF1E293B)),
+                                          style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              color: const Color(0xFF1E293B)),
                                           textAlign: TextAlign.left,
                                         ),
                                       );
@@ -507,12 +593,15 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                                   );
                                 }),
                                 // Summary Row
-                                if (widget.summaryRow != null && widget.summaryRow!.isNotEmpty)
+                                if (widget.summaryRow != null &&
+                                    widget.summaryRow!.isNotEmpty)
                                   TableRow(
-                                    decoration: const BoxDecoration(color: Color(0xFFE6F0FA)),
+                                    decoration: const BoxDecoration(
+                                        color: Color(0xFFE6F0FA)),
                                     children: widget.summaryRow!.map((val) {
                                       return Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 8),
                                         child: Text(
                                           val,
                                           style: GoogleFonts.inter(
@@ -537,11 +626,13 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
                             children: [
                               Text(
                                 'Generated automatically by $companyName Management ERP',
-                                style: GoogleFonts.inter(fontSize: 9, color: Colors.grey.shade500),
+                                style: GoogleFonts.inter(
+                                    fontSize: 9, color: Colors.grey.shade500),
                               ),
                               Text(
                                 'Page 1 of 1',
-                                style: GoogleFonts.inter(fontSize: 9, color: Colors.grey.shade500),
+                                style: GoogleFonts.inter(
+                                    fontSize: 9, color: Colors.grey.shade500),
                               ),
                             ],
                           ),

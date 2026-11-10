@@ -251,10 +251,12 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                       );
 
                       DateTime initialFrom = _effectiveFrom ?? DateTime.now();
-                      if (initialFrom.isBefore(DateTime(2000)))
+                      if (initialFrom.isBefore(DateTime(2000))) {
                         initialFrom = DateTime(2000);
-                      if (initialFrom.isAfter(DateTime(2050)))
+                      }
+                      if (initialFrom.isAfter(DateTime(2050))) {
                         initialFrom = DateTime(2050);
+                      }
 
                       final fromDateField = InkWell(
                         onTap: () async {
@@ -292,10 +294,12 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
 
                       DateTime initialTo = _effectiveTo ??
                           DateTime.now().add(const Duration(days: 365));
-                      if (initialTo.isBefore(DateTime(2000)))
+                      if (initialTo.isBefore(DateTime(2000))) {
                         initialTo = DateTime(2000);
-                      if (initialTo.isAfter(DateTime(2050)))
+                      }
+                      if (initialTo.isAfter(DateTime(2050))) {
                         initialTo = DateTime(2050);
+                      }
 
                       final toDateField = InkWell(
                         onTap: () async {
@@ -377,8 +381,9 @@ class _TaxFormDialogState extends State<TaxFormDialog> {
                                       'Services Only (Delivery, Maintenance)')),
                             ],
                             onChanged: (val) {
-                              if (val != null)
+                              if (val != null) {
                                 setState(() => _applicability = val);
+                              }
                             },
                             decoration: const InputDecoration(
                               labelText: 'Applicability',

@@ -284,8 +284,9 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
                           prefixIcon: Icon(Icons.water_drop_outlined, size: 18),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return 'Enter quantity';
+                          }
                           final n = int.tryParse(val.trim());
                           if (n == null || n < 0) return 'Invalid qty';
                           return null;
@@ -304,8 +305,9 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
                           prefixIcon: Icon(Icons.currency_rupee, size: 18),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return 'Enter amount';
+                          }
                           final n = double.tryParse(val.trim());
                           if (n == null || n < 0) return 'Invalid amount';
                           return null;
@@ -327,8 +329,9 @@ class _OthersEntryDialogState extends State<OthersEntryDialog> {
                     prefixIcon: Icon(Icons.payments_outlined, size: 18),
                   ),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty)
+                    if (val == null || val.trim().isEmpty) {
                       return 'Enter payment';
+                    }
                     final n = double.tryParse(val.trim());
                     if (n == null || n < 0) return 'Invalid amount';
                     return null;

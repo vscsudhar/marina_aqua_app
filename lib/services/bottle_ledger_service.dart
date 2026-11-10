@@ -11,7 +11,8 @@ class BottleLedgerService {
     ApiService? apiService,
     ExportPrintService? exportPrintService,
   ])  : _apiService = apiService ?? locator<ApiService>(),
-        _exportPrintService = exportPrintService ?? locator<ExportPrintService>();
+        _exportPrintService =
+            exportPrintService ?? locator<ExportPrintService>();
 
   /// Fetch monthly bottle ledger matrix and stock register.
   Future<BottleLedgerReportModel> getMonthlyLedger({
@@ -48,7 +49,9 @@ class BottleLedgerService {
     final list = response.data['data'] as List? ?? [];
     return list
         .map((item) => BottleLedgerDrilldownItemModel.fromJson(
-            item is Map<String, dynamic> ? item : Map<String, dynamic>.from(item)))
+            item is Map<String, dynamic>
+                ? item
+                : Map<String, dynamic>.from(item)))
         .toList();
   }
 
@@ -57,7 +60,8 @@ class BottleLedgerService {
     required int year,
     required int month,
   }) async {
-    final fileName = 'bottle_ledger_${year}_${month.toString().padLeft(2, '0')}.pdf';
+    final fileName =
+        'bottle_ledger_${year}_${month.toString().padLeft(2, '0')}.pdf';
     await _exportPrintService.downloadFromApi(
       endpoint: '/bottle-ledger/pdf',
       queryParams: {
@@ -85,4 +89,3 @@ class BottleLedgerService {
     );
   }
 }
-

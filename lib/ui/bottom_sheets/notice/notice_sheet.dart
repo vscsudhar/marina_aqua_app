@@ -35,7 +35,8 @@ class NoticeSheet extends StackedView<NoticeSheetModel> {
             if (request.title != null && request.title!.isNotEmpty)
               Text(
                 request.title!,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
               ),
             verticalSpaceTiny,
             if (request.description != null && request.description!.isNotEmpty)

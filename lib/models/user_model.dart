@@ -33,7 +33,9 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
       email: json['email'] as String? ?? '',
       username: json['username'] as String?,
@@ -47,9 +49,13 @@ class UserModel {
       companyCode: json['company_code'] as String?,
       companyName: json['company_name'] as String?,
       companyLogo: json['company_logo'] as String?,
-      plan: json['plan'] is Map<String, dynamic> ? json['plan'] as Map<String, dynamic> : null,
+      plan: json['plan'] is Map<String, dynamic>
+          ? json['plan'] as Map<String, dynamic>
+          : null,
       planExpiresAt: json['plan_expires_at'] as String? ??
-          (json['plan'] is Map<String, dynamic> ? json['plan']['expires_at'] as String? : null),
+          (json['plan'] is Map<String, dynamic>
+              ? json['plan']['expires_at'] as String?
+              : null),
     );
   }
 
@@ -100,13 +106,27 @@ class UserModel {
     if (raw == null || raw.isEmpty) return null;
     final dt = DateTime.tryParse(raw);
     if (dt == null) return raw;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return '${dt.day.toString().padLeft(2, '0')}-${months[dt.month - 1]}-${dt.year}';
   }
 
   bool get isPlanExpired {
     if (role == 'super_admin') return false;
-    if (plan != null && (plan?['status'] == 'inactive' || plan?['status'] == 'expired')) {
+    if (plan != null &&
+        (plan?['status'] == 'inactive' || plan?['status'] == 'expired')) {
       return true;
     }
     final raw = planExpiresAt ?? (plan?['expires_at'] as String?);

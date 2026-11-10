@@ -506,10 +506,12 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.sell),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return 'Price required';
-                          if (double.tryParse(val) == null)
+                          }
+                          if (double.tryParse(val) == null) {
                             return 'Invalid amount';
+                          }
                           return null;
                         },
                       );
@@ -526,10 +528,12 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.shopping_bag_outlined),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return 'Cost required';
-                          if (double.tryParse(val) == null)
+                          }
+                          if (double.tryParse(val) == null) {
                             return 'Invalid amount';
+                          }
                           return null;
                         },
                       );
@@ -578,8 +582,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           prefixIcon: Icon(Icons.warning_amber_rounded),
                         ),
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty)
+                          if (val == null || val.trim().isEmpty) {
                             return 'Required';
+                          }
                           return null;
                         },
                       );

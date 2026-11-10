@@ -47,11 +47,14 @@ class DealerLedgerReportService {
     );
 
     final list = response.data['data'] as List? ?? [];
-    return list.map((item) => DailyOtherTransactionModel.fromJson(item)).toList();
+    return list
+        .map((item) => DailyOtherTransactionModel.fromJson(item))
+        .toList();
   }
 
   /// Creates or updates a daily "Others" transaction.
-  Future<DailyOtherTransactionModel> saveOthers(Map<String, dynamic> payload) async {
+  Future<DailyOtherTransactionModel> saveOthers(
+      Map<String, dynamic> payload) async {
     final response = await _apiService.client.post(
       '/reports/dealer-ledger/others',
       data: payload,
@@ -68,7 +71,8 @@ class DealerLedgerReportService {
     List<int>? dealerIds,
     int? caneProductId,
   }) {
-    final base = '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-pdf';
+    final base =
+        '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-pdf';
     final params = ['year=$year', 'month=$month'];
     if (dealerIds != null && dealerIds.isNotEmpty) {
       params.add('dealer_ids=${dealerIds.join(',')}');
@@ -86,7 +90,8 @@ class DealerLedgerReportService {
     List<int>? dealerIds,
     int? caneProductId,
   }) {
-    final base = '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-excel';
+    final base =
+        '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-excel';
     final params = ['year=$year', 'month=$month'];
     if (dealerIds != null && dealerIds.isNotEmpty) {
       params.add('dealer_ids=${dealerIds.join(',')}');
@@ -104,7 +109,8 @@ class DealerLedgerReportService {
     List<int>? dealerIds,
     int? caneProductId,
   }) {
-    final base = '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-csv';
+    final base =
+        '${_apiService.client.options.baseUrl}/reports/dealer-ledger/export-csv';
     final params = ['year=$year', 'month=$month'];
     if (dealerIds != null && dealerIds.isNotEmpty) {
       params.add('dealer_ids=${dealerIds.join(',')}');
@@ -116,7 +122,8 @@ class DealerLedgerReportService {
   }
 
   /// Downloads file as raw bytes with authentication headers.
-  Future<List<int>> downloadReportBytes(String endpoint, [Map<String, dynamic>? queryParams]) async {
+  Future<List<int>> downloadReportBytes(String endpoint,
+      [Map<String, dynamic>? queryParams]) async {
     final response = await _apiService.client.get(
       endpoint,
       queryParameters: queryParams ?? {},

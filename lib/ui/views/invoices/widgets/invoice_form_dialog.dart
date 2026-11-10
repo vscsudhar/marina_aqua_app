@@ -8,6 +8,7 @@ import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/models/dealer_model.dart';
 import 'package:marina_aqua/models/product_model.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/common/ui_helpers.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/services/billing_service.dart';
 
@@ -71,7 +72,7 @@ class InvoiceFormDialog extends StatefulWidget {
 class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   final _formKey = GlobalKey<FormState>();
   final currencyFormat =
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   late DateTime _invoiceDate;
   DateTime? _dueDate;
@@ -710,7 +711,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     hintText: 'e.g. 101 or INV-101',
                     isDense: true,
                     border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.tag, size: 20, color: kcPrimaryDark),
+                    prefixIcon:
+                        const Icon(Icons.tag, size: 20, color: kcPrimaryDark),
                     suffixIcon: _isLoadingInvoiceNo
                         ? const SizedBox(
                             width: 20,
@@ -729,14 +731,16 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     helperText: widget.existingInvoice != null
                         ? 'Editable. Preserves lines and updates references.'
                         : 'Lowest available positive number suggested.',
-                    helperStyle: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
+                    helperStyle:
+                        GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
                   ),
                   onChanged: _onInvoiceNoChanged,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
                       return 'Invoice number is required';
                     }
-                    if (!_isInvoiceNoValid && _invoiceNoValidationMessage != null) {
+                    if (!_isInvoiceNoValid &&
+                        _invoiceNoValidationMessage != null) {
                       return _invoiceNoValidationMessage;
                     }
                     return null;
@@ -814,17 +818,21 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     isDense: true,
                     border: const OutlineInputBorder(),
                     suffixIcon: PopupMenuButton<String>(
-                      icon: const Icon(Icons.arrow_drop_down_circle_outlined, color: kcPrimaryColor, size: 20),
+                      icon: const Icon(Icons.arrow_drop_down_circle_outlined,
+                          color: kcPrimaryColor, size: 20),
                       tooltip: 'Select Supply Code (e.g. Coimbatore)',
                       onSelected: (val) {
                         setState(() {
                           _placeOfSupplyController.text = val;
                         });
                       },
-                      itemBuilder: (ctx) => kGstSupplyCodes.map((c) => PopupMenuItem(
-                        value: c.placeOfSupply,
-                        child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 12)),
-                      )).toList(),
+                      itemBuilder: (ctx) => kGstSupplyCodes
+                          .map((c) => PopupMenuItem(
+                                value: c.placeOfSupply,
+                                child: Text(c.displayName,
+                                    style: GoogleFonts.inter(fontSize: 12)),
+                              ))
+                          .toList(),
                     ),
                   ),
                   onChanged: (_) => setState(() {}),
@@ -1221,7 +1229,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    currencyFormat.format(r.lineTotal),
+                                    formatAmount(r.lineTotal),
                                     style: GoogleFonts.inter(
                                       fontWeight: FontWeight.w700,
                                       color: kcDeepNavy,
@@ -1229,19 +1237,19 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                   ),
                                   if (r.taxRate > 0 && !_isInterstate) ...[
                                     Text(
-                                      'CGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${currencyFormat.format(r.cgstAmount)}',
+                                      'CGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${formatAmount(r.cgstAmount)}',
                                       style: GoogleFonts.inter(
                                           fontSize: 10, color: kcMediumGrey),
                                     ),
                                     Text(
-                                      'SGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${currencyFormat.format(r.sgstAmount)}',
+                                      'SGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${formatAmount(r.sgstAmount)}',
                                       style: GoogleFonts.inter(
                                           fontSize: 10, color: kcMediumGrey),
                                     ),
                                   ] else if (r.taxRate > 0 &&
                                       _isInterstate) ...[
                                     Text(
-                                      'IGST (${r.taxRate.toStringAsFixed(0)}%): ${currencyFormat.format(r.igstAmount)}',
+                                      'IGST (${r.taxRate.toStringAsFixed(0)}%): ${formatAmount(r.igstAmount)}',
                                       style: GoogleFonts.inter(
                                           fontSize: 10, color: kcMediumGrey),
                                     ),
@@ -1376,7 +1384,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 maxLines: 2,
                 decoration: const InputDecoration(
                   labelText: 'Declaration',
-                  hintText: 'We declare that this invoice shows the actual price of the goods...',
+                  hintText:
+                      'We declare that this invoice shows the actual price of the goods...',
                   isDense: true,
                   border: OutlineInputBorder(),
                 ),
@@ -1403,32 +1412,31 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     color: kcDeepNavy),
               ),
               const Divider(height: 20),
-              _summaryRow(
-                  'Subtotal (Gross):', currencyFormat.format(_subtotal)),
+              _summaryRow('Subtotal (Gross):', formatAmount(_subtotal)),
               if (_discountTotal > 0)
-                _summaryRow('Discount Total:',
-                    '- ${currencyFormat.format(_discountTotal)}',
+                _summaryRow(
+                    'Discount Total:', '- ${formatAmount(_discountTotal)}',
                     color: kcErrorColor),
-              _summaryRow(
-                  'Taxable Value:', currencyFormat.format(_taxableTotal),
+              _summaryRow('Taxable Value:', formatAmount(_taxableTotal),
                   isBold: true),
               const SizedBox(height: 8),
               if (!_isInterstate) ...[
-                _summaryRow('CGST (Central Tax 50%):',
-                    currencyFormat.format(_cgstTotal)),
                 _summaryRow(
-                    'SGST (State Tax 50%):', currencyFormat.format(_sgstTotal)),
+                    'CGST (Central Tax 50%):', formatAmount(_cgstTotal)),
+                _summaryRow('SGST (State Tax 50%):', formatAmount(_sgstTotal)),
               ] else ...[
-                _summaryRow('IGST (Integrated Tax 100%):',
-                    currencyFormat.format(_igstTotal),
+                _summaryRow(
+                    'IGST (Integrated Tax 100%):', formatAmount(_igstTotal),
                     color: kcPrimaryDark),
               ],
-              _summaryRow('Total GST Tax:', currencyFormat.format(_taxTotal)),
-              _summaryRow('Round Off:', currencyFormat.format(_roundOff)),
+              _summaryRow('Total GST Tax:', formatAmount(_taxTotal)),
+              _summaryRow('Round Off:',
+                  '${_roundOff >= 0 ? '+' : '-'}₹${_roundOff.abs().toStringAsFixed(2)}',
+                  color: kcPrimaryDark, isBold: true),
               const Divider(height: 20),
               _summaryRow(
                 'Invoice Grand Total:',
-                currencyFormat.format(_grandTotal),
+                formatAmount(_grandTotal),
                 isBold: true,
                 fontSize: 17,
                 color: kcDeepNavy,
@@ -1436,12 +1444,12 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               const SizedBox(height: 6),
               _summaryRow(
                 'Paid Amount:',
-                currencyFormat.format(_paidAmount),
+                formatAmount(_paidAmount),
                 color: kcSuccessColor,
               ),
               _summaryRow(
                 'Balance Due:',
-                currencyFormat.format(_balanceDue),
+                formatAmount(_balanceDue),
                 isBold: true,
                 color: _balanceDue > 0 ? kcErrorColor : kcSuccessColor,
               ),

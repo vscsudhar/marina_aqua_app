@@ -42,7 +42,11 @@ class DealerService {
 
     final meta = data['meta'] is Map<String, dynamic>
         ? PaginationMeta.fromJson(data['meta'] as Map<String, dynamic>)
-        : PaginationMeta(currentPage: currentPage, perPage: currentPerPage, total: itemsList.length, lastPage: 1);
+        : PaginationMeta(
+            currentPage: currentPage,
+            perPage: currentPerPage,
+            total: itemsList.length,
+            lastPage: 1);
 
     return PaginatedList(items: itemsList, meta: meta);
   }
@@ -86,7 +90,8 @@ class DealerService {
   }
 
   Future<DealerModel> toggleDealerStatus(int id) async {
-    final response = await _apiService.client.patch('/dealers/$id/toggle-status');
+    final response =
+        await _apiService.client.patch('/dealers/$id/toggle-status');
     final res = response.data as Map<String, dynamic>;
     return DealerModel.fromJson(res['data'] as Map<String, dynamic>);
   }
@@ -123,22 +128,27 @@ class DealerService {
     };
   }
 
-  Future<DealerProductPriceModel> setDealerPrice(int dealerId, Map<String, dynamic> data) async {
+  Future<DealerProductPriceModel> setDealerPrice(
+      int dealerId, Map<String, dynamic> data) async {
     final response = await _apiService.client.post(
       '/dealers/$dealerId/prices',
       data: data,
     );
     final res = response.data as Map<String, dynamic>;
-    return DealerProductPriceModel.fromJson(res['data'] as Map<String, dynamic>);
+    return DealerProductPriceModel.fromJson(
+        res['data'] as Map<String, dynamic>);
   }
 
   Future<String> deleteDealerPrice(int dealerId, int priceId) async {
-    final response = await _apiService.client.delete('/dealers/$dealerId/prices/$priceId');
+    final response =
+        await _apiService.client.delete('/dealers/$dealerId/prices/$priceId');
     final data = response.data as Map<String, dynamic>;
     return data['message'] as String? ?? 'Custom price removed.';
   }
 
-  Future<Map<String, dynamic>> resolveEffectivePrice(int dealerId, int productId, {String? date}) async {
+  Future<Map<String, dynamic>> resolveEffectivePrice(
+      int dealerId, int productId,
+      {String? date}) async {
     final queryParams = <String, dynamic>{'product_id': productId};
     if (date != null) queryParams['date'] = date;
 
@@ -150,7 +160,8 @@ class DealerService {
     return data['data'] as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> getDealerLedger(int dealerId, {String? startDate, String? endDate}) async {
+  Future<Map<String, dynamic>> getDealerLedger(int dealerId,
+      {String? startDate, String? endDate}) async {
     final queryParams = <String, dynamic>{};
     if (startDate != null) queryParams['start_date'] = startDate;
     if (endDate != null) queryParams['end_date'] = endDate;

@@ -296,7 +296,7 @@ void main() {
         outstandingAmount: 0,
         paymentStatus: 'paid',
         status: 'delivered',
-        items: const [
+        items: [
           DealerSupplyItemModel(
             id: 1,
             productId: 1,
@@ -327,7 +327,7 @@ void main() {
         outstandingAmount: 600,
         paymentStatus: 'unpaid',
         status: 'delivered',
-        items: const [
+        items: [
           DealerSupplyItemModel(
             id: 2,
             productId: 1,
@@ -370,9 +370,9 @@ void main() {
         year: anyNamed('year'),
         paymentStatus: anyNamed('paymentStatus'),
         search: anyNamed('search'),
-      )).thenAnswer((_) async => PaginatedList(
+      )).thenAnswer((_) async => const PaginatedList(
             items: [delivery2, otherDealerDelivery, delivery1],
-            meta: const PaginationMeta(
+            meta: PaginationMeta(
                 currentPage: 1, perPage: 100, total: 3, lastPage: 1),
           ));
 

@@ -30,7 +30,8 @@ class DashboardMetrics {
       todaySupplyQuantity: _toDouble(json['today_supply_quantity']),
       todaySupplyAmount: _toDouble(json['today_supply_amount']),
       todayCollectedAmount: _toDouble(json['today_collected_amount']),
-      totalOutstandingDealerBalance: _toDouble(json['total_outstanding_dealer_balance']),
+      totalOutstandingDealerBalance:
+          _toDouble(json['total_outstanding_dealer_balance']),
       lowStockItemsCount: _toInt(json['low_stock_items_count']),
       date: json['date'] as String? ?? '',
       timezone: json['timezone'] as String? ?? 'Asia/Kolkata',
@@ -74,7 +75,9 @@ class LowStockItem {
 
   factory LowStockItem.fromJson(Map<String, dynamic> json) {
     return LowStockItem(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
       sku: json['sku'] as String? ?? '',
       unit: json['unit'] as String? ?? 'Unit',
@@ -84,7 +87,8 @@ class LowStockItem {
     );
   }
 
-  double get stockRatio => minStockLevel > 0 ? (currentStock / minStockLevel).clamp(0.0, 1.0) : 0.0;
+  double get stockRatio =>
+      minStockLevel > 0 ? (currentStock / minStockLevel).clamp(0.0, 1.0) : 0.0;
 }
 
 class RecentTransaction {
@@ -117,7 +121,9 @@ class RecentTransaction {
 
   factory RecentTransaction.fromJson(Map<String, dynamic> json) {
     return RecentTransaction(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       type: json['type'] as String? ?? 'supply',
       typeLabel: json['type_label'] as String? ?? '',
       referenceNo: json['reference_no'] as String? ?? '',

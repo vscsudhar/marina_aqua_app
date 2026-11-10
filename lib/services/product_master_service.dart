@@ -43,7 +43,8 @@ class ProductMasterService {
   // CATEGORIES
   // ==========================================
 
-  Future<List<CategoryModel>> getAllCategories({bool activeOnly = false}) async {
+  Future<List<CategoryModel>> getAllCategories(
+      {bool activeOnly = false}) async {
     final queryParams = <String, dynamic>{'all': 'true'};
     if (activeOnly) {
       queryParams['is_active'] = 'true';
@@ -94,7 +95,11 @@ class ProductMasterService {
 
     final meta = data['meta'] is Map<String, dynamic>
         ? PaginationMeta.fromJson(data['meta'] as Map<String, dynamic>)
-        : PaginationMeta(currentPage: currentPage, perPage: currentPerPage, total: itemsList.length, lastPage: 1);
+        : PaginationMeta(
+            currentPage: currentPage,
+            perPage: currentPerPage,
+            total: itemsList.length,
+            lastPage: 1);
 
     return PaginatedList(items: itemsList, meta: meta);
   }
@@ -218,7 +223,11 @@ class ProductMasterService {
 
       final meta = data['meta'] is Map<String, dynamic>
           ? PaginationMeta.fromJson(data['meta'] as Map<String, dynamic>)
-          : PaginationMeta(currentPage: currentPage, perPage: currentPerPage, total: itemsList.length, lastPage: 1);
+          : PaginationMeta(
+              currentPage: currentPage,
+              perPage: currentPerPage,
+              total: itemsList.length,
+              lastPage: 1);
 
       return PaginatedList(items: itemsList, meta: meta);
     } on DioException catch (e) {
@@ -352,7 +361,11 @@ class ProductMasterService {
 
     final meta = data['meta'] is Map<String, dynamic>
         ? PaginationMeta.fromJson(data['meta'] as Map<String, dynamic>)
-        : PaginationMeta(currentPage: currentPage, perPage: currentPerPage, total: itemsList.length, lastPage: 1);
+        : PaginationMeta(
+            currentPage: currentPage,
+            perPage: currentPerPage,
+            total: itemsList.length,
+            lastPage: 1);
 
     return PaginatedList(items: itemsList, meta: meta);
   }
@@ -376,7 +389,8 @@ class ProductMasterService {
     }
   }
 
-  Future<ProductModel> updateProduct(int id, Map<String, dynamic> payload) async {
+  Future<ProductModel> updateProduct(
+      int id, Map<String, dynamic> payload) async {
     try {
       final response = await _apiService.client.put(
         '/products/$id',
@@ -391,7 +405,8 @@ class ProductMasterService {
 
   Future<ProductModel> toggleProductStatus(int id) async {
     try {
-      final response = await _apiService.client.patch('/products/$id/toggle-status');
+      final response =
+          await _apiService.client.patch('/products/$id/toggle-status');
       final data = response.data as Map<String, dynamic>;
       return ProductModel.fromJson(data['data'] as Map<String, dynamic>);
     } on DioException catch (e) {

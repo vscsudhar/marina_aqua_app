@@ -21,7 +21,8 @@ class ExportPlatform {
     } catch (e) {
       // Fallback: data URI
       final anchor = html.AnchorElement(
-        href: 'data:$mimeType;base64,${html.window.btoa(String.fromCharCodes(bytes))}',
+        href:
+            'data:$mimeType;base64,${html.window.btoa(String.fromCharCodes(bytes))}',
       )
         ..setAttribute('download', fileName)
         ..style.display = 'none';

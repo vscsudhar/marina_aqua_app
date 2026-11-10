@@ -13,7 +13,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
   const PurchasesView({super.key, this.onBack});
 
   @override
-  PurchasesViewModel viewModelBuilder(BuildContext context) => PurchasesViewModel();
+  PurchasesViewModel viewModelBuilder(BuildContext context) =>
+      PurchasesViewModel();
 
   @override
   void onViewModelReady(PurchasesViewModel viewModel) {
@@ -28,7 +29,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
     PurchasesViewModel viewModel,
     Widget? child,
   ) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
@@ -46,11 +48,15 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
           children: [
             Text(
               'Purchases & Inventory Management',
-              style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary),
             ),
             Text(
               'Procurement, stock ledger tracking, supplier history & adjustments',
-              style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -69,7 +75,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             ),
             icon: const Icon(Icons.tune, size: 16),
-            label: Text('Stock Adjustment', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600)),
+            label: Text('Stock Adjustment',
+                style: GoogleFonts.inter(
+                    fontSize: 12, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 10),
           ElevatedButton.icon(
@@ -80,7 +88,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             icon: const Icon(Icons.add_shopping_cart, size: 16),
-            label: Text('New Purchase', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold)),
+            label: Text('New Purchase',
+                style: GoogleFonts.inter(
+                    fontSize: 12, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 16),
         ],
@@ -96,7 +106,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                   if (viewModel.exportSuccessMessage != null) ...[
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF0FDF4),
                         borderRadius: BorderRadius.circular(8),
@@ -104,12 +115,16 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle, color: Color(0xFF16A34A), size: 18),
+                          const Icon(Icons.check_circle,
+                              color: Color(0xFF16A34A), size: 18),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               viewModel.exportSuccessMessage!,
-                              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF15803D)),
+                              style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF15803D)),
                             ),
                           ),
                         ],
@@ -127,15 +142,21 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _tabButton(0, 'Purchases History', Icons.receipt_long, viewModel.purchases.length, viewModel),
-                          _tabButton(1, 'Stock & Alerts', Icons.inventory, viewModel.summary.lowStockCount, viewModel, isAlert: true),
-                          _tabButton(2, 'Stock Ledger Movements', Icons.history, viewModel.movements.length, viewModel),
-                          _tabButton(3, 'Suppliers Master', Icons.business, viewModel.suppliers.length, viewModel),
+                          _tabButton(0, 'Purchases History', Icons.receipt_long,
+                              viewModel.purchases.length, viewModel),
+                          _tabButton(1, 'Stock & Alerts', Icons.inventory,
+                              viewModel.summary.lowStockCount, viewModel,
+                              isAlert: true),
+                          _tabButton(2, 'Stock Ledger Movements', Icons.history,
+                              viewModel.movements.length, viewModel),
+                          _tabButton(3, 'Suppliers Master', Icons.business,
+                              viewModel.suppliers.length, viewModel),
                         ],
                       ),
                     ),
@@ -146,10 +167,13 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                   IndexedStack(
                     index: viewModel.selectedTabIndex,
                     children: [
-                      _buildPurchasesTab(context, viewModel, currencyFormat, isDesktop),
-                      _buildStockAlertsTab(context, viewModel, currencyFormat, isDesktop),
+                      _buildPurchasesTab(
+                          context, viewModel, currencyFormat, isDesktop),
+                      _buildStockAlertsTab(
+                          context, viewModel, currencyFormat, isDesktop),
                       _buildMovementsTab(viewModel, isDesktop),
-                      _buildSuppliersTab(context, viewModel, currencyFormat, isDesktop),
+                      _buildSuppliersTab(
+                          context, viewModel, currencyFormat, isDesktop),
                     ],
                   ),
                 ],
@@ -158,7 +182,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
     );
   }
 
-  Widget _tabButton(int index, String title, IconData icon, int count, PurchasesViewModel viewModel, {bool isAlert = false}) {
+  Widget _tabButton(int index, String title, IconData icon, int count,
+      PurchasesViewModel viewModel,
+      {bool isAlert = false}) {
     final isSelected = viewModel.selectedTabIndex == index;
     return InkWell(
       onTap: () => viewModel.setTab(index),
@@ -167,12 +193,17 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: isSelected ? AppColors.primary : AppColors.textSecondary),
+            Icon(icon,
+                size: 16,
+                color:
+                    isSelected ? AppColors.primary : AppColors.textSecondary),
             const SizedBox(width: 8),
             Text(
               title,
@@ -187,7 +218,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isAlert && count > 0 ? Colors.red.shade100 : (isSelected ? AppColors.primary : Colors.grey.shade200),
+                  color: isAlert && count > 0
+                      ? Colors.red.shade100
+                      : (isSelected ? AppColors.primary : Colors.grey.shade200),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -195,7 +228,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isAlert && count > 0 ? Colors.red.shade900 : (isSelected ? Colors.white : Colors.grey.shade800),
+                    color: isAlert && count > 0
+                        ? Colors.red.shade900
+                        : (isSelected ? Colors.white : Colors.grey.shade800),
                   ),
                 ),
               ),
@@ -206,13 +241,16 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
     );
   }
 
-  Widget _buildMetricCards(PurchasesViewModel viewModel, NumberFormat currencyFormat, bool isDesktop) {
+  Widget _buildMetricCards(PurchasesViewModel viewModel,
+      NumberFormat currencyFormat, bool isDesktop) {
     final sum = viewModel.summary;
     return LayoutBuilder(
       builder: (context, constraints) {
         final cardWidth = constraints.maxWidth >= 900
             ? (constraints.maxWidth - 48) / 4
-            : (constraints.maxWidth >= 480 ? (constraints.maxWidth - 12) / 2 : constraints.maxWidth);
+            : (constraints.maxWidth >= 480
+                ? (constraints.maxWidth - 12) / 2
+                : constraints.maxWidth);
 
         return Wrap(
           spacing: 12,
@@ -248,10 +286,16 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
             _kpiCard(
               title: 'Low Stock Alerts',
               value: '${sum.lowStockCount} Items',
-              subtext: sum.lowStockCount > 0 ? 'Urgent reorder required' : 'Stock levels healthy',
+              subtext: sum.lowStockCount > 0
+                  ? 'Urgent reorder required'
+                  : 'Stock levels healthy',
               icon: Icons.warning_amber_rounded,
-              color: sum.lowStockCount > 0 ? Colors.red.shade700 : Colors.teal.shade700,
-              bgColor: sum.lowStockCount > 0 ? Colors.red.shade50 : Colors.teal.shade50,
+              color: sum.lowStockCount > 0
+                  ? Colors.red.shade700
+                  : Colors.teal.shade700,
+              bgColor: sum.lowStockCount > 0
+                  ? Colors.red.shade50
+                  : Colors.teal.shade50,
               width: cardWidth,
             ),
           ],
@@ -281,7 +325,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+                color: bgColor, borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(width: 14),
@@ -291,21 +336,26 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                  style: GoogleFonts.inter(
+                      fontSize: 12, color: AppColors.textSecondary),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                  style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtext,
-                  style: GoogleFonts.inter(fontSize: 11, color: color, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.inter(
+                      fontSize: 11, color: color, fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -318,7 +368,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
   }
 
   // ==================== TAB 0: PURCHASES HISTORY ====================
-  Widget _buildPurchasesTab(BuildContext context, PurchasesViewModel viewModel, NumberFormat currencyFormat, bool isDesktop) {
+  Widget _buildPurchasesTab(BuildContext context, PurchasesViewModel viewModel,
+      NumberFormat currencyFormat, bool isDesktop) {
     return Column(
       children: [
         // Filter toolbar
@@ -348,7 +399,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                         prefixIcon: Icon(Icons.search, size: 20),
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       ),
                       onChanged: viewModel.search,
                     ),
@@ -363,16 +415,19 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                         labelText: 'Filter Supplier',
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       ),
                       items: [
                         const DropdownMenuItem(
                           value: null,
-                          child: Text('All Suppliers', overflow: TextOverflow.ellipsis),
+                          child: Text('All Suppliers',
+                              overflow: TextOverflow.ellipsis),
                         ),
                         ...viewModel.suppliers.map((s) => DropdownMenuItem(
                               value: s.id,
-                              child: Text(s.name, overflow: TextOverflow.ellipsis),
+                              child:
+                                  Text(s.name, overflow: TextOverflow.ellipsis),
                             )),
                       ],
                       onChanged: viewModel.setSupplierFilter,
@@ -388,20 +443,24 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                         labelText: 'Status',
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: null,
-                          child: Text('All Statuses', overflow: TextOverflow.ellipsis),
+                          child: Text('All Statuses',
+                              overflow: TextOverflow.ellipsis),
                         ),
                         DropdownMenuItem(
                           value: 'received',
-                          child: Text('Received', overflow: TextOverflow.ellipsis),
+                          child:
+                              Text('Received', overflow: TextOverflow.ellipsis),
                         ),
                         DropdownMenuItem(
                           value: 'cancelled',
-                          child: Text('Cancelled', overflow: TextOverflow.ellipsis),
+                          child: Text('Cancelled',
+                              overflow: TextOverflow.ellipsis),
                         ),
                       ],
                       onChanged: viewModel.setStatusFilter,
@@ -414,8 +473,11 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                         context: context,
                         firstDate: DateTime(2020),
                         lastDate: DateTime.now().add(const Duration(days: 30)),
-                        initialDateRange: viewModel.startDate != null && viewModel.endDate != null
-                            ? DateTimeRange(start: viewModel.startDate!, end: viewModel.endDate!)
+                        initialDateRange: viewModel.startDate != null &&
+                                viewModel.endDate != null
+                            ? DateTimeRange(
+                                start: viewModel.startDate!,
+                                end: viewModel.endDate!)
                             : null,
                       );
                       if (picked != null) {
@@ -430,7 +492,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                       style: GoogleFonts.inter(fontSize: 12),
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 12),
                     ),
                   ),
                   if (viewModel.startDate != null)
@@ -456,7 +519,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
 
         // Purchases List
         if (viewModel.purchases.isEmpty)
-          _emptyState('No purchases found matching criteria.', 'Click "New Purchase" to record incoming stock shipments.')
+          _emptyState('No purchases found matching criteria.',
+              'Click "New Purchase" to record incoming stock shipments.')
         else
           Container(
             decoration: BoxDecoration(
@@ -468,24 +532,32 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: viewModel.purchases.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade200),
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: Colors.grey.shade200),
               itemBuilder: (context, index) {
                 final p = viewModel.purchases[index];
                 return Material(
                   color: Colors.transparent,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: CircleAvatar(
-                      backgroundColor: p.isCancelled ? Colors.red.shade50 : Colors.blue.shade50,
+                      backgroundColor: p.isCancelled
+                          ? Colors.red.shade50
+                          : Colors.blue.shade50,
                       child: Icon(
-                        p.isCancelled ? Icons.cancel_outlined : Icons.receipt_long,
+                        p.isCancelled
+                            ? Icons.cancel_outlined
+                            : Icons.receipt_long,
                         color: p.isCancelled ? Colors.red : AppColors.primary,
                         size: 20,
                       ),
                     ),
                     title: Row(
                       children: [
-                        Text(p.purchaseNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text(p.purchaseNo,
+                            style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
                         const SizedBox(width: 8),
                         _statusChip(p.status),
                         const SizedBox(width: 6),
@@ -494,7 +566,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                     ),
                     subtitle: Text(
                       'Supplier: ${p.supplierName} • Date: ${p.purchaseDate}${p.invoiceNo != null ? ' • Inv: ${p.invoiceNo}' : ''} • ${p.items.length} items',
-                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                          fontSize: 12, color: AppColors.textSecondary),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -504,22 +577,31 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(currencyFormat.format(p.totalAmount),
-                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary)),
                             Text('Paid: ${currencyFormat.format(p.paidAmount)}',
-                                style: GoogleFonts.inter(fontSize: 11, color: Colors.green.shade800)),
+                                style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: Colors.green.shade800)),
                           ],
                         ),
                         const SizedBox(width: 12),
                         IconButton(
-                          icon: const Icon(Icons.visibility, size: 20, color: AppColors.primary),
+                          icon: const Icon(Icons.visibility,
+                              size: 20, color: AppColors.primary),
                           tooltip: 'View details & movements',
-                          onPressed: () => viewModel.openPurchaseDetails(context, p),
+                          onPressed: () =>
+                              viewModel.openPurchaseDetails(context, p),
                         ),
                         if (!p.isCancelled)
                           IconButton(
-                            icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
+                            icon: const Icon(Icons.edit,
+                                size: 20, color: Colors.grey),
                             tooltip: 'Edit purchase',
-                            onPressed: () => viewModel.openEditPurchase(context, p),
+                            onPressed: () =>
+                                viewModel.openEditPurchase(context, p),
                           ),
                       ],
                     ),
@@ -534,7 +616,11 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
   }
 
   // ==================== TAB 1: STOCK & ALERTS ====================
-  Widget _buildStockAlertsTab(BuildContext context, PurchasesViewModel viewModel, NumberFormat currencyFormat, bool isDesktop) {
+  Widget _buildStockAlertsTab(
+      BuildContext context,
+      PurchasesViewModel viewModel,
+      NumberFormat currencyFormat,
+      bool isDesktop) {
     final tracked = viewModel.trackedProducts;
     return Container(
       decoration: BoxDecoration(
@@ -553,8 +639,13 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Current Inventory & Low-Stock Alerts', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('Real-time warehouse stock tracking linked to product master', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                    Text('Current Inventory & Low-Stock Alerts',
+                        style: GoogleFonts.outfit(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                        'Real-time warehouse stock tracking linked to product master',
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
                 Wrap(
@@ -587,13 +678,15 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
           ),
           const Divider(height: 1),
           if (tracked.isEmpty)
-            _emptyState('No stock-tracked products configured.', 'Edit products in Product Master to enable inventory tracking.')
+            _emptyState('No stock-tracked products configured.',
+                'Edit products in Product Master to enable inventory tracking.')
           else
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: tracked.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: Colors.grey.shade100),
               itemBuilder: (context, index) {
                 final p = tracked[index];
                 final isLow = p.isLowStock;
@@ -601,22 +694,32 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 return Material(
                   color: Colors.transparent,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     leading: CircleAvatar(
-                      backgroundColor: isLow ? Colors.red.shade50 : Colors.teal.shade50,
+                      backgroundColor:
+                          isLow ? Colors.red.shade50 : Colors.teal.shade50,
                       child: Icon(
-                        isLow ? Icons.warning_amber_rounded : Icons.check_circle_outline,
-                        color: isLow ? Colors.red.shade700 : Colors.teal.shade700,
+                        isLow
+                            ? Icons.warning_amber_rounded
+                            : Icons.check_circle_outline,
+                        color:
+                            isLow ? Colors.red.shade700 : Colors.teal.shade700,
                       ),
                     ),
                     title: Row(
                       children: [
-                        Text(p.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text(p.name,
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: isLow ? Colors.red.shade100 : Colors.green.shade100,
+                            color: isLow
+                                ? Colors.red.shade100
+                                : Colors.green.shade100,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -624,7 +727,9 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: isLow ? Colors.red.shade900 : Colors.green.shade900,
+                              color: isLow
+                                  ? Colors.red.shade900
+                                  : Colors.green.shade900,
                             ),
                           ),
                         ),
@@ -632,7 +737,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                     ),
                     subtitle: Text(
                       'SKU: ${p.sku} • Min Level: ${p.minStockLevel.toStringAsFixed(0)} ${p.unitName} • Cost: ${currencyFormat.format(p.costPrice)} • Selling Price: ${currencyFormat.format(p.defaultPrice)}',
-                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                          fontSize: 12, color: AppColors.textSecondary),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -646,22 +752,27 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                               style: GoogleFonts.outfit(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isLow ? Colors.red.shade800 : AppColors.primary,
+                                color: isLow
+                                    ? Colors.red.shade800
+                                    : AppColors.primary,
                               ),
                             ),
                             Text(
                               'Available Units',
-                              style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
+                              style: GoogleFonts.inter(
+                                  fontSize: 10, color: AppColors.textSecondary),
                             ),
                           ],
                         ),
                         const SizedBox(width: 14),
                         OutlinedButton.icon(
-                          onPressed: () => viewModel.openStockAdjustment(context, p),
+                          onPressed: () =>
+                              viewModel.openStockAdjustment(context, p),
                           icon: const Icon(Icons.tune, size: 14),
                           label: const Text('Adjust'),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                           ),
                         ),
                       ],
@@ -695,8 +806,13 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Stock Ledger & Movements History', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('Transaction-safe chronological ledger of receipts, issues and adjustments', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                    Text('Stock Ledger & Movements History',
+                        style: GoogleFonts.outfit(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                        'Transaction-safe chronological ledger of receipts, issues and adjustments',
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
                 IconButton(
@@ -708,13 +824,15 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
           ),
           const Divider(height: 1),
           if (movements.isEmpty)
-            _emptyState('No inventory movements logged yet.', 'Movements are automatically recorded on purchases, dealer supplies and adjustments.')
+            _emptyState('No inventory movements logged yet.',
+                'Movements are automatically recorded on purchases, dealer supplies and adjustments.')
           else
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: movements.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: Colors.grey.shade100),
               itemBuilder: (context, index) {
                 final m = movements[index];
                 final isIncoming = m.isIncoming;
@@ -722,32 +840,43 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 return Material(
                   color: Colors.transparent,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: CircleAvatar(
-                      backgroundColor: isIncoming ? Colors.green.shade50 : Colors.red.shade50,
+                      backgroundColor: isIncoming
+                          ? Colors.green.shade50
+                          : Colors.red.shade50,
                       child: Icon(
                         isIncoming ? Icons.south_west : Icons.north_east,
-                        color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
+                        color: isIncoming
+                            ? Colors.green.shade800
+                            : Colors.red.shade800,
                         size: 18,
                       ),
                     ),
                     title: Row(
                       children: [
-                        Text(m.movementNo, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text(m.movementNo,
+                            style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text(m.movementType.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          child: Text(m.movementType.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
                     subtitle: Text(
                       '${m.productName} • Date: ${m.movementDate}${m.referenceNo != null ? ' • Ref: ${m.referenceNo}' : ''}${m.notes != null ? ' • ${m.notes}' : ''}',
-                      style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                          fontSize: 11, color: AppColors.textSecondary),
                     ),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -758,12 +887,15 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                           style: GoogleFonts.outfit(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: isIncoming ? Colors.green.shade800 : Colors.red.shade800,
+                            color: isIncoming
+                                ? Colors.green.shade800
+                                : Colors.red.shade800,
                           ),
                         ),
                         Text(
                           'Bal: ${m.balanceBefore.toStringAsFixed(0)} → ${m.balanceAfter.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+                          style: GoogleFonts.inter(
+                              fontSize: 11, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -777,7 +909,8 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
   }
 
   // ==================== TAB 3: SUPPLIERS DIRECTORY ====================
-  Widget _buildSuppliersTab(BuildContext context, PurchasesViewModel viewModel, NumberFormat currencyFormat, bool isDesktop) {
+  Widget _buildSuppliersTab(BuildContext context, PurchasesViewModel viewModel,
+      NumberFormat currencyFormat, bool isDesktop) {
     final suppliers = viewModel.suppliers;
     return Container(
       decoration: BoxDecoration(
@@ -796,8 +929,13 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Suppliers & Vendors Directory', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('Raw material, jar preform, cap and consumable partners', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                    Text('Suppliers & Vendors Directory',
+                        style: GoogleFonts.outfit(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                        'Raw material, jar preform, cap and consumable partners',
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
                 ElevatedButton.icon(
@@ -814,34 +952,46 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
           ),
           const Divider(height: 1),
           if (suppliers.isEmpty)
-            _emptyState('No suppliers registered.', 'Click "Add Supplier" to register procurement vendors.')
+            _emptyState('No suppliers registered.',
+                'Click "Add Supplier" to register procurement vendors.')
           else
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: suppliers.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: Colors.grey.shade100),
               itemBuilder: (context, index) {
                 final s = suppliers[index];
 
                 return Material(
                   color: Colors.transparent,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     leading: CircleAvatar(
                       backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                      child: Text(s.code.split('-').last, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary)),
+                      child: Text(s.code.split('-').last,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: AppColors.primary)),
                     ),
                     title: Row(
                       children: [
-                        Text(s.name, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text(s.name,
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
                         const SizedBox(width: 8),
-                        Text('(${s.code})', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                        Text('(${s.code})',
+                            style: GoogleFonts.inter(
+                                fontSize: 12, color: AppColors.textSecondary)),
                       ],
                     ),
                     subtitle: Text(
                       'Phone: ${s.phone}${s.contactPerson != null ? ' • Contact: ${s.contactPerson}' : ''}${s.gstin != null ? ' • GSTIN: ${s.gstin}' : ''}',
-                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                          fontSize: 12, color: AppColors.textSecondary),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -850,14 +1000,23 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(currencyFormat.format(s.currentBalance), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                            Text('Outstanding', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
+                            Text(currencyFormat.format(s.currentBalance),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary)),
+                            Text('Outstanding',
+                                style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary)),
                           ],
                         ),
                         const SizedBox(width: 12),
                         IconButton(
-                          icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
-                          onPressed: () => viewModel.openEditSupplier(context, s),
+                          icon: const Icon(Icons.edit,
+                              size: 20, color: Colors.grey),
+                          onPressed: () =>
+                              viewModel.openEditSupplier(context, s),
                         ),
                       ],
                     ),
@@ -878,9 +1037,15 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
           children: [
             Icon(Icons.inbox_outlined, size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text(title, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            Text(title,
+                style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary)),
             const SizedBox(height: 4),
-            Text(subtitle, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+            Text(subtitle,
+                style: GoogleFonts.inter(
+                    fontSize: 13, color: AppColors.textSecondary)),
           ],
         ),
       ),

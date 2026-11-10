@@ -37,9 +37,15 @@ class DealerProductPriceModel {
 
   factory DealerProductPriceModel.fromJson(Map<String, dynamic> json) {
     return DealerProductPriceModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      dealerId: json['dealer_id'] is int ? json['dealer_id'] : int.tryParse(json['dealer_id'].toString()) ?? 0,
-      productId: json['product_id'] is int ? json['product_id'] : int.tryParse(json['product_id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
+      dealerId: json['dealer_id'] is int
+          ? json['dealer_id']
+          : int.tryParse(json['dealer_id'].toString()) ?? 0,
+      productId: json['product_id'] is int
+          ? json['product_id']
+          : int.tryParse(json['product_id'].toString()) ?? 0,
       productName: json['product_name'] as String? ?? '',
       productSku: json['product_sku'] as String? ?? '',
       unitName: json['unit_name'] as String? ?? 'Unit',
@@ -50,7 +56,8 @@ class DealerProductPriceModel {
       effectiveFrom: json['effective_from'] as String?,
       effectiveTo: json['effective_to'] as String?,
       isActive: json['is_active'] == true || json['is_active'] == 1,
-      isCurrentlyEffective: json['is_currently_effective'] == true || json['is_currently_effective'] == 1,
+      isCurrentlyEffective: json['is_currently_effective'] == true ||
+          json['is_currently_effective'] == 1,
       notes: json['notes'] as String?,
       createdAt: json['created_at'] as String?,
     );
@@ -106,7 +113,9 @@ class CatalogMatrixItem {
 
   factory CatalogMatrixItem.fromJson(Map<String, dynamic> json) {
     return CatalogMatrixItem(
-      productId: json['product_id'] is int ? json['product_id'] : int.tryParse(json['product_id'].toString()) ?? 0,
+      productId: json['product_id'] is int
+          ? json['product_id']
+          : int.tryParse(json['product_id'].toString()) ?? 0,
       productName: json['product_name'] as String? ?? '',
       productSku: json['product_sku'] as String? ?? '',
       categoryName: json['category_name'] as String? ?? 'General',

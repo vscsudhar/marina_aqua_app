@@ -22,18 +22,22 @@ class SettingsViewModel extends ReactiveViewModel {
         _authService = authService ?? locator<AuthService>();
 
   @override
-  List<ListenableServiceMixin> get listenableServices => [_settingsService, _authService];
+  List<ListenableServiceMixin> get listenableServices =>
+      [_settingsService, _authService];
 
   CompanySettingModel _companySettings = const CompanySettingModel(id: 1);
   CompanySettingModel get companySettings {
     if (_companySettings != const CompanySettingModel(id: 1)) {
       return _companySettings;
     }
-    return _settingsService.isInitialized ? _settingsService.settings : _companySettings;
+    return _settingsService.isInitialized
+        ? _settingsService.settings
+        : _companySettings;
   }
 
   String? get companyLogo {
-    if (companySettings.logoUrl != null && companySettings.logoUrl!.isNotEmpty) {
+    if (companySettings.logoUrl != null &&
+        companySettings.logoUrl!.isNotEmpty) {
       return companySettings.logoUrl;
     }
     return _authService.currentUser?.companyLogo;
@@ -126,7 +130,8 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   /// Validates and uploads logo file
-  Future<bool> pickAndUploadLogo(Uint8List bytes, String filename, int sizeBytes) async {
+  Future<bool> pickAndUploadLogo(
+      Uint8List bytes, String filename, int sizeBytes) async {
     final lowerName = filename.toLowerCase();
     final isAllowedExtension = lowerName.endsWith('.png') ||
         lowerName.endsWith('.jpg') ||
@@ -135,14 +140,16 @@ class SettingsViewModel extends ReactiveViewModel {
         lowerName.endsWith('.svg');
 
     if (!isAllowedExtension) {
-      _errorMessage = 'Invalid logo format. Only PNG, JPG, WEBP and SVG are allowed.';
+      _errorMessage =
+          'Invalid logo format. Only PNG, JPG, WEBP and SVG are allowed.';
       notifyListeners();
       return false;
     }
 
     const maxBytes = 2 * 1024 * 1024; // 2MB
     if (sizeBytes > maxBytes) {
-      _errorMessage = 'Logo file size exceeds 2MB limit. Please upload a smaller image.';
+      _errorMessage =
+          'Logo file size exceeds 2MB limit. Please upload a smaller image.';
       notifyListeners();
       return false;
     }
@@ -182,7 +189,8 @@ class SettingsViewModel extends ReactiveViewModel {
       try {
         await _authService.refreshProfile();
       } catch (_) {}
-      _successMessage = 'Company logo removed. Standard Marina Aqua emblem restored.';
+      _successMessage =
+          'Company logo removed. Standard Marina Aqua emblem restored.';
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {

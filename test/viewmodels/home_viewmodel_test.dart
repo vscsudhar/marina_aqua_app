@@ -106,7 +106,8 @@ void main() {
       expect(model.greeting.isNotEmpty, true);
     });
 
-    test('fetchDashboardData successfully populates summary and charts', () async {
+    test('fetchDashboardData successfully populates summary and charts',
+        () async {
       final dashboardService = getAndRegisterDashboardService();
 
       when(dashboardService.getSummary(
@@ -141,7 +142,8 @@ void main() {
         date: anyNamed('date'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
-      )).thenThrow(ApiException(message: 'Server error retrieving KPIs', statusCode: 500));
+      )).thenThrow(ApiException(
+          message: 'Server error retrieving KPIs', statusCode: 500));
 
       when(dashboardService.getCharts(
         days: anyNamed('days'),
@@ -191,7 +193,8 @@ void main() {
       verify(authService.logout()).called(1);
     });
 
-    test('onShortcutSelected switches active module and updates currentRoute', () {
+    test('onShortcutSelected switches active module and updates currentRoute',
+        () {
       final model = getModel();
       expect(model.activeModule, 'dashboard');
       expect(model.currentRoute, Routes.homeView);

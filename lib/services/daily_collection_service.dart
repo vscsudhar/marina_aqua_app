@@ -33,7 +33,8 @@ class DailyCollectionService {
   }) async {
     final queryParams = <String, dynamic>{};
     if (date != null) queryParams['date'] = date;
-    if (search != null && search.trim().isNotEmpty) queryParams['search'] = search.trim();
+    if (search != null && search.trim().isNotEmpty)
+      queryParams['search'] = search.trim();
     if (status != null && status.isNotEmpty) queryParams['status'] = status;
 
     final response = await _apiService.client.get(
@@ -42,7 +43,10 @@ class DailyCollectionService {
     );
 
     final list = response.data['data'] as List? ?? [];
-    return list.map((item) => DailyDealerItemModel.fromJson(item as Map<String, dynamic>)).toList();
+    return list
+        .map((item) =>
+            DailyDealerItemModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   /// List supply transactions with filters and pagination.
@@ -67,8 +71,10 @@ class DailyCollectionService {
     if (date != null) queryParams['date'] = date;
     if (month != null) queryParams['month'] = month;
     if (year != null) queryParams['year'] = year;
-    if (paymentStatus != null && paymentStatus.isNotEmpty) queryParams['payment_status'] = paymentStatus;
-    if (search != null && search.trim().isNotEmpty) queryParams['search'] = search.trim();
+    if (paymentStatus != null && paymentStatus.isNotEmpty)
+      queryParams['payment_status'] = paymentStatus;
+    if (search != null && search.trim().isNotEmpty)
+      queryParams['search'] = search.trim();
 
     final response = await _apiService.client.get(
       '/supplies',
@@ -113,8 +119,10 @@ class DailyCollectionService {
   }
 
   /// Update an existing supply delivery and recalculate totals and ledger.
-  Future<DealerSupplyModel> updateSupply(int id, Map<String, dynamic> payload) async {
-    final response = await _apiService.client.put('/supplies/$id', data: payload);
+  Future<DealerSupplyModel> updateSupply(
+      int id, Map<String, dynamic> payload) async {
+    final response =
+        await _apiService.client.put('/supplies/$id', data: payload);
     final data = response.data['data'] as Map<String, dynamic>;
     return DealerSupplyModel.fromJson(data);
   }
@@ -143,7 +151,8 @@ class DailyCollectionService {
 
     if (dealerId != null) queryParams['dealer_id'] = dealerId;
     if (date != null) queryParams['date'] = date;
-    if (paymentMethod != null && paymentMethod.isNotEmpty) queryParams['payment_method'] = paymentMethod;
+    if (paymentMethod != null && paymentMethod.isNotEmpty)
+      queryParams['payment_method'] = paymentMethod;
 
     final response = await _apiService.client.get(
       '/payments',
@@ -152,7 +161,8 @@ class DailyCollectionService {
 
     final data = response.data as Map<String, dynamic>;
     final itemsList = (data['data'] as List? ?? [])
-        .map((item) => DealerPaymentModel.fromJson(item as Map<String, dynamic>))
+        .map(
+            (item) => DealerPaymentModel.fromJson(item as Map<String, dynamic>))
         .toList();
 
     final paginationData = data['pagination'] as Map<String, dynamic>?;

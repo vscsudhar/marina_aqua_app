@@ -22,6 +22,7 @@ import 'package:marina_aqua/services/billing_service.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_view.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/services/export_print_service.dart';
+import 'package:marina_aqua/services/damaged_product_service.dart';
 import 'package:marina_aqua/ui/views/settings/settings_view.dart';
 import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -58,6 +59,7 @@ import 'package:stacked_services/stacked_services.dart';
     LazySingleton(classType: SettingsService),
     LazySingleton(classType: UserManagementService),
     LazySingleton(classType: ExportPrintService),
+    LazySingleton(classType: DamagedProductService),
     // @stacked-service
   ],
   bottomsheets: [

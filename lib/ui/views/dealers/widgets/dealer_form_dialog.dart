@@ -291,8 +291,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                               ),
                               onChanged: _onNameChanged,
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty)
+                                if (val == null || val.trim().isEmpty) {
                                   return 'Dealer name is required';
+                                }
                                 return null;
                               },
                             ),
@@ -310,8 +311,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                               ),
                               textCapitalization: TextCapitalization.characters,
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty)
+                                if (val == null || val.trim().isEmpty) {
                                   return 'Dealer code is required';
+                                }
                                 return null;
                               },
                             ),
@@ -334,8 +336,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                                 prefixIcon: Icon(Icons.phone),
                               ),
                               validator: (val) {
-                                if (val == null || val.trim().isEmpty)
+                                if (val == null || val.trim().isEmpty) {
                                   return 'Phone number is required';
+                                }
                                 return null;
                               },
                             ),

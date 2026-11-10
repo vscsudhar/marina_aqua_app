@@ -25,10 +25,12 @@ class DailyCollectionViewModel extends BaseViewModel {
     ProductMasterService? productService,
     DialogService? dialogService,
     ExportPrintService? exportPrintService,
-  ])  : _collectionService = collectionService ?? locator<DailyCollectionService>(),
+  ])  : _collectionService =
+            collectionService ?? locator<DailyCollectionService>(),
         _productService = productService ?? locator<ProductMasterService>(),
         _dialogService = dialogService ?? locator<DialogService>(),
-        _exportPrintService = exportPrintService ?? locator<ExportPrintService>();
+        _exportPrintService =
+            exportPrintService ?? locator<ExportPrintService>();
 
   DateTime _selectedDate = DateTime.now();
   DateTime get selectedDate => _selectedDate;
@@ -68,10 +70,13 @@ class DailyCollectionViewModel extends BaseViewModel {
 
   Timer? _debounceTimer;
 
-  String get formattedSelectedDate => DateFormat('yyyy-MM-dd').format(_selectedDate);
-  String get displaySelectedDate => DateFormat('dd MMMM yyyy').format(_selectedDate);
+  String get formattedSelectedDate =>
+      DateFormat('yyyy-MM-dd').format(_selectedDate);
+  String get displaySelectedDate =>
+      DateFormat('dd MMMM yyyy').format(_selectedDate);
   bool get isToday =>
-      DateFormat('yyyy-MM-dd').format(_selectedDate) == DateFormat('yyyy-MM-dd').format(DateTime.now());
+      DateFormat('yyyy-MM-dd').format(_selectedDate) ==
+      DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   void init() {
     loadProducts();
@@ -100,8 +105,10 @@ class DailyCollectionViewModel extends BaseViewModel {
         search: _searchQuery,
         status: _selectedStatusFilter == 'all' ? null : _selectedStatusFilter,
       );
-      final suppliesFuture = _collectionService.getSupplies(date: dateStr, perPage: 100);
-      final paymentsFuture = _collectionService.getPayments(date: dateStr, perPage: 100);
+      final suppliesFuture =
+          _collectionService.getSupplies(date: dateStr, perPage: 100);
+      final paymentsFuture =
+          _collectionService.getPayments(date: dateStr, perPage: 100);
 
       final results = await Future.wait([
         summaryFuture,
@@ -125,7 +132,8 @@ class DailyCollectionViewModel extends BaseViewModel {
 
   /// Returns all supplies recorded for a specific dealer in chronological order
   List<DealerSupplyModel> getSuppliesForDealer(int dealerId) {
-    final list = _supplies?.items.where((s) => s.dealerId == dealerId).toList() ?? [];
+    final list =
+        _supplies?.items.where((s) => s.dealerId == dealerId).toList() ?? [];
     list.sort((a, b) => a.id.compareTo(b.id));
     return list;
   }
@@ -241,7 +249,8 @@ class DailyCollectionViewModel extends BaseViewModel {
   // ==========================================
 
   Map<String, dynamic> _prepareExportData() {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final headers = [
       'Dealer Code',
       'Dealer Name',
@@ -306,7 +315,9 @@ class DailyCollectionViewModel extends BaseViewModel {
 
     final metadata = {
       'Date': displaySelectedDate,
-      'Filter': _selectedStatusFilter == 'all' ? 'All Dealers' : _selectedStatusFilter.toUpperCase(),
+      'Filter': _selectedStatusFilter == 'all'
+          ? 'All Dealers'
+          : _selectedStatusFilter.toUpperCase(),
       if (_searchQuery.isNotEmpty) 'Search': _searchQuery,
       'Total Dealers': '${_dealers.length}',
     };
@@ -314,7 +325,10 @@ class DailyCollectionViewModel extends BaseViewModel {
     final kpis = {
       'Total Value': currencyFormat.format(totalSupplies),
       'Total Collected': currencyFormat.format(totalCollected),
-      'Pending Balance': currencyFormat.format(totalSupplies - totalCollected > 0 ? totalSupplies - totalCollected : 0),
+      'Pending Balance': currencyFormat.format(
+          totalSupplies - totalCollected > 0
+              ? totalSupplies - totalCollected
+              : 0),
       'Items Delivered': '$totalItems Items',
     };
 
@@ -346,7 +360,8 @@ class DailyCollectionViewModel extends BaseViewModel {
       );
 
       final fileName = 'Daily_Collections_$formattedSelectedDate.pdf';
-      _exportPrintService.downloadBytes(pdfBytes, fileName, ExportPrintService.mimePdf);
+      _exportPrintService.downloadBytes(
+          pdfBytes, fileName, ExportPrintService.mimePdf);
       _exportSuccessMessage = 'Daily Collection PDF downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export PDF failed: $e';
@@ -374,7 +389,8 @@ class DailyCollectionViewModel extends BaseViewModel {
       );
 
       final fileName = 'Daily_Collections_$formattedSelectedDate.xlsx';
-      _exportPrintService.downloadBytes(excelBytes, fileName, ExportPrintService.mimeExcel);
+      _exportPrintService.downloadBytes(
+          excelBytes, fileName, ExportPrintService.mimeExcel);
       _exportSuccessMessage = 'Daily Collection Excel downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export Excel failed: $e';
@@ -401,7 +417,8 @@ class DailyCollectionViewModel extends BaseViewModel {
       );
 
       final fileName = 'Daily_Collections_$formattedSelectedDate.csv';
-      _exportPrintService.downloadBytes(csvBytes, fileName, ExportPrintService.mimeCsv);
+      _exportPrintService.downloadBytes(
+          csvBytes, fileName, ExportPrintService.mimeCsv);
       _exportSuccessMessage = 'Daily Collection CSV downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export CSV failed: $e';
@@ -440,4 +457,3 @@ class DailyCollectionViewModel extends BaseViewModel {
     super.dispose();
   }
 }
-

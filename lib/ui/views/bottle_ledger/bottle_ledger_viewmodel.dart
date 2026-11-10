@@ -27,6 +27,14 @@ class BottleLedgerViewModel extends BaseViewModel {
   BottleLedgerReportModel? _report;
   BottleLedgerReportModel? get report => _report;
 
+  bool _showDamageLedger = false;
+  bool get showDamageLedger => _showDamageLedger;
+
+  void toggleDamageLedger([bool? value]) {
+    _showDamageLedger = value ?? !_showDamageLedger;
+    notifyListeners();
+  }
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -50,8 +58,18 @@ class BottleLedgerViewModel extends BaseViewModel {
 
   String get currentMonthName {
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return '${months[_selectedMonth - 1]} $_selectedYear';
   }
@@ -162,4 +180,3 @@ class BottleLedgerViewModel extends BaseViewModel {
     }
   }
 }
-

@@ -152,7 +152,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         setState(() => _isUploadingLogo = true);
         final file = files.first;
         final bytes = await file.xFile.readAsBytes();
-        final updated = await locator<SettingsService>().uploadCompanyLogo(bytes, file.name);
+        final updated = await locator<SettingsService>()
+            .uploadCompanyLogo(bytes, file.name);
         if (mounted) {
           setState(() {
             _logoUrl = updated.logoUrl ?? updated.logoPath;
@@ -300,15 +301,19 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: _logoUrl != null && _logoUrl!.isNotEmpty
                                     ? Image.network(
-                                        ApiService.resolveLogoUrl(_logoUrl) ?? _logoUrl!,
+                                        ApiService.resolveLogoUrl(_logoUrl) ??
+                                            _logoUrl!,
                                         key: ValueKey(_logoUrl),
                                         fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) => const Center(
-                                          child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                        errorBuilder: (_, __, ___) =>
+                                            const Center(
+                                          child: Icon(Icons.water_drop,
+                                              color: kcPrimaryColor, size: 28),
                                         ),
                                       )
                                     : const Center(
-                                        child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 28),
+                                        child: Icon(Icons.water_drop,
+                                            color: kcPrimaryColor, size: 28),
                                       ),
                               ),
                             ),
@@ -319,12 +324,16 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                                 children: [
                                   Text(
                                     'Company Logo',
-                                    style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: kcDeepNavy),
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: kcDeepNavy),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'Displayed on invoices, sidebar, and print views (PNG, JPG, SVG).',
-                                    style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
+                                    style: GoogleFonts.inter(
+                                        fontSize: 11, color: kcTextSecondary),
                                   ),
                                 ],
                               ),
@@ -333,15 +342,23 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             OutlinedButton.icon(
                               onPressed: _isUploadingLogo ? null : _pickLogo,
                               icon: _isUploadingLogo
-                                  ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2))
                                   : const Icon(Icons.upload_file, size: 16),
-                              label: Text(_isUploadingLogo ? 'Uploading...' : 'Change Logo'),
-                              style: OutlinedButton.styleFrom(foregroundColor: kcPrimaryColor),
+                              label: Text(_isUploadingLogo
+                                  ? 'Uploading...'
+                                  : 'Change Logo'),
+                              style: OutlinedButton.styleFrom(
+                                  foregroundColor: kcPrimaryColor),
                             ),
                             if (_logoUrl != null && _logoUrl!.isNotEmpty) ...[
                               const SizedBox(width: 8),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: kcErrorColor, size: 20),
+                                icon: const Icon(Icons.delete_outline,
+                                    color: kcErrorColor, size: 20),
                                 tooltip: 'Remove Logo',
                                 onPressed: _removeLogo,
                               ),
@@ -365,7 +382,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             child: _buildTextField(
                               controller: _invoicePrefixController,
                               label: 'Invoice Prefix (Optional)',
-                              hintText: 'Leave blank for numbers only (e.g. 101)',
+                              hintText:
+                                  'Leave blank for numbers only (e.g. 101)',
                             ),
                           ),
                         ],
@@ -429,7 +447,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
                           color: kcVeryLightGrey,
                           borderRadius: BorderRadius.circular(8),
@@ -437,22 +456,36 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField<String>(
-                            initialValue: kGstSupplyCodes.any((c) => c.code == _stateCodeController.text.trim())
-                                ? kGstSupplyCodes.firstWhere((c) => c.code == _stateCodeController.text.trim()).displayName
+                            initialValue: kGstSupplyCodes.any((c) =>
+                                    c.code == _stateCodeController.text.trim())
+                                ? kGstSupplyCodes
+                                    .firstWhere((c) =>
+                                        c.code ==
+                                        _stateCodeController.text.trim())
+                                    .displayName
                                 : null,
                             decoration: const InputDecoration(
-                              labelText: 'Supply / State Code (Dropdown Selection)',
+                              labelText:
+                                  'Supply / State Code (Dropdown Selection)',
                               border: InputBorder.none,
-                              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+                              prefixIcon: Icon(Icons.location_on_outlined,
+                                  size: 20, color: kcPrimaryColor),
                             ),
-                            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
-                            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
-                                  value: c.displayName,
-                                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
-                                )).toList(),
+                            hint: const Text(
+                                'Select Supply Code (e.g. 33 - Coimbatore)'),
+                            items: kGstSupplyCodes
+                                .map((c) => DropdownMenuItem(
+                                      value: c.displayName,
+                                      child: Text(c.displayName,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500)),
+                                    ))
+                                .toList(),
                             onChanged: (val) {
                               if (val != null) {
-                                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                                final matched = kGstSupplyCodes
+                                    .firstWhere((c) => c.displayName == val);
                                 setState(() {
                                   _stateCodeController.text = matched.code;
                                   _stateNameController.text = matched.stateName;
@@ -592,13 +625,12 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      _sectionHeader('Default Declaration',
-                          Icons.description_outlined),
+                      _sectionHeader(
+                          'Default Declaration', Icons.description_outlined),
                       const SizedBox(height: 12),
                       _buildTextField(
                         controller: _invoiceFooterNotesController,
-                        label:
-                            'Standard Declaration on Printed Invoices',
+                        label: 'Standard Declaration on Printed Invoices',
                         maxLines: 3,
                       ),
                     ],

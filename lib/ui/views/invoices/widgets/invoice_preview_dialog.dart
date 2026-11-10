@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
@@ -10,6 +9,7 @@ import 'package:marina_aqua/services/api_service.dart';
 import 'package:marina_aqua/services/auth_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/common/ui_helpers.dart';
 
 class InvoicePreviewDialog extends StatelessWidget {
   final InvoiceModel invoice;
@@ -43,9 +43,6 @@ class InvoicePreviewDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat =
-        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -626,41 +623,44 @@ class InvoicePreviewDialog extends StatelessWidget {
 
                           final sumWidget = Column(
                             children: [
-                              _sumRow('Subtotal:',
-                                  currencyFormat.format(invoice.subtotal)),
+                              _sumRow(
+                                  'Subtotal:', formatAmount(invoice.subtotal)),
                               if (invoice.discountTotal > 0)
                                 _sumRow('Discount:',
-                                    '- ${currencyFormat.format(invoice.discountTotal)}',
+                                    '- ${formatAmount(invoice.discountTotal)}',
                                     color: kcErrorColor),
                               _sumRow('Taxable Amount:',
-                                  currencyFormat.format(invoice.taxableAmount),
+                                  formatAmount(invoice.taxableAmount),
                                   isBold: true),
                               if (!invoice.isInterstate) ...[
-                                _sumRow('CGST:',
-                                    currencyFormat.format(invoice.cgstAmount)),
-                                _sumRow('SGST:',
-                                    currencyFormat.format(invoice.sgstAmount)),
+                                _sumRow(
+                                    'CGST:', formatAmount(invoice.cgstAmount)),
+                                _sumRow(
+                                    'SGST:', formatAmount(invoice.sgstAmount)),
                               ] else ...[
-                                _sumRow('IGST:',
-                                    currencyFormat.format(invoice.igstAmount)),
+                                _sumRow(
+                                    'IGST:', formatAmount(invoice.igstAmount)),
                               ],
-                              if (invoice.roundOff != 0)
-                                _sumRow('Round Off:',
-                                    currencyFormat.format(invoice.roundOff)),
+                              _sumRow(
+                                'Round Off:',
+                                '${invoice.roundOff >= 0 ? '+' : '-'}₹${invoice.roundOff.abs().toStringAsFixed(2)}',
+                                color: kcPrimaryDark,
+                                isBold: true,
+                              ),
                               const Divider(height: 16),
                               _sumRow(
                                 'Grand Total:',
-                                currencyFormat.format(invoice.grandTotal),
+                                formatAmount(invoice.grandTotal),
                                 isBold: true,
                                 fontSize: 16,
                                 color: kcDeepNavy,
                               ),
                               _sumRow('Amount Paid:',
-                                  currencyFormat.format(invoice.paidAmount),
+                                  formatAmount(invoice.paidAmount),
                                   color: kcSuccessColor),
                               _sumRow(
                                 'Balance Due:',
-                                currencyFormat.format(invoice.balanceDue),
+                                formatAmount(invoice.balanceDue),
                                 isBold: true,
                                 color: invoice.balanceDue > 0
                                     ? kcErrorColor
@@ -827,7 +827,8 @@ class InvoicePreviewDialog extends StatelessWidget {
                       if (onChangeNumber != null)
                         OutlinedButton.icon(
                           onPressed: onChangeNumber,
-                          icon: const Icon(Icons.tag, size: 18, color: kcPrimaryDark),
+                          icon: const Icon(Icons.tag,
+                              size: 18, color: kcPrimaryDark),
                           label: const Text('Change Number'),
                         ),
                       if (onDelete != null)

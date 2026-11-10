@@ -45,7 +45,9 @@ class _KpiCardState extends State<KpiCard> {
           color: kcSurfaceWhite,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: _isHovered ? widget.accentColor.withValues(alpha: 0.4) : kcBorderColor,
+            color: _isHovered
+                ? widget.accentColor.withValues(alpha: 0.4)
+                : kcBorderColor,
             width: _isHovered ? 1.5 : 1.0,
           ),
           boxShadow: [
@@ -73,13 +75,16 @@ class _KpiCardState extends State<KpiCard> {
                       color: widget.accentColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(widget.icon, color: widget.accentColor, size: 20),
+                    child:
+                        Icon(widget.icon, color: widget.accentColor, size: 20),
                   ),
                   if (widget.badgeText != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                        color: (widget.badgeColor ?? widget.accentColor).withValues(alpha: 0.12),
+                        color: (widget.badgeColor ?? widget.accentColor)
+                            .withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(

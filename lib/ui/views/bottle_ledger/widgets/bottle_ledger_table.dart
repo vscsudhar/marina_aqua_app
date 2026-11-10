@@ -33,7 +33,8 @@ class BottleLedgerTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
     return Container(
       decoration: BoxDecoration(
@@ -60,9 +61,11 @@ class BottleLedgerTable extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    title.toLowerCase().contains('dealer')
-                        ? Icons.storefront_rounded
-                        : Icons.local_shipping_rounded,
+                    title.toLowerCase().contains('damage')
+                        ? Icons.remove_shopping_cart_rounded
+                        : (title.toLowerCase().contains('dealer')
+                            ? Icons.storefront_rounded
+                            : Icons.local_shipping_rounded),
                     color: Colors.white,
                     size: 18,
                   ),
@@ -105,17 +108,21 @@ class BottleLedgerTable extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: showCountColumn ? 920 : 540),
+                constraints:
+                    BoxConstraints(minWidth: showCountColumn ? 920 : 540),
                 child: DataTable(
                   headingRowHeight: 34,
                   dataRowMinHeight: 30,
                   dataRowMaxHeight: 32,
                   horizontalMargin: 6,
                   columnSpacing: 8,
-                  headingRowColor: WidgetStateProperty.all(Colors.grey.shade100),
+                  headingRowColor:
+                      WidgetStateProperty.all(Colors.grey.shade100),
                   border: TableBorder(
-                    horizontalInside: BorderSide(color: Colors.grey.shade200, width: 0.8),
-                    verticalInside: BorderSide(color: Colors.grey.shade200, width: 0.8),
+                    horizontalInside:
+                        BorderSide(color: Colors.grey.shade200, width: 0.8),
+                    verticalInside:
+                        BorderSide(color: Colors.grey.shade200, width: 0.8),
                   ),
                   columns: [
                     const DataColumn(
@@ -124,7 +131,8 @@ class BottleLedgerTable extends StatelessWidget {
                         child: Text(
                           'Date',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
                         ),
                       ),
                     ),
@@ -166,7 +174,8 @@ class BottleLedgerTable extends StatelessWidget {
                           child: Text(
                             'Tot Qty',
                             textAlign: TextAlign.right,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 10),
                           ),
                         ),
                       ),
@@ -176,7 +185,8 @@ class BottleLedgerTable extends StatelessWidget {
                         child: Text(
                           'Tot Amt',
                           textAlign: TextAlign.right,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 10),
                         ),
                       ),
                     ),
@@ -192,7 +202,10 @@ class BottleLedgerTable extends StatelessWidget {
                             child: Text(
                               'Op',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Color(0xFF92400E)),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  color: Color(0xFF92400E)),
                             ),
                           ),
                         ),
@@ -216,7 +229,9 @@ class BottleLedgerTable extends StatelessWidget {
                             SizedBox(
                               width: showCountColumn ? 44 : 48,
                               child: Text(
-                                showCountColumn ? '-' : '${(openingStock[pk] ?? 0).toStringAsFixed(0)} q',
+                                showCountColumn
+                                    ? '-'
+                                    : '${(openingStock[pk] ?? 0).toStringAsFixed(0)} q',
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(
                                   fontSize: 10,
@@ -232,9 +247,14 @@ class BottleLedgerTable extends StatelessWidget {
                             SizedBox(
                               width: 44,
                               child: Text(
-                                openingStock.values.fold<double>(0.0, (a, b) => a + b).toStringAsFixed(0),
+                                openingStock.values
+                                    .fold<double>(0.0, (a, b) => a + b)
+                                    .toStringAsFixed(0),
                                 textAlign: TextAlign.right,
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF92400E)),
+                                style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF92400E)),
                               ),
                             ),
                           ),
@@ -244,7 +264,8 @@ class BottleLedgerTable extends StatelessWidget {
                             child: Text(
                               '-',
                               textAlign: TextAlign.right,
-                              style: TextStyle(fontSize: 10, color: Color(0xFF92400E)),
+                              style: TextStyle(
+                                  fontSize: 10, color: Color(0xFF92400E)),
                             ),
                           ),
                         ),
@@ -292,12 +313,18 @@ class BottleLedgerTable extends StatelessWidget {
                               SizedBox(
                                 width: 44,
                                 child: Text(
-                                  r.totalQuantity > 0 ? r.totalQuantity.toStringAsFixed(0) : '-',
+                                  r.totalQuantity > 0
+                                      ? r.totalQuantity.toStringAsFixed(0)
+                                      : '-',
                                   textAlign: TextAlign.right,
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
-                                    fontWeight: r.totalQuantity > 0 ? FontWeight.bold : FontWeight.normal,
-                                    color: r.totalQuantity > 0 ? Colors.black87 : Colors.grey.shade400,
+                                    fontWeight: r.totalQuantity > 0
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: r.totalQuantity > 0
+                                        ? Colors.black87
+                                        : Colors.grey.shade400,
                                   ),
                                 ),
                               ),
@@ -306,12 +333,18 @@ class BottleLedgerTable extends StatelessWidget {
                             SizedBox(
                               width: 52,
                               child: Text(
-                                r.totalAmount > 0 ? currencyFormat.format(r.totalAmount) : '-',
+                                r.totalAmount > 0
+                                    ? currencyFormat.format(r.totalAmount)
+                                    : '-',
                                 textAlign: TextAlign.right,
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  fontWeight: r.totalAmount > 0 ? FontWeight.bold : FontWeight.normal,
-                                  color: r.totalAmount > 0 ? Colors.black87 : Colors.grey.shade400,
+                                  fontWeight: r.totalAmount > 0
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: r.totalAmount > 0
+                                      ? Colors.black87
+                                      : Colors.grey.shade400,
                                 ),
                               ),
                             ),
@@ -329,7 +362,8 @@ class BottleLedgerTable extends StatelessWidget {
                             child: Text(
                               'Tot',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 10),
                             ),
                           ),
                         ),
@@ -339,12 +373,17 @@ class BottleLedgerTable extends StatelessWidget {
                               SizedBox(
                                 width: 36,
                                 child: Text(
-                                  (monthlyQtyTotals[pk] ?? 0) > 0 ? (monthlyQtyTotals[pk]!).toStringAsFixed(0) : '-',
+                                  (monthlyQtyTotals[pk] ?? 0) > 0
+                                      ? (monthlyQtyTotals[pk]!)
+                                          .toStringAsFixed(0)
+                                      : '-',
                                   textAlign: TextAlign.right,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    color: (monthlyQtyTotals[pk] ?? 0) > 0 ? Colors.black87 : Colors.grey.shade500,
+                                    color: (monthlyQtyTotals[pk] ?? 0) > 0
+                                        ? Colors.black87
+                                        : Colors.grey.shade500,
                                   ),
                                 ),
                               ),
@@ -353,12 +392,16 @@ class BottleLedgerTable extends StatelessWidget {
                             SizedBox(
                               width: showCountColumn ? 44 : 48,
                               child: Text(
-                                (monthlyTotals[pk] ?? 0) > 0 ? currencyFormat.format(monthlyTotals[pk]) : '-',
+                                (monthlyTotals[pk] ?? 0) > 0
+                                    ? currencyFormat.format(monthlyTotals[pk])
+                                    : '-',
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: (monthlyTotals[pk] ?? 0) > 0 ? headerColor : Colors.grey.shade500,
+                                  color: (monthlyTotals[pk] ?? 0) > 0
+                                      ? headerColor
+                                      : Colors.grey.shade500,
                                 ),
                               ),
                             ),
@@ -369,9 +412,12 @@ class BottleLedgerTable extends StatelessWidget {
                             SizedBox(
                               width: 44,
                               child: Text(
-                                grandQtyTotal > 0 ? grandQtyTotal.toStringAsFixed(0) : '-',
+                                grandQtyTotal > 0
+                                    ? grandQtyTotal.toStringAsFixed(0)
+                                    : '-',
                                 textAlign: TextAlign.right,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 10),
                               ),
                             ),
                           ),
@@ -381,7 +427,8 @@ class BottleLedgerTable extends StatelessWidget {
                             child: Text(
                               currencyFormat.format(grandTotal),
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 10),
                             ),
                           ),
                         ),
@@ -429,7 +476,8 @@ class BottleLedgerTable extends StatelessWidget {
     required double width,
     required VoidCallback onTap,
   }) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
     final hasAmount = amount > 0;
 
     return InkWell(

@@ -73,11 +73,14 @@ void main() {
       ),
     ];
 
-    testWidgets('PaymentEntryDialog displays product dropdown, count, dealer price, actual amount, and ledger balance', (tester) async {
+    testWidgets(
+        'PaymentEntryDialog displays product dropdown, count, dealer price, actual amount, and ledger balance',
+        (tester) async {
       final dealerService = locator<DealerService>();
 
       // Mock dealer contract price resolution (e.g. ₹30.00 for 20L Jar instead of ₹35 default)
-      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date'))).thenAnswer(
+      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date')))
+          .thenAnswer(
         (_) async => {
           'price': 30.0,
           'catalog_price': 35.0,
@@ -85,7 +88,8 @@ void main() {
         },
       );
 
-      when(dealerService.resolveEffectivePrice(1, 2, date: anyNamed('date'))).thenAnswer(
+      when(dealerService.resolveEffectivePrice(1, 2, date: anyNamed('date')))
+          .thenAnswer(
         (_) async => {
           'price': 110.0,
           'catalog_price': 120.0,
@@ -115,7 +119,8 @@ void main() {
       expect(find.text('Sri Murugan Aqua'), findsOneWidget);
 
       // 2. Verify products section header
-      expect(find.text('Delivered Products (Against Dealer Price)'), findsOneWidget);
+      expect(find.text('Delivered Products (Against Dealer Price)'),
+          findsOneWidget);
 
       // 3. Verify dealer price & initial line actual amount (1 count * ₹30 = ₹30.00)
       expect(find.text('₹30.00'), findsWidgets);
@@ -134,14 +139,18 @@ void main() {
       expect(find.text('Balance Added to Ledger:'), findsOneWidget);
 
       // 6. Enter partial collection amount: ₹200
-      final collectionAmountField = find.widgetWithText(TextFormField, 'Collection Amount (₹) *');
+      final collectionAmountField =
+          find.widgetWithText(TextFormField, 'Collection Amount (₹) *');
       expect(collectionAmountField, findsOneWidget);
       await tester.enterText(collectionAmountField, '200');
       await tester.pumpAndSettle();
 
       // Balance = ₹300 - ₹200 = ₹100.00 added to ledger
       expect(find.text('₹100.00'), findsWidgets);
-      expect(find.textContaining('Remaining balance of ₹100.00 will be added to Sri Murugan Aqua\'s ledger as outstanding.'), findsOneWidget);
+      expect(
+          find.textContaining(
+              'Remaining balance of ₹100.00 will be added to Sri Murugan Aqua\'s ledger as outstanding.'),
+          findsOneWidget);
 
       // 7. Add another product row
       final addAnotherBtn = find.text('Add Another Product');
@@ -150,7 +159,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // There should now be 2 product cards
-      expect(find.widgetWithText(TextFormField, 'Count / Qty *'), findsNWidgets(2));
+      expect(find.widgetWithText(TextFormField, 'Count / Qty *'),
+          findsNWidgets(2));
 
       // 8. Remove the second row
       final deleteButtons = find.byTooltip('Remove Product');
@@ -159,7 +169,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Back to 1 row
-      expect(find.widgetWithText(TextFormField, 'Count / Qty *'), findsOneWidget);
+      expect(
+          find.widgetWithText(TextFormField, 'Count / Qty *'), findsOneWidget);
 
       // 9. Save collection & supply
       final saveBtn = find.text('Save Collection & Supply');
@@ -177,13 +188,17 @@ void main() {
       expect(items.first['product_id'], 1);
       expect(items.first['quantity'], 10.0);
       expect(items.first['custom_price'], 30.0);
-      expect(savedPayload!['idempotency_key'].toString().startsWith('COL-1-'), isTrue);
+      expect(savedPayload!['idempotency_key'].toString().startsWith('COL-1-'),
+          isTrue);
     });
 
-    testWidgets('Can record collection multiple times against same dealer with previous activity shown', (tester) async {
+    testWidgets(
+        'Can record collection multiple times against same dealer with previous activity shown',
+        (tester) async {
       final dealerService = locator<DealerService>();
 
-      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date'))).thenAnswer(
+      when(dealerService.resolveEffectivePrice(1, 1, date: anyNamed('date')))
+          .thenAnswer(
         (_) async => {
           'price': 30.0,
           'catalog_price': 35.0,
@@ -234,7 +249,8 @@ void main() {
       expect(find.text('Collected Today: ₹500'), findsOneWidget);
 
       // 2. Product row is still readily initialized for recording subsequent collection
-      expect(find.widgetWithText(TextFormField, 'Count / Qty *'), findsOneWidget);
+      expect(
+          find.widgetWithText(TextFormField, 'Count / Qty *'), findsOneWidget);
 
       // 3. Set count to 5 jars
       final countField = find.widgetWithText(TextFormField, 'Count / Qty *');
@@ -255,7 +271,8 @@ void main() {
       expect(secondPayload!['payment_amount'], 150.0);
       final items = secondPayload!['items'] as List;
       expect(items.first['quantity'], 5.0);
-      expect(secondPayload!['idempotency_key'].toString().startsWith('COL-1-'), isTrue);
+      expect(secondPayload!['idempotency_key'].toString().startsWith('COL-1-'),
+          isTrue);
     });
   });
 }

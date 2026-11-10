@@ -33,7 +33,8 @@ class CompanySettingModel {
     this.phone = '+91 94441 23456',
     this.email = 'billing@marinaaqua.com',
     this.website = 'www.marinaaqua.com',
-    this.address = 'Plot No. 14, OMR IT Highway, Thoraipakkam, Chennai - 600097',
+    this.address =
+        'Plot No. 14, OMR IT Highway, Thoraipakkam, Chennai - 600097',
     this.stateName = 'Tamil Nadu',
     this.stateCode = '33',
     this.gstin = '33AABCM1234F1Z9',
@@ -52,13 +53,17 @@ class CompanySettingModel {
     this.invoicePrefix = '',
     this.invoiceNumberPadding = 4,
     this.nextInvoiceNumber = 1,
-    this.invoiceFooterNotes = 'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
+    this.invoiceFooterNotes =
+        'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
   });
 
   factory CompanySettingModel.fromJson(Map<String, dynamic> json) {
     return CompanySettingModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 1,
-      companyName: json['company_name'] as String? ?? 'Marina Aqua Pure Water Co.',
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 1,
+      companyName:
+          json['company_name'] as String? ?? 'Marina Aqua Pure Water Co.',
       tagline: json['tagline'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String? ?? '',
@@ -229,26 +234,56 @@ class InvoiceItemModel {
 
   factory InvoiceItemModel.fromJson(Map<String, dynamic> json) {
     return InvoiceItemModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      invoiceId: json['invoice_id'] is int ? json['invoice_id'] : int.tryParse(json['invoice_id'].toString()) ?? 0,
-      productId: json['product_id'] is int ? json['product_id'] : int.tryParse(json['product_id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
+      invoiceId: json['invoice_id'] is int
+          ? json['invoice_id']
+          : int.tryParse(json['invoice_id'].toString()) ?? 0,
+      productId: json['product_id'] is int
+          ? json['product_id']
+          : int.tryParse(json['product_id']?.toString() ?? ''),
       productName: json['product_name'] as String?,
       productSku: json['product_sku'] as String?,
       itemDescription: json['item_description'] as String? ?? '',
       hsnSac: json['hsn_sac'] as String? ?? '2201',
-      quantity: (json['quantity'] != null) ? double.tryParse(json['quantity'].toString()) ?? 0.0 : 0.0,
+      quantity: (json['quantity'] != null)
+          ? double.tryParse(json['quantity'].toString()) ?? 0.0
+          : 0.0,
       unit: json['unit'] as String? ?? 'Unit',
-      unitPrice: (json['unit_price'] != null) ? double.tryParse(json['unit_price'].toString()) ?? 0.0 : 0.0,
-      discountAmount: (json['discount_amount'] != null) ? double.tryParse(json['discount_amount'].toString()) ?? 0.0 : 0.0,
-      taxableAmount: (json['taxable_amount'] != null) ? double.tryParse(json['taxable_amount'].toString()) ?? 0.0 : 0.0,
-      taxRate: (json['tax_rate'] != null) ? double.tryParse(json['tax_rate'].toString()) ?? 0.0 : 0.0,
-      cgstRate: (json['cgst_rate'] != null) ? double.tryParse(json['cgst_rate'].toString()) ?? 0.0 : 0.0,
-      cgstAmount: (json['cgst_amount'] != null) ? double.tryParse(json['cgst_amount'].toString()) ?? 0.0 : 0.0,
-      sgstRate: (json['sgst_rate'] != null) ? double.tryParse(json['sgst_rate'].toString()) ?? 0.0 : 0.0,
-      sgstAmount: (json['sgst_amount'] != null) ? double.tryParse(json['sgst_amount'].toString()) ?? 0.0 : 0.0,
-      igstRate: (json['igst_rate'] != null) ? double.tryParse(json['igst_rate'].toString()) ?? 0.0 : 0.0,
-      igstAmount: (json['igst_amount'] != null) ? double.tryParse(json['igst_amount'].toString()) ?? 0.0 : 0.0,
-      lineTotal: (json['line_total'] != null) ? double.tryParse(json['line_total'].toString()) ?? 0.0 : 0.0,
+      unitPrice: (json['unit_price'] != null)
+          ? double.tryParse(json['unit_price'].toString()) ?? 0.0
+          : 0.0,
+      discountAmount: (json['discount_amount'] != null)
+          ? double.tryParse(json['discount_amount'].toString()) ?? 0.0
+          : 0.0,
+      taxableAmount: (json['taxable_amount'] != null)
+          ? double.tryParse(json['taxable_amount'].toString()) ?? 0.0
+          : 0.0,
+      taxRate: (json['tax_rate'] != null)
+          ? double.tryParse(json['tax_rate'].toString()) ?? 0.0
+          : 0.0,
+      cgstRate: (json['cgst_rate'] != null)
+          ? double.tryParse(json['cgst_rate'].toString()) ?? 0.0
+          : 0.0,
+      cgstAmount: (json['cgst_amount'] != null)
+          ? double.tryParse(json['cgst_amount'].toString()) ?? 0.0
+          : 0.0,
+      sgstRate: (json['sgst_rate'] != null)
+          ? double.tryParse(json['sgst_rate'].toString()) ?? 0.0
+          : 0.0,
+      sgstAmount: (json['sgst_amount'] != null)
+          ? double.tryParse(json['sgst_amount'].toString()) ?? 0.0
+          : 0.0,
+      igstRate: (json['igst_rate'] != null)
+          ? double.tryParse(json['igst_rate'].toString()) ?? 0.0
+          : 0.0,
+      igstAmount: (json['igst_amount'] != null)
+          ? double.tryParse(json['igst_amount'].toString()) ?? 0.0
+          : 0.0,
+      lineTotal: (json['line_total'] != null)
+          ? double.tryParse(json['line_total'].toString()) ?? 0.0
+          : 0.0,
       notes: json['notes'] as String?,
     );
   }
@@ -281,11 +316,17 @@ class InvoicePaymentModel {
 
   factory InvoicePaymentModel.fromJson(Map<String, dynamic> json) {
     return InvoicePaymentModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      invoiceId: json['invoice_id'] is int ? json['invoice_id'] : int.tryParse(json['invoice_id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
+      invoiceId: json['invoice_id'] is int
+          ? json['invoice_id']
+          : int.tryParse(json['invoice_id'].toString()) ?? 0,
       paymentNo: json['payment_no'] as String? ?? '',
       paymentDate: json['payment_date'] as String? ?? '',
-      amount: (json['amount'] != null) ? double.tryParse(json['amount'].toString()) ?? 0.0 : 0.0,
+      amount: (json['amount'] != null)
+          ? double.tryParse(json['amount'].toString()) ?? 0.0
+          : 0.0,
       paymentMethod: json['payment_method'] as String? ?? 'cash',
       referenceNo: json['reference_no'] as String?,
       notes: json['notes'] as String?,
@@ -326,14 +367,26 @@ class CreditNoteModel {
 
   factory CreditNoteModel.fromJson(Map<String, dynamic> json) {
     return CreditNoteModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       creditNoteNo: json['credit_note_no'] as String? ?? '',
       creditNoteDate: json['credit_note_date'] as String? ?? '',
-      invoiceId: json['invoice_id'] is int ? json['invoice_id'] : int.tryParse(json['invoice_id'].toString()) ?? 0,
-      dealerId: json['dealer_id'] is int ? json['dealer_id'] : int.tryParse(json['dealer_id']?.toString() ?? ''),
-      subtotal: (json['subtotal'] != null) ? double.tryParse(json['subtotal'].toString()) ?? 0.0 : 0.0,
-      taxAmount: (json['tax_amount'] != null) ? double.tryParse(json['tax_amount'].toString()) ?? 0.0 : 0.0,
-      totalAmount: (json['total_amount'] != null) ? double.tryParse(json['total_amount'].toString()) ?? 0.0 : 0.0,
+      invoiceId: json['invoice_id'] is int
+          ? json['invoice_id']
+          : int.tryParse(json['invoice_id'].toString()) ?? 0,
+      dealerId: json['dealer_id'] is int
+          ? json['dealer_id']
+          : int.tryParse(json['dealer_id']?.toString() ?? ''),
+      subtotal: (json['subtotal'] != null)
+          ? double.tryParse(json['subtotal'].toString()) ?? 0.0
+          : 0.0,
+      taxAmount: (json['tax_amount'] != null)
+          ? double.tryParse(json['tax_amount'].toString()) ?? 0.0
+          : 0.0,
+      totalAmount: (json['total_amount'] != null)
+          ? double.tryParse(json['total_amount'].toString()) ?? 0.0
+          : 0.0,
       reason: json['reason'] as String? ?? '',
       notes: json['notes'] as String?,
       createdBy: json['created_by'] as String?,
@@ -364,6 +417,7 @@ class InvoiceModel {
   final double sgstAmount;
   final double igstAmount;
   final double taxTotal;
+  final double? rawGrandTotal;
   final double roundOff;
   final double grandTotal;
   final double paidAmount;
@@ -407,6 +461,7 @@ class InvoiceModel {
     this.sgstAmount = 0.0,
     this.igstAmount = 0.0,
     this.taxTotal = 0.0,
+    this.rawGrandTotal,
     this.roundOff = 0.0,
     required this.grandTotal,
     this.paidAmount = 0.0,
@@ -435,11 +490,15 @@ class InvoiceModel {
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     return InvoiceModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       invoiceNo: json['invoice_no'] as String? ?? '',
       invoiceDate: json['invoice_date'] as String? ?? '',
       dueDate: json['due_date'] as String?,
-      dealerId: json['dealer_id'] is int ? json['dealer_id'] : int.tryParse(json['dealer_id']?.toString() ?? ''),
+      dealerId: json['dealer_id'] is int
+          ? json['dealer_id']
+          : int.tryParse(json['dealer_id']?.toString() ?? ''),
       customerName: json['customer_name'] as String? ?? 'Valued Customer',
       customerPhone: json['customer_phone'] as String?,
       customerEmail: json['customer_email'] as String?,
@@ -447,19 +506,46 @@ class InvoiceModel {
       customerGstin: json['customer_gstin'] as String?,
       placeOfSupply: json['place_of_supply'] as String? ?? '33-Tamil Nadu',
       isInterstate: json['is_interstate'] == true || json['is_interstate'] == 1,
-      dealerSupplyId: json['dealer_supply_id'] is int ? json['dealer_supply_id'] : int.tryParse(json['dealer_supply_id']?.toString() ?? ''),
+      dealerSupplyId: json['dealer_supply_id'] is int
+          ? json['dealer_supply_id']
+          : int.tryParse(json['dealer_supply_id']?.toString() ?? ''),
       dealerSupplyNo: json['dealer_supply_no'] as String?,
-      subtotal: (json['subtotal'] != null) ? double.tryParse(json['subtotal'].toString()) ?? 0.0 : 0.0,
-      discountTotal: (json['discount_total'] != null) ? double.tryParse(json['discount_total'].toString()) ?? 0.0 : 0.0,
-      taxableAmount: (json['taxable_amount'] != null) ? double.tryParse(json['taxable_amount'].toString()) ?? 0.0 : 0.0,
-      cgstAmount: (json['cgst_amount'] != null) ? double.tryParse(json['cgst_amount'].toString()) ?? 0.0 : 0.0,
-      sgstAmount: (json['sgst_amount'] != null) ? double.tryParse(json['sgst_amount'].toString()) ?? 0.0 : 0.0,
-      igstAmount: (json['igst_amount'] != null) ? double.tryParse(json['igst_amount'].toString()) ?? 0.0 : 0.0,
-      taxTotal: (json['tax_total'] != null) ? double.tryParse(json['tax_total'].toString()) ?? 0.0 : 0.0,
-      roundOff: (json['round_off'] != null) ? double.tryParse(json['round_off'].toString()) ?? 0.0 : 0.0,
-      grandTotal: (json['grand_total'] != null) ? double.tryParse(json['grand_total'].toString()) ?? 0.0 : 0.0,
-      paidAmount: (json['paid_amount'] != null) ? double.tryParse(json['paid_amount'].toString()) ?? 0.0 : 0.0,
-      balanceDue: (json['balance_due'] != null) ? double.tryParse(json['balance_due'].toString()) ?? 0.0 : 0.0,
+      subtotal: (json['subtotal'] != null)
+          ? double.tryParse(json['subtotal'].toString()) ?? 0.0
+          : 0.0,
+      discountTotal: (json['discount_total'] != null)
+          ? double.tryParse(json['discount_total'].toString()) ?? 0.0
+          : 0.0,
+      taxableAmount: (json['taxable_amount'] != null)
+          ? double.tryParse(json['taxable_amount'].toString()) ?? 0.0
+          : 0.0,
+      cgstAmount: (json['cgst_amount'] != null)
+          ? double.tryParse(json['cgst_amount'].toString()) ?? 0.0
+          : 0.0,
+      sgstAmount: (json['sgst_amount'] != null)
+          ? double.tryParse(json['sgst_amount'].toString()) ?? 0.0
+          : 0.0,
+      igstAmount: (json['igst_amount'] != null)
+          ? double.tryParse(json['igst_amount'].toString()) ?? 0.0
+          : 0.0,
+      taxTotal: (json['tax_total'] != null)
+          ? double.tryParse(json['tax_total'].toString()) ?? 0.0
+          : 0.0,
+      rawGrandTotal: json['raw_grand_total'] != null
+          ? double.tryParse(json['raw_grand_total'].toString())
+          : null,
+      roundOff: (json['round_off'] != null)
+          ? double.tryParse(json['round_off'].toString()) ?? 0.0
+          : 0.0,
+      grandTotal: (json['grand_total'] != null)
+          ? double.tryParse(json['grand_total'].toString()) ?? 0.0
+          : 0.0,
+      paidAmount: (json['paid_amount'] != null)
+          ? double.tryParse(json['paid_amount'].toString()) ?? 0.0
+          : 0.0,
+      balanceDue: (json['balance_due'] != null)
+          ? double.tryParse(json['balance_due'].toString()) ?? 0.0
+          : 0.0,
       status: json['status'] as String? ?? 'draft',
       paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       cancellationReason: json['cancellation_reason'] as String?,
@@ -471,15 +557,18 @@ class InvoiceModel {
       terms: json['terms'] as String?,
       itemsCount: json['items_count'] is int ? json['items_count'] : 0,
       items: (json['items'] as List?)
-              ?.map((item) => InvoiceItemModel.fromJson(item as Map<String, dynamic>))
+              ?.map((item) =>
+                  InvoiceItemModel.fromJson(item as Map<String, dynamic>))
               .toList() ??
           const [],
       payments: (json['payments'] as List?)
-              ?.map((p) => InvoicePaymentModel.fromJson(p as Map<String, dynamic>))
+              ?.map((p) =>
+                  InvoicePaymentModel.fromJson(p as Map<String, dynamic>))
               .toList() ??
           const [],
       creditNotes: (json['credit_notes'] as List?)
-              ?.map((cn) => CreditNoteModel.fromJson(cn as Map<String, dynamic>))
+              ?.map(
+                  (cn) => CreditNoteModel.fromJson(cn as Map<String, dynamic>))
               .toList() ??
           const [],
       dealer: json['dealer'] as Map<String, dynamic>?,

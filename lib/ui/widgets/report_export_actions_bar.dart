@@ -40,12 +40,16 @@ class ReportExportActionsBar extends StatelessWidget {
             const SizedBox(
               width: 14,
               height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: AppColors.primary),
             ),
             const SizedBox(width: 10),
             Text(
               exportingLabel ?? 'Generating export...',
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary),
             ),
           ],
         ),
@@ -67,12 +71,18 @@ class ReportExportActionsBar extends StatelessWidget {
         if (onPrint != null)
           OutlinedButton.icon(
             onPressed: onPrint,
-            icon: const Icon(Icons.print_outlined, size: 16, color: Color(0xFF0F172A)),
-            label: Text('Print', style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+            icon: const Icon(Icons.print_outlined,
+                size: 16, color: Color(0xFF0F172A)),
+            label: Text('Print',
+                style: GoogleFonts.inter(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF0F172A))),
             style: OutlinedButton.styleFrom(
               padding: padding,
               side: const BorderSide(color: Color(0xFFCBD5E1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               backgroundColor: Colors.white,
             ),
           ),
@@ -81,12 +91,19 @@ class ReportExportActionsBar extends StatelessWidget {
         if (onExportPdf != null)
           OutlinedButton.icon(
             onPressed: onExportPdf,
-            icon: const Icon(Icons.picture_as_pdf_outlined, size: 16, color: Color(0xFFDC2626)),
-            label: Text('Export PDF', style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w600, color: const Color(0xFFDC2626))),
+            icon: const Icon(Icons.picture_as_pdf_outlined,
+                size: 16, color: Color(0xFFDC2626)),
+            label: Text('Export PDF',
+                style: GoogleFonts.inter(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFFDC2626))),
             style: OutlinedButton.styleFrom(
               padding: padding,
-              side: BorderSide(color: const Color(0xFFDC2626).withValues(alpha: 0.4)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              side: BorderSide(
+                  color: const Color(0xFFDC2626).withValues(alpha: 0.4)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               backgroundColor: const Color(0xFFFEF2F2),
             ),
           ),
@@ -95,12 +112,19 @@ class ReportExportActionsBar extends StatelessWidget {
         if (onExportExcel != null)
           OutlinedButton.icon(
             onPressed: onExportExcel,
-            icon: const Icon(Icons.table_chart_outlined, size: 16, color: Color(0xFF16A34A)),
-            label: Text('Export Excel', style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w600, color: const Color(0xFF16A34A))),
+            icon: const Icon(Icons.table_chart_outlined,
+                size: 16, color: Color(0xFF16A34A)),
+            label: Text('Export Excel',
+                style: GoogleFonts.inter(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF16A34A))),
             style: OutlinedButton.styleFrom(
               padding: padding,
-              side: BorderSide(color: const Color(0xFF16A34A).withValues(alpha: 0.4)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              side: BorderSide(
+                  color: const Color(0xFF16A34A).withValues(alpha: 0.4)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               backgroundColor: const Color(0xFFF0FDF4),
             ),
           ),
@@ -109,12 +133,18 @@ class ReportExportActionsBar extends StatelessWidget {
         if (showCsv && onExportCsv != null)
           OutlinedButton.icon(
             onPressed: onExportCsv,
-            icon: const Icon(Icons.file_download_outlined, size: 16, color: Color(0xFF475569)),
-            label: Text('CSV', style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
+            icon: const Icon(Icons.file_download_outlined,
+                size: 16, color: Color(0xFF475569)),
+            label: Text('CSV',
+                style: GoogleFonts.inter(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF475569))),
             style: OutlinedButton.styleFrom(
               padding: padding,
               side: const BorderSide(color: Color(0xFFCBD5E1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               backgroundColor: Colors.white,
             ),
           ),

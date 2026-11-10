@@ -21,7 +21,9 @@ class UnitModel {
 
   factory UnitModel.fromJson(Map<String, dynamic> json) {
     return UnitModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
       code: json['code'] as String? ?? '',
       description: json['description'] as String?,

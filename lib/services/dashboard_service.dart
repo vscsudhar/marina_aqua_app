@@ -19,7 +19,10 @@ class DashboardService {
     if (date != null && date.isNotEmpty) {
       queryParams['date'] = date;
     }
-    if (startDate != null && startDate.isNotEmpty && endDate != null && endDate.isNotEmpty) {
+    if (startDate != null &&
+        startDate.isNotEmpty &&
+        endDate != null &&
+        endDate.isNotEmpty) {
       queryParams['start_date'] = startDate;
       queryParams['end_date'] = endDate;
     }
@@ -27,13 +30,17 @@ class DashboardService {
     final response = await _apiService.get<DashboardSummaryModel>(
       '/dashboard/summary',
       queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      fromData: (data) => DashboardSummaryModel.fromJson(data as Map<String, dynamic>),
+      fromData: (data) =>
+          DashboardSummaryModel.fromJson(data as Map<String, dynamic>),
     );
 
     if (response.isSuccess && response.data != null) {
       return response.data!;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to fetch dashboard summary.');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to fetch dashboard summary.');
     }
   }
 
@@ -48,13 +55,17 @@ class DashboardService {
         'days': days,
         'months': months,
       },
-      fromData: (data) => DashboardChartsModel.fromJson(data as Map<String, dynamic>),
+      fromData: (data) =>
+          DashboardChartsModel.fromJson(data as Map<String, dynamic>),
     );
 
     if (response.isSuccess && response.data != null) {
       return response.data!;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to fetch dashboard charts.');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to fetch dashboard charts.');
     }
   }
 }

@@ -177,8 +177,10 @@ class ProductsViewModel extends BaseViewModel {
 
   Future<void> toggleProductStatus(ProductModel product) async {
     try {
-      final updated = await _productMasterService.toggleProductStatus(product.id);
-      _products = _products.map((p) => p.id == product.id ? updated : p).toList();
+      final updated =
+          await _productMasterService.toggleProductStatus(product.id);
+      _products =
+          _products.map((p) => p.id == product.id ? updated : p).toList();
       notifyListeners();
     } on ApiException catch (e) {
       await _dialogService.showDialog(
@@ -188,7 +190,8 @@ class ProductsViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> confirmDeleteProduct(BuildContext context, ProductModel product) async {
+  Future<void> confirmDeleteProduct(
+      BuildContext context, ProductModel product) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -291,7 +294,8 @@ class ProductsViewModel extends BaseViewModel {
     await fetchCategories();
   }
 
-  Future<void> confirmDeleteCategory(BuildContext context, CategoryModel category) async {
+  Future<void> confirmDeleteCategory(
+      BuildContext context, CategoryModel category) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

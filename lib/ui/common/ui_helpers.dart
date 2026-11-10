@@ -1,6 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+/// Formats amount displaying actual decimals if present (e.g. 20.45, 1250.60) or whole number if integer (e.g. 20, 1250).
+String formatAmount(double val, {bool showSymbol = true}) {
+  final hasDecimals = (val - val.roundToDouble()).abs() > 0.001;
+  final fmt = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: showSymbol ? '₹' : '',
+    decimalDigits: hasDecimals ? 2 : 0,
+  );
+  return fmt.format(val).trim();
+}
 
 const double _tinySize = 5.0;
 const double _smallSize = 10.0;

@@ -45,7 +45,9 @@ class DealerModel {
 
   factory DealerModel.fromJson(Map<String, dynamic> json) {
     return DealerModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       code: json['code'] as String? ?? '',
       name: json['name'] as String? ?? '',
       contactPerson: json['contact_person'] as String?,

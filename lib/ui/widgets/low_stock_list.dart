@@ -44,7 +44,8 @@ class LowStockList extends StatelessWidget {
                         color: kcWarningColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.warning_amber_rounded, color: kcWarningColor, size: 20),
+                      child: const Icon(Icons.warning_amber_rounded,
+                          color: kcWarningColor, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
@@ -64,7 +65,8 @@ class LowStockList extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: items.isEmpty
                       ? kcSuccessColor.withValues(alpha: 0.1)
@@ -90,10 +92,12 @@ class LowStockList extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(color: kcBorderColor, height: 16),
+              separatorBuilder: (_, __) =>
+                  const Divider(color: kcBorderColor, height: 16),
               itemBuilder: (context, index) {
                 final item = items[index];
-                final isCritical = item.currentStock <= (item.minStockLevel * 0.5);
+                final isCritical =
+                    item.currentStock <= (item.minStockLevel * 0.5);
 
                 return Row(
                   children: [
@@ -189,7 +193,8 @@ class LowStockList extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.check_circle_outline_rounded, color: kcSuccessColor, size: 20),
+          const Icon(Icons.check_circle_outline_rounded,
+              color: kcSuccessColor, size: 20),
           const SizedBox(width: 10),
           Flexible(
             child: Text(

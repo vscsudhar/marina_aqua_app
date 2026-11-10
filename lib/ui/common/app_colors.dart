@@ -60,4 +60,3 @@ abstract class AppColors {
   static const Color warning = kcWarningColor;
   static const Color success = kcSuccessColor;
 }
-

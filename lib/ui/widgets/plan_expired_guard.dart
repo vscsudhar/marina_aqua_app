@@ -81,7 +81,8 @@ class PlanExpiredGuard extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         actionsPadding: const EdgeInsets.all(16),
         title: Row(
           children: [
@@ -91,13 +92,17 @@ class PlanExpiredGuard extends StatelessWidget {
                 color: kcErrorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.workspace_premium_rounded, color: kcErrorColor, size: 24),
+              child: const Icon(Icons.workspace_premium_rounded,
+                  color: kcErrorColor, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Plan Renewal Required',
-                style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: kcDeepNavy),
+                style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: kcDeepNavy),
               ),
             ),
           ],
@@ -108,7 +113,8 @@ class PlanExpiredGuard extends StatelessWidget {
           children: [
             Text(
               'Your business account subscription has expired. In Read-Only Mode, you can inspect historical records, ledgers, and catalog items, but new transactions and edits are locked until renewed.',
-              style: GoogleFonts.inter(fontSize: 13, color: kcMediumGrey, height: 1.4),
+              style: GoogleFonts.inter(
+                  fontSize: 13, color: kcMediumGrey, height: 1.4),
             ),
             const SizedBox(height: 16),
             Container(
@@ -120,11 +126,14 @@ class PlanExpiredGuard extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _infoRow('Current Plan', u?.planName ?? 'Standard Plan', isBold: true),
+                  _infoRow('Current Plan', u?.planName ?? 'Standard Plan',
+                      isBold: true),
                   const Divider(height: 14),
-                  _infoRow('Expiry Date', u?.formattedExpiresAt ?? 'Expired', color: kcErrorColor, isBold: true),
+                  _infoRow('Expiry Date', u?.formattedExpiresAt ?? 'Expired',
+                      color: kcErrorColor, isBold: true),
                   const Divider(height: 14),
-                  _infoRow('Account Status', 'Read-Only (Expired)', color: kcErrorColor),
+                  _infoRow('Account Status', 'Read-Only (Expired)',
+                      color: kcErrorColor),
                 ],
               ),
             ),
@@ -134,16 +143,21 @@ class PlanExpiredGuard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF0F766E).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF0F766E).withValues(alpha: 0.2)),
+                border: Border.all(
+                    color: const Color(0xFF0F766E).withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.support_agent_rounded, color: Color(0xFF0F766E), size: 24),
+                  const Icon(Icons.support_agent_rounded,
+                      color: Color(0xFF0F766E), size: 24),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'To renew or upgrade your business subscription, please contact your Super Administrator.',
-                      style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF0F766E), fontWeight: FontWeight.w500),
+                      style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xFF0F766E),
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -154,18 +168,22 @@ class PlanExpiredGuard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Close', style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: kcMediumGrey)),
+            child: Text('Close',
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600, color: kcMediumGrey)),
           ),
         ],
       ),
     );
   }
 
-  Widget _infoRow(String label, String value, {bool isBold = false, Color? color}) {
+  Widget _infoRow(String label, String value,
+      {bool isBold = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey)),
+        Text(label,
+            style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey)),
         Text(
           value,
           style: GoogleFonts.inter(
@@ -234,7 +252,8 @@ class PlanExpiredGuard extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
+                child: const Icon(Icons.warning_amber_rounded,
+                    color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -268,7 +287,8 @@ class PlanExpiredGuard extends StatelessWidget {
               const SizedBox(width: 10),
               ElevatedButton.icon(
                 onPressed: () => _showRenewalDialog(context, u),
-                icon: const Icon(Icons.bolt_rounded, size: 15, color: Color(0xFF991B1B)),
+                icon: const Icon(Icons.bolt_rounded,
+                    size: 15, color: Color(0xFF991B1B)),
                 label: Text(
                   'Renew Plan',
                   style: GoogleFonts.inter(
@@ -280,8 +300,10 @@ class PlanExpiredGuard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
@@ -291,4 +313,3 @@ class PlanExpiredGuard extends StatelessWidget {
     );
   }
 }
-

@@ -101,7 +101,8 @@ class LoginViewModel extends BaseViewModel {
       _errorMessage = e.message;
       notifyListeners();
     } catch (e) {
-      _errorMessage = 'Unable to connect to the server. Please verify your connection.';
+      _errorMessage =
+          'Unable to connect to the server. Please verify your connection.';
       notifyListeners();
     } finally {
       setBusy(false);

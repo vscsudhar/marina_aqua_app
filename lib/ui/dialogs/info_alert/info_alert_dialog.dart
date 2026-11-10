@@ -52,7 +52,8 @@ class InfoAlertDialog extends StackedView<InfoAlertDialogModel> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (request.title != null && request.title!.isNotEmpty)
+                            if (request.title != null &&
+                                request.title!.isNotEmpty)
                               Text(
                                 request.title!,
                                 style: const TextStyle(
@@ -61,7 +62,8 @@ class InfoAlertDialog extends StackedView<InfoAlertDialogModel> {
                                 ),
                               ),
                             verticalSpaceTiny,
-                            if (request.description != null && request.description!.isNotEmpty)
+                            if (request.description != null &&
+                                request.description!.isNotEmpty)
                               Text(
                                 request.description!,
                                 style: const TextStyle(
@@ -89,33 +91,33 @@ class InfoAlertDialog extends StackedView<InfoAlertDialogModel> {
                   ),
                 ),
               ),
-            verticalSpaceMedium,
-            GestureDetector(
-              onTap: () => completer(DialogResponse(confirmed: true)),
-              child: Container(
-                height: 50,
-                width: double.infinity,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Text(
-                  'Got it',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              verticalSpaceMedium,
+              GestureDetector(
+                onTap: () => completer(DialogResponse(confirmed: true)),
+                child: Container(
+                  height: 50,
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Got it',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   InfoAlertDialogModel viewModelBuilder(BuildContext context) =>

@@ -167,7 +167,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealerModel],
-            meta: PaginationMeta(currentPage: 1, perPage: 100, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 100, total: 1, lastPage: 1),
           ));
 
       when(repService.getMonthlyLedger(
@@ -193,7 +194,8 @@ void main() {
       expect(model.report?.period2Summary.dealers[1]?.openingBalance, 3500);
     });
 
-    test('setYear and setMonth update selected period and re-fetch matrix', () async {
+    test('setYear and setMonth update selected period and re-fetch matrix',
+        () async {
       setupMockSuccess();
       final model = DealerLedgerViewModel();
       model.init();
@@ -248,7 +250,8 @@ void main() {
       expect(model.isDetailedMode, false);
     });
 
-    test('saveOthers delegates to reportService.saveOthers and returns true', () async {
+    test('saveOthers delegates to reportService.saveOthers and returns true',
+        () async {
       setupMockSuccess();
       final repService = locator<DealerLedgerReportService>();
       final payload = {
@@ -294,7 +297,8 @@ void main() {
       await model.exportPdf();
 
       expect(model.isExporting, false);
-      expect(model.exportSuccessMessage, 'PDF generated and downloaded successfully.');
+      expect(model.exportSuccessMessage,
+          'PDF generated and downloaded successfully.');
       verify(repService.downloadReportBytes(
         '/reports/dealer-ledger/export-pdf',
         any,
@@ -316,7 +320,8 @@ void main() {
       await model.exportExcel();
 
       expect(model.isExporting, false);
-      expect(model.exportSuccessMessage, 'Excel spreadsheet downloaded successfully.');
+      expect(model.exportSuccessMessage,
+          'Excel spreadsheet downloaded successfully.');
       verify(repService.downloadReportBytes(
         '/reports/dealer-ledger/export-excel',
         any,
@@ -345,7 +350,8 @@ void main() {
       )).called(1);
     });
 
-    test('error state handled when getMonthlyLedger throws Exception', () async {
+    test('error state handled when getMonthlyLedger throws Exception',
+        () async {
       final repService = locator<DealerLedgerReportService>();
       final dlrService = locator<DealerService>();
 
@@ -355,7 +361,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [],
-            meta: PaginationMeta(currentPage: 1, perPage: 100, total: 0, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 100, total: 0, lastPage: 1),
           ));
 
       when(repService.getMonthlyLedger(
@@ -372,7 +379,9 @@ void main() {
       expect(model.errorMessage, 'Failed to compute ledger matrix');
     });
 
-    test('DailyOtherTransactionModel correctly parses String numbers without TypeError', () {
+    test(
+        'DailyOtherTransactionModel correctly parses String numbers without TypeError',
+        () {
       final json = {
         'id': 10,
         'transaction_date': '2026-10-25',
@@ -391,7 +400,9 @@ void main() {
       expect(model.notes, 'Test Counter Sale');
     });
 
-    test('MonthlyLedgerReportModel handles String formatted numbers in JSON without TypeError', () {
+    test(
+        'MonthlyLedgerReportModel handles String formatted numbers in JSON without TypeError',
+        () {
       final json = {
         'company': {'name': 'Marina Aqua'},
         'report_meta': {'month': '10', 'year': '2026', 'days_in_month': '31'},
@@ -461,7 +472,8 @@ void main() {
       expect(report.period1Summary.others.totalFilling, 250.00);
     });
 
-    test('saveOthers delegates to reportService.saveOthers and reloads report', () async {
+    test('saveOthers delegates to reportService.saveOthers and reloads report',
+        () async {
       setupMockSuccess();
       final repService = locator<DealerLedgerReportService>();
 
@@ -472,14 +484,15 @@ void main() {
         'payments_received': 300.0,
       };
 
-      when(repService.saveOthers(payload)).thenAnswer((_) async => const DailyOtherTransactionModel(
-            id: 1,
-            transactionDate: '2026-10-15',
-            period: 1,
-            caneQuantity: 15,
-            fillingAmount: 300.0,
-            paymentsReceived: 300.0,
-          ));
+      when(repService.saveOthers(payload))
+          .thenAnswer((_) async => const DailyOtherTransactionModel(
+                id: 1,
+                transactionDate: '2026-10-15',
+                period: 1,
+                caneQuantity: 15,
+                fillingAmount: 300.0,
+                paymentsReceived: 300.0,
+              ));
 
       final model = DealerLedgerViewModel();
       model.init();

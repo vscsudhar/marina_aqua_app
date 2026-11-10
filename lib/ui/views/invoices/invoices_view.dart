@@ -8,6 +8,7 @@ import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/services/billing_service.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/common/ui_helpers.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_viewmodel.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/cancel_invoice_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/company_settings_dialog.dart';
@@ -27,7 +28,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       BuildContext context, InvoicesViewModel viewModel, Widget? child) {
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
     final currencyFormat =
-        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
     return Scaffold(
       backgroundColor: kcBackgroundColor,
@@ -168,21 +169,21 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
           children: [
             _kpiCard(
               title: 'Total Invoiced Value',
-              value: currencyFormat.format(viewModel.totalInvoicedAmount),
+              value: formatAmount(viewModel.totalInvoicedAmount),
               icon: Icons.receipt_long,
               color: kcPrimaryColor,
               width: cardWidth,
             ),
             _kpiCard(
               title: 'Collections Received',
-              value: currencyFormat.format(viewModel.totalCollectedAmount),
+              value: formatAmount(viewModel.totalCollectedAmount),
               icon: Icons.check_circle,
               color: kcSuccessColor,
               width: cardWidth,
             ),
             _kpiCard(
               title: 'Outstanding Due',
-              value: currencyFormat.format(viewModel.totalOutstandingAmount),
+              value: formatAmount(viewModel.totalOutstandingAmount),
               icon: Icons.account_balance_wallet,
               color: kcErrorColor,
               width: cardWidth,
@@ -594,25 +595,25 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            currencyFormat.format(inv.taxableAmount),
+                            formatAmount(inv.taxableAmount),
                             style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                           if (inv.taxTotal > 0 && !inv.isInterstate)
                             Text(
-                              'CGST ${currencyFormat.format(inv.cgstAmount)} | SGST ${currencyFormat.format(inv.sgstAmount)}',
+                              'CGST ${formatAmount(inv.cgstAmount)} | SGST ${formatAmount(inv.sgstAmount)}',
                               style: GoogleFonts.inter(
                                   fontSize: 10, color: kcMediumGrey),
                             )
                           else if (inv.taxTotal > 0 && inv.isInterstate)
                             Text(
-                              'IGST: ${currencyFormat.format(inv.igstAmount)}',
+                              'IGST: ${formatAmount(inv.igstAmount)}',
                               style: GoogleFonts.inter(
                                   fontSize: 10, color: kcMediumGrey),
                             )
                           else
                             Text(
-                              'GST: ${currencyFormat.format(inv.taxTotal)}',
+                              'GST: ${formatAmount(inv.taxTotal)}',
                               style: GoogleFonts.inter(
                                   fontSize: 11, color: kcMediumGrey),
                             ),
@@ -626,7 +627,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            currencyFormat.format(inv.grandTotal),
+                            formatAmount(inv.grandTotal),
                             style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 14,
@@ -634,7 +635,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                           ),
                           if (inv.balanceDue > 0)
                             Text(
-                              'Due: ${currencyFormat.format(inv.balanceDue)}',
+                              'Due: ${formatAmount(inv.balanceDue)}',
                               style: GoogleFonts.inter(
                                   fontSize: 11,
                                   color: kcErrorColor,
@@ -933,7 +934,8 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   // Dialog Handlers
 
-  void _openCreateInvoice(BuildContext context, InvoicesViewModel viewModel) async {
+  void _openCreateInvoice(
+      BuildContext context, InvoicesViewModel viewModel) async {
     final result = await showDialog(
       context: context,
       barrierDismissible: false,
@@ -1002,8 +1004,8 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     );
   }
 
-  void _openEditDraft(
-      BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) async {
+  void _openEditDraft(BuildContext context, InvoicesViewModel viewModel,
+      InvoiceModel invoice) async {
     final result = await showDialog(
       context: context,
       barrierDismissible: false,
@@ -1203,8 +1205,8 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                       labelText: 'New Invoice Number *',
                       isDense: true,
                       border: const OutlineInputBorder(),
-                      prefixIcon:
-                          const Icon(Icons.edit, size: 18, color: kcPrimaryDark),
+                      prefixIcon: const Icon(Icons.edit,
+                          size: 18, color: kcPrimaryDark),
                       suffixIcon: isLoading
                           ? const SizedBox(
                               width: 20,
@@ -1330,8 +1332,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                   ),
                   Text(
                     '• Total Amount: ₹${invoice.grandTotal.toStringAsFixed(2)}',
-                    style:
-                        GoogleFonts.inter(fontSize: 12, color: kcDeepNavy),
+                    style: GoogleFonts.inter(fontSize: 12, color: kcDeepNavy),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -1344,8 +1345,8 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                   const SizedBox(height: 2),
                   Text(
                     '• All line items and associated ledger entries will be completely removed.',
-                    style: GoogleFonts.inter(
-                        fontSize: 11, color: kcTextSecondary),
+                    style:
+                        GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
                   ),
                 ],
               ),

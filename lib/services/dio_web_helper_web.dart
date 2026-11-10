@@ -7,4 +7,3 @@ void configureDioForWeb(Dio dio) {
     adapter.enableCORSWarning = false;
   }
 }
-

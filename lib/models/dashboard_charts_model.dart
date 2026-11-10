@@ -19,7 +19,9 @@ class DailyCollectionPoint {
       label: json['label'] as String? ?? '',
       day: json['day'] as String? ?? '',
       amount: _toDouble(json['amount']),
-      count: json['count'] is int ? json['count'] : int.tryParse(json['count'].toString()) ?? 0,
+      count: json['count'] is int
+          ? json['count']
+          : int.tryParse(json['count'].toString()) ?? 0,
     );
   }
 
@@ -48,8 +50,12 @@ class MonthlySalePoint {
 
   factory MonthlySalePoint.fromJson(Map<String, dynamic> json) {
     return MonthlySalePoint(
-      year: json['year'] is int ? json['year'] : int.tryParse(json['year'].toString()) ?? 2026,
-      month: json['month'] is int ? json['month'] : int.tryParse(json['month'].toString()) ?? 1,
+      year: json['year'] is int
+          ? json['year']
+          : int.tryParse(json['year'].toString()) ?? 2026,
+      month: json['month'] is int
+          ? json['month']
+          : int.tryParse(json['month'].toString()) ?? 1,
       label: json['label'] as String? ?? '',
       amount: DailyCollectionPoint._toDouble(json['amount']),
       quantity: DailyCollectionPoint._toDouble(json['quantity']),
@@ -75,7 +81,9 @@ class PaymentModePoint {
       mode: json['mode'] as String? ?? 'cash',
       modeLabel: json['mode_label'] as String? ?? 'CASH',
       amount: DailyCollectionPoint._toDouble(json['amount']),
-      count: json['count'] is int ? json['count'] : int.tryParse(json['count'].toString()) ?? 0,
+      count: json['count'] is int
+          ? json['count']
+          : int.tryParse(json['count'].toString()) ?? 0,
     );
   }
 }

@@ -49,6 +49,13 @@ class DashboardShortcutBar extends StatelessWidget {
         color: kcAquaCyan,
       ),
       _ShortcutItem(
+        id: 'damaged_products',
+        title: 'Damaged Products',
+        subtitle: 'Record stock damage & loss',
+        icon: Icons.remove_shopping_cart_rounded,
+        color: const Color(0xFFE11D48),
+      ),
+      _ShortcutItem(
         id: 'invoices',
         title: 'Invoices & Reports',
         subtitle: 'GST manual bills & A4 print',
@@ -104,7 +111,8 @@ class DashboardShortcutBar extends StatelessWidget {
                   onTap: () => onShortcutSelected?.call(item.id),
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: kcSurfaceWhite,
                       borderRadius: BorderRadius.circular(14),

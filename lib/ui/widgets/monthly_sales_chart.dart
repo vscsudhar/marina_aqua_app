@@ -21,7 +21,8 @@ class MonthlySalesChart extends StatefulWidget {
 
 class _MonthlySalesChartState extends State<MonthlySalesChart> {
   int? _hoveredIndex;
-  final _currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+  final _currencyFormat =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +30,13 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
       return _buildEmptyState('No monthly sales recorded.');
     }
 
-    final maxAmount = widget.points.fold<double>(0.0, (prev, p) => max(prev, p.amount));
+    final maxAmount =
+        widget.points.fold<double>(0.0, (prev, p) => max(prev, p.amount));
     final displayMax = maxAmount > 0 ? maxAmount : 1000.0;
-    final totalRevenue = widget.points.fold<double>(0.0, (prev, p) => prev + p.amount);
-    final totalUnits = widget.points.fold<double>(0.0, (prev, p) => prev + p.quantity);
+    final totalRevenue =
+        widget.points.fold<double>(0.0, (prev, p) => prev + p.amount);
+    final totalUnits =
+        widget.points.fold<double>(0.0, (prev, p) => prev + p.quantity);
 
     return Container(
       padding: const EdgeInsets.all(22),
@@ -85,7 +89,8 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: kcPrimaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -93,7 +98,8 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.water_drop_outlined, color: kcPrimaryDark, size: 14),
+                    const Icon(Icons.water_drop_outlined,
+                        color: kcPrimaryDark, size: 14),
                     const SizedBox(width: 4),
                     Text(
                       'Delivered Orders',
@@ -129,8 +135,11 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
                     children: List.generate(widget.points.length, (index) {
                       final item = widget.points[index];
                       final isHovered = _hoveredIndex == index;
-                      final heightRatio = (item.amount / displayMax).clamp(0.04, 1.0);
-                      final barHeight = (constraints.maxHeight - 46).clamp(10.0, 150.0) * heightRatio;
+                      final heightRatio =
+                          (item.amount / displayMax).clamp(0.04, 1.0);
+                      final barHeight =
+                          (constraints.maxHeight - 46).clamp(10.0, 150.0) *
+                              heightRatio;
 
                       return MouseRegion(
                         onEnter: (_) => setState(() => _hoveredIndex = index),
@@ -141,7 +150,8 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
                           children: [
                             if (isHovered)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 margin: const EdgeInsets.only(bottom: 4),
                                 decoration: BoxDecoration(
                                   color: kcDeepNavy,
@@ -170,11 +180,13 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
                                 ),
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(6)),
                                 boxShadow: isHovered
                                     ? [
                                         BoxShadow(
-                                          color: kcPrimaryColor.withValues(alpha: 0.4),
+                                          color: kcPrimaryColor.withValues(
+                                              alpha: 0.4),
                                           blurRadius: 10,
                                           offset: const Offset(0, -2),
                                         ),
@@ -189,8 +201,11 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
                                 item.label,
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
-                                  color: isHovered ? kcPrimaryDark : kcTextMuted,
+                                  fontWeight: isHovered
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color:
+                                      isHovered ? kcPrimaryDark : kcTextMuted,
                                 ),
                               ),
                             ),
@@ -230,7 +245,8 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
           children: [
             const Icon(Icons.show_chart_rounded, size: 40, color: kcLightGrey),
             const SizedBox(height: 8),
-            Text(message, style: GoogleFonts.inter(color: kcTextSecondary, fontSize: 13)),
+            Text(message,
+                style: GoogleFonts.inter(color: kcTextSecondary, fontSize: 13)),
           ],
         ),
       ),

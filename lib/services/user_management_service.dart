@@ -29,14 +29,18 @@ class UserManagementService {
       final users = rawUsers
           .map((u) => UserModel.fromJson(u as Map<String, dynamic>))
           .toList();
-      final planUsage = response.data!['plan_usage'] as Map<String, dynamic>? ?? {};
+      final planUsage =
+          response.data!['plan_usage'] as Map<String, dynamic>? ?? {};
 
       return {
         'users': users,
         'plan_usage': planUsage,
       };
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to fetch users');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to fetch users');
     }
   }
 
@@ -64,7 +68,10 @@ class UserManagementService {
     if (response.isSuccess && response.data != null) {
       return response.data!;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to create user');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to create user');
     }
   }
 
@@ -99,7 +106,10 @@ class UserManagementService {
     if (response.isSuccess && response.data != null) {
       return response.data!;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to update user');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to update user');
     }
   }
 
@@ -112,14 +122,20 @@ class UserManagementService {
     if (response.isSuccess && response.data != null) {
       return response.data!;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to toggle user status');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to toggle user status');
     }
   }
 
   Future<void> deleteUser(int id) async {
     final response = await _apiService.delete('/company/users/$id');
     if (!response.isSuccess) {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Failed to delete user');
+      throw ApiException(
+          message: response.message.isNotEmpty
+              ? response.message
+              : 'Failed to delete user');
     }
   }
 }

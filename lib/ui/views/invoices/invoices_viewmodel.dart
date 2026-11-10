@@ -13,6 +13,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/dealer_service.dart';
 import '../../../services/export_print_service.dart';
 import '../../../services/product_master_service.dart';
+import '../../common/ui_helpers.dart';
 import '../../widgets/report_print_preview_dialog.dart';
 
 class InvoicesViewModel extends ReactiveViewModel {
@@ -37,7 +38,8 @@ class InvoicesViewModel extends ReactiveViewModel {
         _dealerService = dealerService ?? locator<DealerService>(),
         _productService = productService ?? locator<ProductMasterService>(),
         _navigationService = navigationService ?? locator<NavigationService>(),
-        _exportPrintService = exportPrintService ?? locator<ExportPrintService>(),
+        _exportPrintService =
+            exportPrintService ?? locator<ExportPrintService>(),
         _authService = authService ?? locator<AuthService>();
 
   // State
@@ -45,10 +47,13 @@ class InvoicesViewModel extends ReactiveViewModel {
   List<InvoiceModel> get invoices => _invoices;
 
   @override
-  List<ListenableServiceMixin> get listenableServices => [_settingsService, _authService];
+  List<ListenableServiceMixin> get listenableServices =>
+      [_settingsService, _authService];
 
   CompanySettingModel _companySettings = const CompanySettingModel(id: 1);
-  CompanySettingModel get companySettings => _settingsService.isInitialized ? _settingsService.settings : _companySettings;
+  CompanySettingModel get companySettings => _settingsService.isInitialized
+      ? _settingsService.settings
+      : _companySettings;
 
   List<DealerModel> _dealers = [];
   List<DealerModel> get dealers => _dealers;
@@ -177,14 +182,19 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   void setStatusFilter(String? status) {
-    _statusFilter = (status != null && status.isNotEmpty && status != 'all') ? status : null;
+    _statusFilter = (status != null && status.isNotEmpty && status != 'all')
+        ? status
+        : null;
     _currentPage = 1;
     loadInvoices();
   }
 
   void setPaymentStatusFilter(String? paymentStatus) {
-    _paymentStatusFilter =
-        (paymentStatus != null && paymentStatus.isNotEmpty && paymentStatus != 'all') ? paymentStatus : null;
+    _paymentStatusFilter = (paymentStatus != null &&
+            paymentStatus.isNotEmpty &&
+            paymentStatus != 'all')
+        ? paymentStatus
+        : null;
     _currentPage = 1;
     loadInvoices();
   }
@@ -221,10 +231,13 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   // ===================== INVOICE ACTIONS =====================
 
-  Future<InvoiceModel> createInvoice(Map<String, dynamic> payload, bool isFinal) async {
+  Future<InvoiceModel> createInvoice(
+      Map<String, dynamic> payload, bool isFinal) async {
     try {
       final inv = await _billingService.createInvoice(payload);
-      _successMessage = isFinal ? 'Invoice issued & finalized successfully!' : 'Invoice saved as draft!';
+      _successMessage = isFinal
+          ? 'Invoice issued & finalized successfully!'
+          : 'Invoice saved as draft!';
       await loadInvoices();
       return inv;
     } catch (e) {
@@ -233,10 +246,12 @@ class InvoicesViewModel extends ReactiveViewModel {
     }
   }
 
-  Future<InvoiceModel> updateInvoice(int id, Map<String, dynamic> payload, bool isFinal) async {
+  Future<InvoiceModel> updateInvoice(
+      int id, Map<String, dynamic> payload, bool isFinal) async {
     try {
       final inv = await _billingService.updateInvoice(id, payload);
-      _successMessage = isFinal ? 'Invoice updated & finalized!' : 'Invoice draft updated!';
+      _successMessage =
+          isFinal ? 'Invoice updated & finalized!' : 'Invoice draft updated!';
       await loadInvoices();
       return inv;
     } catch (e) {
@@ -251,9 +266,11 @@ class InvoicesViewModel extends ReactiveViewModel {
     _exportPrintService.openUrlInBrowser(url);
   }
 
-  Future<void> updateInvoiceNumber(int id, String newInvoiceNo, {String? reason}) async {
+  Future<void> updateInvoiceNumber(int id, String newInvoiceNo,
+      {String? reason}) async {
     try {
-      await _billingService.updateInvoiceNumber(id, newInvoiceNo, reason: reason);
+      await _billingService.updateInvoiceNumber(id, newInvoiceNo,
+          reason: reason);
       _successMessage = 'Invoice number updated to $newInvoiceNo successfully!';
       await loadInvoices();
     } catch (e) {
@@ -310,7 +327,8 @@ class InvoicesViewModel extends ReactiveViewModel {
   Future<void> deleteInvoice(int id) async {
     try {
       await _billingService.deleteInvoice(id);
-      _successMessage = 'Invoice deleted successfully! The number is now released for reuse.';
+      _successMessage =
+          'Invoice deleted successfully! The number is now released for reuse.';
       await loadInvoices();
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
@@ -341,7 +359,8 @@ class InvoicesViewModel extends ReactiveViewModel {
     try {
       final bytes = await _billingService.downloadPdfBytes(invoice.id);
       final filename = 'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
-      _exportPrintService.downloadBytes(bytes, filename, ExportPrintService.mimePdf);
+      _exportPrintService.downloadBytes(
+          bytes, filename, ExportPrintService.mimePdf);
       _successMessage = 'Invoice PDF downloaded ($filename).';
     } catch (e) {
       _errorMessage = 'PDF download failed: ${e.toString()}';
@@ -358,8 +377,10 @@ class InvoicesViewModel extends ReactiveViewModel {
 
     try {
       final bytes = await _billingService.downloadPdfBytes(invoice.id);
-      await _exportPrintService.printPdfBytes(bytes, title: 'Invoice ${invoice.invoiceNo}');
-      _successMessage = 'Print preview launched for invoice ${invoice.invoiceNo}.';
+      await _exportPrintService.printPdfBytes(bytes,
+          title: 'Invoice ${invoice.invoiceNo}');
+      _successMessage =
+          'Print preview launched for invoice ${invoice.invoiceNo}.';
     } catch (e) {
       _errorMessage = 'Print invoice failed: ${e.toString()}';
     } finally {
@@ -373,7 +394,6 @@ class InvoicesViewModel extends ReactiveViewModel {
   // ==========================================
 
   Map<String, dynamic> _prepareInvoicesRegisterExportData() {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final headers = [
       'Invoice No',
       'Date',
@@ -396,7 +416,9 @@ class InvoicesViewModel extends ReactiveViewModel {
 
     for (final inv in _invoices) {
       final parsedDate = DateTime.tryParse(inv.invoiceDate);
-      final dateStr = parsedDate != null ? DateFormat('dd-MM-yyyy').format(parsedDate) : inv.invoiceDate;
+      final dateStr = parsedDate != null
+          ? DateFormat('dd-MM-yyyy').format(parsedDate)
+          : inv.invoiceDate;
       final taxable = inv.taxableAmount;
       final tax = inv.taxTotal;
       final grand = inv.grandTotal;
@@ -414,11 +436,11 @@ class InvoicesViewModel extends ReactiveViewModel {
         dateStr,
         inv.customerName,
         inv.placeOfSupply.isNotEmpty ? inv.placeOfSupply : 'Tamil Nadu (33)',
-        currencyFormat.format(taxable),
-        currencyFormat.format(tax),
-        currencyFormat.format(grand),
-        currencyFormat.format(paid),
-        currencyFormat.format(balance),
+        formatAmount(taxable),
+        formatAmount(tax),
+        formatAmount(grand),
+        formatAmount(paid),
+        formatAmount(balance),
         inv.paymentStatus.toUpperCase(),
       ]);
     }
@@ -428,11 +450,11 @@ class InvoicesViewModel extends ReactiveViewModel {
       '${_invoices.length} Invoices',
       '',
       '',
-      currencyFormat.format(totalTaxable),
-      currencyFormat.format(totalTax),
-      currencyFormat.format(totalGrand),
-      currencyFormat.format(totalPaid),
-      currencyFormat.format(totalBalance),
+      formatAmount(totalTaxable),
+      formatAmount(totalTax),
+      formatAmount(totalGrand),
+      formatAmount(totalPaid),
+      formatAmount(totalBalance),
       '',
     ];
 
@@ -443,17 +465,18 @@ class InvoicesViewModel extends ReactiveViewModel {
     final metadata = {
       'Period': dateRangeStr,
       if (_dealerFilter != null) 'Dealer Filter ID': '$_dealerFilter',
-      if (_statusFilter != null && _statusFilter!.isNotEmpty) 'Status': _statusFilter!.toUpperCase(),
+      if (_statusFilter != null && _statusFilter!.isNotEmpty)
+        'Status': _statusFilter!.toUpperCase(),
       if (_paymentStatusFilter != null && _paymentStatusFilter!.isNotEmpty)
         'Payment': _paymentStatusFilter!.toUpperCase(),
       'Total Invoices': '${_invoices.length}',
     };
 
     final kpis = {
-      'Total Billed': currencyFormat.format(totalGrand),
-      'Total Tax': currencyFormat.format(totalTax),
-      'Collected': currencyFormat.format(totalPaid),
-      'Outstanding Due': currencyFormat.format(totalBalance),
+      'Total Billed': formatAmount(totalGrand),
+      'Total Tax': formatAmount(totalTax),
+      'Collected': formatAmount(totalPaid),
+      'Outstanding Due': formatAmount(totalBalance),
     };
 
     return {
@@ -484,8 +507,10 @@ class InvoicesViewModel extends ReactiveViewModel {
         isLandscape: true,
       );
 
-      final fileName = 'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-      _exportPrintService.downloadBytes(pdfBytes, fileName, ExportPrintService.mimePdf);
+      final fileName =
+          'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      _exportPrintService.downloadBytes(
+          pdfBytes, fileName, ExportPrintService.mimePdf);
       _successMessage = 'Invoices Register PDF downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export PDF failed: $e';
@@ -512,8 +537,10 @@ class InvoicesViewModel extends ReactiveViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
-      _exportPrintService.downloadBytes(excelBytes, fileName, ExportPrintService.mimeExcel);
+      final fileName =
+          'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
+      _exportPrintService.downloadBytes(
+          excelBytes, fileName, ExportPrintService.mimeExcel);
       _successMessage = 'Invoices Register Excel downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export Excel failed: $e';
@@ -539,8 +566,10 @@ class InvoicesViewModel extends ReactiveViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
-      _exportPrintService.downloadBytes(csvBytes, fileName, ExportPrintService.mimeCsv);
+      final fileName =
+          'Invoices_Register_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+      _exportPrintService.downloadBytes(
+          csvBytes, fileName, ExportPrintService.mimeCsv);
       _successMessage = 'Invoices Register CSV downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export CSV failed: $e';

@@ -22,7 +22,8 @@ class DealerLedgerViewModel extends ReactiveViewModel {
     SettingsService? settingsService,
   })  : _reportService = reportService ?? locator<DealerLedgerReportService>(),
         _dealerService = dealerService ?? locator<DealerService>(),
-        _exportPrintService = exportPrintService ?? locator<ExportPrintService>(),
+        _exportPrintService =
+            exportPrintService ?? locator<ExportPrintService>(),
         _settingsService = settingsService ?? locator<SettingsService>();
 
   @override
@@ -70,7 +71,8 @@ class DealerLedgerViewModel extends ReactiveViewModel {
     notifyListeners();
 
     try {
-      final dealerRes = await _dealerService.getDealers(perPage: 100, isActive: true);
+      final dealerRes =
+          await _dealerService.getDealers(perPage: 100, isActive: true);
       _allDealers = dealerRes.items;
 
       await _fetchReportInternal();
@@ -101,7 +103,8 @@ class DealerLedgerViewModel extends ReactiveViewModel {
     _report = await _reportService.getMonthlyLedger(
       year: _selectedYear,
       month: _selectedMonth,
-      dealerIds: _selectedDealerIds.isNotEmpty ? _selectedDealerIds.toList() : null,
+      dealerIds:
+          _selectedDealerIds.isNotEmpty ? _selectedDealerIds.toList() : null,
     );
   }
 
@@ -173,8 +176,10 @@ class DealerLedgerViewModel extends ReactiveViewModel {
         queryParams,
       );
 
-      final fileName = 'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.pdf';
-      _exportPrintService.downloadBytes(bytes, fileName, ExportPrintService.mimePdf);
+      final fileName =
+          'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.pdf';
+      _exportPrintService.downloadBytes(
+          bytes, fileName, ExportPrintService.mimePdf);
       _exportSuccessMessage = 'PDF generated and downloaded successfully.';
     } catch (e) {
       _errorMessage = 'Export PDF failed: ${e.toString()}';
@@ -203,8 +208,10 @@ class DealerLedgerViewModel extends ReactiveViewModel {
         queryParams,
       );
 
-      final fileName = 'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.xlsx';
-      _exportPrintService.downloadBytes(bytes, fileName, ExportPrintService.mimeExcel);
+      final fileName =
+          'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.xlsx';
+      _exportPrintService.downloadBytes(
+          bytes, fileName, ExportPrintService.mimeExcel);
       _exportSuccessMessage = 'Excel spreadsheet downloaded successfully.';
     } catch (e) {
       _errorMessage = 'Export Excel failed: ${e.toString()}';
@@ -233,8 +240,10 @@ class DealerLedgerViewModel extends ReactiveViewModel {
         queryParams,
       );
 
-      final fileName = 'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.csv';
-      _exportPrintService.downloadBytes(bytes, fileName, ExportPrintService.mimeCsv);
+      final fileName =
+          'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.csv';
+      _exportPrintService.downloadBytes(
+          bytes, fileName, ExportPrintService.mimeCsv);
       _exportSuccessMessage = 'CSV exported successfully.';
     } catch (e) {
       _errorMessage = 'Export CSV failed: ${e.toString()}';
@@ -276,4 +285,3 @@ class DealerLedgerViewModel extends ReactiveViewModel {
     }
   }
 }
-

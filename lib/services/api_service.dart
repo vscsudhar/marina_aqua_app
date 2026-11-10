@@ -21,6 +21,23 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
+/// =========================================================================
+/// Centralized API Configuration - Manage your base URL in ONE SINGLE PLACE
+/// =========================================================================
+class ApiConfig {
+  /// Live Production Server:
+  static const String baseUrl = 'https://aqua-api.ethiodeploy.app/api/v1';
+
+  /// Local Network IP Server (Commented out):
+  // static const String baseUrl = 'http://192.168.0.174:8000/api/v1';
+
+  /// Localhost Server (Commented out):
+  // static const String baseUrl = 'http://localhost:8000/api/v1';
+
+  /// Automatic root origin without `/api/v1` for media, logos, and invoices
+  static String get baseOrigin => baseUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
+}
+
 class ApiService {
   final StorageService _storageService;
   late final Dio _dio;
@@ -29,16 +46,8 @@ class ApiService {
 
   ApiService([StorageService? storageService])
       : _storageService = storageService ?? locator<StorageService>() {
-    // Base URL using system IP for cross-device & network access
-    String defaultBaseUrl = 'http://192.168.0.174:8000/api/v1';
-    if (kIsWeb) {
-      final host = Uri.base.host;
-      if (host.isNotEmpty && host != '0.0.0.0') {
-        defaultBaseUrl = 'http://$host:8000/api/v1';
-      }
-    }
     const envUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
-    final baseUrl = envUrl.isNotEmpty ? envUrl : defaultBaseUrl;
+    final baseUrl = envUrl.isNotEmpty ? envUrl : ApiConfig.baseUrl;
 
     _dio = Dio(
       BaseOptions(
@@ -104,18 +113,11 @@ class ApiService {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
     final trimmed = rawUrl.trim();
 
-    String baseOrigin = 'http://192.168.0.174:8000';
-    if (kIsWeb) {
-      final host = Uri.base.host;
-      if (host.isNotEmpty && host != '0.0.0.0') {
-        baseOrigin = 'http://$host:8000';
-      }
-    }
+    String baseOrigin = ApiConfig.baseOrigin;
     try {
       if (locator.isRegistered<ApiService>()) {
         final clientUrl = locator<ApiService>().client.options.baseUrl;
-        final uri = Uri.parse(clientUrl);
-        baseOrigin = '${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}';
+        baseOrigin = clientUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
       }
     } catch (_) {}
 
@@ -146,18 +148,11 @@ class ApiService {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
     final trimmed = rawUrl.trim();
 
-    String baseOrigin = 'http://192.168.0.174:8000';
-    if (kIsWeb) {
-      final host = Uri.base.host;
-      if (host.isNotEmpty && host != '0.0.0.0') {
-        baseOrigin = 'http://$host:8000';
-      }
-    }
+    String baseOrigin = ApiConfig.baseOrigin;
     try {
       if (locator.isRegistered<ApiService>()) {
         final clientUrl = locator<ApiService>().client.options.baseUrl;
-        final uri = Uri.parse(clientUrl);
-        baseOrigin = '${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}';
+        baseOrigin = clientUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
       }
     } catch (_) {}
 

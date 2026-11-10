@@ -65,13 +65,23 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
     final isDealer = source == 'dealer';
-    final sourceTitle = isDealer ? 'Dealer Purchases (Without Refill)' : 'Supplier Purchases';
-    final primaryColor = isDealer ? const Color(0xFF0F3460) : const Color(0xFF005F73);
+    final isDamage = source == 'damage';
+    final sourceTitle = isDamage
+        ? 'Damaged Bottles Outward'
+        : (isDealer
+            ? 'Dealer Purchases (Without Refill)'
+            : 'Supplier Purchases');
+    final primaryColor = isDamage
+        ? const Color(0xFFE11D48)
+        : (isDealer ? const Color(0xFF0F3460) : const Color(0xFF005F73));
 
-    final totalQty = items.fold<double>(0.0, (acc, item) => acc + item.quantity);
-    final totalAmt = items.fold<double>(0.0, (acc, item) => acc + item.totalAmount);
+    final totalQty =
+        items.fold<double>(0.0, (acc, item) => acc + item.quantity);
+    final totalAmt =
+        items.fold<double>(0.0, (acc, item) => acc + item.totalAmount);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -92,7 +102,9 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    isDealer ? Icons.storefront_rounded : Icons.local_shipping_rounded,
+                    isDealer
+                        ? Icons.storefront_rounded
+                        : Icons.local_shipping_rounded,
                     color: primaryColor,
                     size: 24,
                   ),
@@ -146,7 +158,8 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                 const Spacer(),
                 Text(
                   '${items.length} ${items.length == 1 ? 'transaction' : 'transactions'} found',
-                  style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600),
+                  style: GoogleFonts.inter(
+                      fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -159,11 +172,13 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inbox_rounded, size: 48, color: Colors.grey.shade300),
+                          Icon(Icons.inbox_rounded,
+                              size: 48, color: Colors.grey.shade300),
                           const SizedBox(height: 8),
                           Text(
                             'No transactions recorded for this cell.',
-                            style: GoogleFonts.inter(color: Colors.grey.shade600),
+                            style:
+                                GoogleFonts.inter(color: Colors.grey.shade600),
                           ),
                         ],
                       ),
@@ -185,10 +200,16 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                         children: [
                           // Table Header
                           TableRow(
-                            decoration: BoxDecoration(color: Colors.grey.shade100),
+                            decoration:
+                                BoxDecoration(color: Colors.grey.shade100),
                             children: [
-                              _thCell(isDealer ? 'Dealer Name' : 'Supplier Name'),
-                              _thCell('Reference / Inv #'),
+                              _thCell(isDamage
+                                  ? 'Damage Reason'
+                                  : (isDealer
+                                      ? 'Dealer Name'
+                                      : 'Supplier Name')),
+                              _thCell(
+                                  isDamage ? 'Damage No' : 'Reference / Inv #'),
                               _thCell('Product Name'),
                               _thCell('Qty', align: TextAlign.right),
                               _thCell('Unit Price', align: TextAlign.right),
@@ -200,11 +221,16 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                             TableRow(
                               children: [
                                 _tdCell(it.partyName, bold: true),
-                                _tdCell(it.referenceNo.isNotEmpty ? it.referenceNo : '-'),
+                                _tdCell(it.referenceNo.isNotEmpty
+                                    ? it.referenceNo
+                                    : '-'),
                                 _tdCell(it.productName),
-                                _tdCell(it.quantity.toStringAsFixed(0), align: TextAlign.right),
-                                _tdCell(currencyFormat.format(it.unitPrice), align: TextAlign.right),
-                                _tdCell(currencyFormat.format(it.totalAmount), align: TextAlign.right, bold: true),
+                                _tdCell(it.quantity.toStringAsFixed(0),
+                                    align: TextAlign.right),
+                                _tdCell(currencyFormat.format(it.unitPrice),
+                                    align: TextAlign.right),
+                                _tdCell(currencyFormat.format(it.totalAmount),
+                                    align: TextAlign.right, bold: true),
                               ],
                             ),
                         ],
@@ -221,7 +247,8 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Text('Close'),
               ),
@@ -232,7 +259,8 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryBadge({required String label, required String value, required Color color}) {
+  Widget _buildSummaryBadge(
+      {required String label, required String value, required Color color}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -249,7 +277,8 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
           ),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.bold, color: color),
+            style: GoogleFonts.inter(
+                fontSize: 13, fontWeight: FontWeight.bold, color: color),
           ),
         ],
       ),
@@ -271,7 +300,8 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
     );
   }
 
-  static Widget _tdCell(String text, {TextAlign align = TextAlign.left, bool bold = false}) {
+  static Widget _tdCell(String text,
+      {TextAlign align = TextAlign.left, bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Text(
@@ -286,4 +316,3 @@ class BottleLedgerDrilldownDialog extends StatelessWidget {
     );
   }
 }
-

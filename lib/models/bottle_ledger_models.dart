@@ -138,6 +138,7 @@ class BottleLedgerStockRegisterItemModel {
   final double openingQty;
   final double supplierInwardQty;
   final double dealerOutwardQty;
+  final double damagedOutwardQty;
   final double closingQty;
 
   const BottleLedgerStockRegisterItemModel({
@@ -145,6 +146,7 @@ class BottleLedgerStockRegisterItemModel {
     required this.openingQty,
     required this.supplierInwardQty,
     required this.dealerOutwardQty,
+    this.damagedOutwardQty = 0.0,
     required this.closingQty,
   });
 
@@ -155,6 +157,7 @@ class BottleLedgerStockRegisterItemModel {
       openingQty: _toDouble(json['opening_qty']),
       supplierInwardQty: _toDouble(json['supplier_inward_qty']),
       dealerOutwardQty: _toDouble(json['dealer_outward_qty']),
+      damagedOutwardQty: _toDouble(json['damaged_outward_qty']),
       closingQty: _toDouble(json['closing_qty']),
     );
   }
@@ -165,6 +168,7 @@ class BottleLedgerReportModel {
   final Map<String, double> openingStock;
   final BottleLedgerTableDataModel dealerTable;
   final BottleLedgerTableDataModel supplierTable;
+  final BottleLedgerTableDataModel? damageTable;
   final List<BottleLedgerStockRegisterItemModel> stockRegister;
 
   const BottleLedgerReportModel({
@@ -172,6 +176,7 @@ class BottleLedgerReportModel {
     required this.openingStock,
     required this.dealerTable,
     required this.supplierTable,
+    this.damageTable,
     required this.stockRegister,
   });
 
@@ -191,6 +196,9 @@ class BottleLedgerReportModel {
           BottleLedgerTableDataModel.fromJson(_toMap(json['dealer_table'])),
       supplierTable:
           BottleLedgerTableDataModel.fromJson(_toMap(json['supplier_table'])),
+      damageTable: json['damage_table'] != null
+          ? BottleLedgerTableDataModel.fromJson(_toMap(json['damage_table']))
+          : null,
       stockRegister: stockList,
     );
   }

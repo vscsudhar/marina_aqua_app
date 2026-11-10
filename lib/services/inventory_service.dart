@@ -18,7 +18,9 @@ class InventoryService {
       queryParameters: {'all': 'true', 'is_active': 'true'},
     );
     final list = response.data['data'] as List? ?? [];
-    return list.map((item) => SupplierModel.fromJson(item as Map<String, dynamic>)).toList();
+    return list
+        .map((item) => SupplierModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   /// Paginated suppliers
@@ -62,16 +64,19 @@ class InventoryService {
       '/suppliers',
       data: data,
     );
-    return SupplierModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return SupplierModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Update supplier
-  Future<SupplierModel> updateSupplier(int id, Map<String, dynamic> data) async {
+  Future<SupplierModel> updateSupplier(
+      int id, Map<String, dynamic> data) async {
     final response = await _apiService.client.put(
       '/suppliers/$id',
       data: data,
     );
-    return SupplierModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return SupplierModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Delete supplier
@@ -101,7 +106,8 @@ class InventoryService {
       queryParams['start_date'] = startDate;
       queryParams['end_date'] = endDate;
     }
-    if (search != null && search.trim().isNotEmpty) queryParams['search'] = search.trim();
+    if (search != null && search.trim().isNotEmpty)
+      queryParams['search'] = search.trim();
 
     final response = await _apiService.client.get(
       '/purchases',
@@ -123,7 +129,8 @@ class InventoryService {
   /// Single purchase details
   Future<PurchaseModel> getPurchaseDetails(int id) async {
     final response = await _apiService.client.get('/purchases/$id');
-    return PurchaseModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return PurchaseModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Post purchase transaction
@@ -132,16 +139,19 @@ class InventoryService {
       '/purchases',
       data: data,
     );
-    return PurchaseModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return PurchaseModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Edit purchase transaction with controlled inventory adjustments
-  Future<PurchaseModel> updatePurchase(int id, Map<String, dynamic> data) async {
+  Future<PurchaseModel> updatePurchase(
+      int id, Map<String, dynamic> data) async {
     final response = await _apiService.client.put(
       '/purchases/$id',
       data: data,
     );
-    return PurchaseModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return PurchaseModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Reverse posted purchase
@@ -150,7 +160,8 @@ class InventoryService {
       '/purchases/$id/reverse',
       data: {'reason': reason ?? 'Reversed by user'},
     );
-    return PurchaseModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return PurchaseModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Delete purchase
@@ -163,7 +174,8 @@ class InventoryService {
   /// Inventory summary metrics for KPI cards
   Future<InventorySummaryModel> getInventorySummary() async {
     final response = await _apiService.client.get('/inventory/summary');
-    return InventorySummaryModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return InventorySummaryModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Inventory movements ledger
@@ -181,12 +193,14 @@ class InventoryService {
       'per_page': perPage ?? 20,
     };
     if (productId != null) queryParams['product_id'] = productId;
-    if (movementType != null && movementType.isNotEmpty) queryParams['movement_type'] = movementType;
+    if (movementType != null && movementType.isNotEmpty)
+      queryParams['movement_type'] = movementType;
     if (startDate != null && endDate != null) {
       queryParams['start_date'] = startDate;
       queryParams['end_date'] = endDate;
     }
-    if (search != null && search.trim().isNotEmpty) queryParams['search'] = search.trim();
+    if (search != null && search.trim().isNotEmpty)
+      queryParams['search'] = search.trim();
 
     final response = await _apiService.client.get(
       '/inventory/movements',
@@ -194,7 +208,8 @@ class InventoryService {
     );
 
     final list = (response.data['data'] as List? ?? [])
-        .map((item) => InventoryMovementModel.fromJson(item as Map<String, dynamic>))
+        .map((item) =>
+            InventoryMovementModel.fromJson(item as Map<String, dynamic>))
         .toList();
 
     final pagMap = response.data['pagination'] as Map<String, dynamic>? ?? {};
@@ -217,7 +232,8 @@ class InventoryService {
       'per_page': perPage ?? 15,
     };
     if (productId != null) queryParams['product_id'] = productId;
-    if (adjustmentType != null && adjustmentType.isNotEmpty) queryParams['adjustment_type'] = adjustmentType;
+    if (adjustmentType != null && adjustmentType.isNotEmpty)
+      queryParams['adjustment_type'] = adjustmentType;
 
     final response = await _apiService.client.get(
       '/inventory/adjustments',
@@ -225,7 +241,8 @@ class InventoryService {
     );
 
     final list = (response.data['data'] as List? ?? [])
-        .map((item) => StockAdjustmentModel.fromJson(item as Map<String, dynamic>))
+        .map((item) =>
+            StockAdjustmentModel.fromJson(item as Map<String, dynamic>))
         .toList();
 
     final pagMap = response.data['pagination'] as Map<String, dynamic>? ?? {};
@@ -237,11 +254,13 @@ class InventoryService {
   }
 
   /// Record authorized stock adjustment
-  Future<StockAdjustmentModel> createStockAdjustment(Map<String, dynamic> data) async {
+  Future<StockAdjustmentModel> createStockAdjustment(
+      Map<String, dynamic> data) async {
     final response = await _apiService.client.post(
       '/inventory/adjustments',
       data: data,
     );
-    return StockAdjustmentModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return StockAdjustmentModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 }

@@ -44,7 +44,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   double _totalCredit = 0;
   List<Map<String, dynamic>> _entries = [];
 
-  final _currency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final _currency =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
   final _dateFormat = DateFormat('dd MMM yyyy');
 
   @override
@@ -94,16 +95,23 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       );
 
       final rawEntries = (data['entries'] as List? ?? []);
-      _entries = rawEntries.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      _entries =
+          rawEntries.map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
-      _openingBalance = (data['opening_balance'] is num) ? (data['opening_balance'] as num).toDouble() : widget.dealer.openingBalance;
-      _closingBalance = (data['current_outstanding'] is num) ? (data['current_outstanding'] as num).toDouble() : widget.dealer.currentOutstanding;
+      _openingBalance = (data['opening_balance'] is num)
+          ? (data['opening_balance'] as num).toDouble()
+          : widget.dealer.openingBalance;
+      _closingBalance = (data['current_outstanding'] is num)
+          ? (data['current_outstanding'] as num).toDouble()
+          : widget.dealer.currentOutstanding;
 
       _totalDebit = 0;
       _totalCredit = 0;
       for (final e in _entries) {
-        _totalDebit += (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
-        _totalCredit += (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
+        _totalDebit +=
+            (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
+        _totalCredit +=
+            (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
       }
 
       setState(() => _isLoading = false);
@@ -128,13 +136,19 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
 
     final rows = <List<String>>[];
     for (final e in _entries) {
-      final dateVal = e['entry_date'] != null ? DateFormat('dd-MM-yyyy').format(DateTime.parse(e['entry_date'].toString())) : '';
+      final dateVal = e['entry_date'] != null
+          ? DateFormat('dd-MM-yyyy')
+              .format(DateTime.parse(e['entry_date'].toString()))
+          : '';
       final refNo = e['reference_no']?.toString() ?? '-';
       final type = (e['entry_type']?.toString() ?? '').toUpperCase();
       final narration = e['narration']?.toString() ?? '';
       final debit = (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
-      final credit = (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
-      final running = (e['running_balance'] is num) ? (e['running_balance'] as num).toDouble() : 0.0;
+      final credit =
+          (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
+      final running = (e['running_balance'] is num)
+          ? (e['running_balance'] as num).toDouble()
+          : 0.0;
 
       rows.add([
         dateVal,
@@ -157,7 +171,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       'Due: ${_currency.format(_closingBalance)}',
     ];
 
-    final periodStr = '${_dateFormat.format(_startDate)} to ${_dateFormat.format(_endDate)}';
+    final periodStr =
+        '${_dateFormat.format(_startDate)} to ${_dateFormat.format(_endDate)}';
 
     final metadata = {
       'Dealer': '${widget.dealer.name} (${widget.dealer.code})',
@@ -198,9 +213,12 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
         kpis: data['kpis'] as Map<String, String>,
       );
 
-      final fileName = 'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.pdf';
-      _exportService.downloadBytes(pdfBytes, fileName, ExportPrintService.mimePdf);
-      setState(() => _successMessage = 'Statement PDF downloaded successfully ($fileName).');
+      final fileName =
+          'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.pdf';
+      _exportService.downloadBytes(
+          pdfBytes, fileName, ExportPrintService.mimePdf);
+      setState(() => _successMessage =
+          'Statement PDF downloaded successfully ($fileName).');
     } catch (e) {
       setState(() => _errorMessage = 'Export PDF failed: $e');
     } finally {
@@ -222,9 +240,12 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.xlsx';
-      _exportService.downloadBytes(excelBytes, fileName, ExportPrintService.mimeExcel);
-      setState(() => _successMessage = 'Statement Excel spreadsheet downloaded ($fileName).');
+      final fileName =
+          'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.xlsx';
+      _exportService.downloadBytes(
+          excelBytes, fileName, ExportPrintService.mimeExcel);
+      setState(() => _successMessage =
+          'Statement Excel spreadsheet downloaded ($fileName).');
     } catch (e) {
       setState(() => _errorMessage = 'Export Excel failed: $e');
     } finally {
@@ -245,8 +266,10 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.csv';
-      _exportService.downloadBytes(csvBytes, fileName, ExportPrintService.mimeCsv);
+      final fileName =
+          'Dealer_Statement_${widget.dealer.code}_${DateFormat('yyyyMMdd').format(_startDate)}.csv';
+      _exportService.downloadBytes(
+          csvBytes, fileName, ExportPrintService.mimeCsv);
       setState(() => _successMessage = 'Statement CSV downloaded ($fileName).');
     } catch (e) {
       setState(() => _errorMessage = 'Export CSV failed: $e');
@@ -280,7 +303,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
-    final dialogWidth = min(media.width - 24, (media.width * 0.92).clamp(320.0, 1100.0));
+    final dialogWidth =
+        min(media.width - 24, (media.width * 0.92).clamp(320.0, 1100.0));
     final dialogHeight = media.height * 0.90;
 
     return Dialog(
@@ -301,7 +325,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 22),
+                  const Icon(Icons.account_balance_wallet_outlined,
+                      color: Colors.white, size: 22),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -309,12 +334,16 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                       children: [
                         Text(
                           '${widget.dealer.name} - Statement of Account',
-                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Dealer Code: ${widget.dealer.code} | Phone: ${widget.dealer.phone}',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 11),
                         ),
                       ],
                     ),
@@ -349,10 +378,15 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 18),
+                              const Icon(Icons.error_outline,
+                                  color: Color(0xFFDC2626), size: 18),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(_errorMessage!, style: GoogleFonts.inter(color: const Color(0xFFB91C1C), fontSize: 12, fontWeight: FontWeight.w600)),
+                                child: Text(_errorMessage!,
+                                    style: GoogleFonts.inter(
+                                        color: const Color(0xFFB91C1C),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600)),
                               ),
                             ],
                           ),
@@ -369,10 +403,15 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle_outline, color: Color(0xFF16A34A), size: 18),
+                              const Icon(Icons.check_circle_outline,
+                                  color: Color(0xFF16A34A), size: 18),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(_successMessage!, style: GoogleFonts.inter(color: const Color(0xFF15803D), fontSize: 12, fontWeight: FontWeight.w600)),
+                                child: Text(_successMessage!,
+                                    style: GoogleFonts.inter(
+                                        color: const Color(0xFF15803D),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600)),
                               ),
                             ],
                           ),
@@ -425,8 +464,10 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                                     final picked = await showDateRangePicker(
                                       context: context,
                                       firstDate: DateTime(2020),
-                                      lastDate: DateTime.now().add(const Duration(days: 30)),
-                                      initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
+                                      lastDate: DateTime.now()
+                                          .add(const Duration(days: 30)),
+                                      initialDateRange: DateTimeRange(
+                                          start: _startDate, end: _endDate),
                                     );
                                     if (picked != null) {
                                       setState(() {
@@ -437,9 +478,11 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                                     }
                                   },
                                   icon: const Icon(Icons.date_range, size: 15),
-                                  label: Text('${_dateFormat.format(_startDate)} - ${_dateFormat.format(_endDate)}'),
+                                  label: Text(
+                                      '${_dateFormat.format(_startDate)} - ${_dateFormat.format(_endDate)}'),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
                                   ),
                                 ),
                               ],
@@ -495,8 +538,12 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                                 title: 'Current Outstanding',
                                 value: _currency.format(_closingBalance),
                                 icon: Icons.account_balance_wallet,
-                                color: _closingBalance > 0 ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
-                                bgColor: _closingBalance > 0 ? const Color(0xFFFFF1F2) : const Color(0xFFF0FDF4),
+                                color: _closingBalance > 0
+                                    ? const Color(0xFFDC2626)
+                                    : const Color(0xFF16A34A),
+                                bgColor: _closingBalance > 0
+                                    ? const Color(0xFFFFF1F2)
+                                    : const Color(0xFFF0FDF4),
                                 width: cardWidth.clamp(140.0, 240.0),
                               ),
                             ],
@@ -507,7 +554,10 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
 
                       // LEDGER TRANSACTION ENTRIES TABLE
                       if (_isLoading)
-                        const Center(child: Padding(padding: EdgeInsets.all(40), child: CircularProgressIndicator()))
+                        const Center(
+                            child: Padding(
+                                padding: EdgeInsets.all(40),
+                                child: CircularProgressIndicator()))
                       else if (_entries.isEmpty)
                         Container(
                           padding: const EdgeInsets.all(40),
@@ -519,11 +569,20 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.receipt_long_outlined, size: 48, color: Color(0xFF94A3B8)),
+                              const Icon(Icons.receipt_long_outlined,
+                                  size: 48, color: Color(0xFF94A3B8)),
                               const SizedBox(height: 12),
-                              Text('No ledger entries recorded for this date range', style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: const Color(0xFF64748B))),
+                              Text(
+                                  'No ledger entries recorded for this date range',
+                                  style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF64748B))),
                               const SizedBox(height: 4),
-                              Text('Try adjusting your date range filter above.', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8))),
+                              Text(
+                                  'Try adjusting your date range filter above.',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: const Color(0xFF94A3B8))),
                             ],
                           ),
                         )
@@ -534,7 +593,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border:
+                                    Border.all(color: const Color(0xFFE2E8F0)),
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: SingleChildScrollView(
@@ -542,76 +602,122 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                                 child: SizedBox(
                                   width: max(constraints.maxWidth, 820),
                                   child: Table(
-                            columnWidths: const {
-                              0: FixedColumnWidth(110),
-                              1: FixedColumnWidth(130),
-                              2: FixedColumnWidth(100),
-                              3: FlexColumnWidth(2),
-                              4: FixedColumnWidth(120),
-                              5: FixedColumnWidth(120),
-                              6: FixedColumnWidth(130),
-                            },
-                            children: [
-                              // Table Header
-                              TableRow(
-                                decoration: const BoxDecoration(color: Color(0xFF003366)),
-                                children: [
-                                  _tableHeaderCell('Date'),
-                                  _tableHeaderCell('Ref No'),
-                                  _tableHeaderCell('Type'),
-                                  _tableHeaderCell('Narration'),
-                                  _tableHeaderCell('Debit (₹)'),
-                                  _tableHeaderCell('Credit (₹)'),
-                                  _tableHeaderCell('Balance (₹)'),
-                                ],
-                              ),
-                              // Rows
-                              ..._entries.asMap().entries.map((entry) {
-                                final idx = entry.key;
-                                final e = entry.value;
-                                final isZebra = idx % 2 == 1;
+                                    columnWidths: const {
+                                      0: FixedColumnWidth(110),
+                                      1: FixedColumnWidth(130),
+                                      2: FixedColumnWidth(100),
+                                      3: FlexColumnWidth(2),
+                                      4: FixedColumnWidth(120),
+                                      5: FixedColumnWidth(120),
+                                      6: FixedColumnWidth(130),
+                                    },
+                                    children: [
+                                      // Table Header
+                                      TableRow(
+                                        decoration: const BoxDecoration(
+                                            color: Color(0xFF003366)),
+                                        children: [
+                                          _tableHeaderCell('Date'),
+                                          _tableHeaderCell('Ref No'),
+                                          _tableHeaderCell('Type'),
+                                          _tableHeaderCell('Narration'),
+                                          _tableHeaderCell('Debit (₹)'),
+                                          _tableHeaderCell('Credit (₹)'),
+                                          _tableHeaderCell('Balance (₹)'),
+                                        ],
+                                      ),
+                                      // Rows
+                                      ..._entries.asMap().entries.map((entry) {
+                                        final idx = entry.key;
+                                        final e = entry.value;
+                                        final isZebra = idx % 2 == 1;
 
-                                final dateVal = e['entry_date'] != null ? DateFormat('dd-MM-yyyy').format(DateTime.parse(e['entry_date'].toString())) : '';
-                                final refNo = e['reference_no']?.toString() ?? '-';
-                                final type = (e['entry_type']?.toString() ?? '').toUpperCase();
-                                final narration = e['narration']?.toString() ?? '';
-                                final debit = (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
-                                final credit = (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
-                                final running = (e['running_balance'] is num) ? (e['running_balance'] as num).toDouble() : 0.0;
+                                        final dateVal = e['entry_date'] != null
+                                            ? DateFormat('dd-MM-yyyy').format(
+                                                DateTime.parse(
+                                                    e['entry_date'].toString()))
+                                            : '';
+                                        final refNo =
+                                            e['reference_no']?.toString() ??
+                                                '-';
+                                        final type =
+                                            (e['entry_type']?.toString() ?? '')
+                                                .toUpperCase();
+                                        final narration =
+                                            e['narration']?.toString() ?? '';
+                                        final debit = (e['debit'] is num)
+                                            ? (e['debit'] as num).toDouble()
+                                            : 0.0;
+                                        final credit = (e['credit'] is num)
+                                            ? (e['credit'] as num).toDouble()
+                                            : 0.0;
+                                        final running =
+                                            (e['running_balance'] is num)
+                                                ? (e['running_balance'] as num)
+                                                    .toDouble()
+                                                : 0.0;
 
-                                return TableRow(
-                                  decoration: BoxDecoration(color: isZebra ? const Color(0xFFF8FAFC) : Colors.white),
-                                  children: [
-                                    _tableDataCell(dateVal),
-                                    _tableDataCell(refNo, isBold: true),
-                                    _tableDataCell(type),
-                                    _tableDataCell(narration),
-                                    _tableDataCell(debit > 0 ? _currency.format(debit) : '-', color: debit > 0 ? const Color(0xFFDC2626) : null),
-                                    _tableDataCell(credit > 0 ? _currency.format(credit) : '-', color: credit > 0 ? const Color(0xFF16A34A) : null),
-                                    _tableDataCell(_currency.format(running), isBold: true),
-                                  ],
-                                );
-                              }),
-                              // Totals Footer Row
-                              TableRow(
-                                decoration: const BoxDecoration(color: Color(0xFFE6F0FA)),
-                                children: [
-                                  _tableDataCell('TOTAL', isBold: true),
-                                  _tableDataCell('${_entries.length} items', isBold: true),
-                                  _tableDataCell(''),
-                                  _tableDataCell(''),
-                                  _tableDataCell(_currency.format(_totalDebit), isBold: true, color: const Color(0xFFDC2626)),
-                                  _tableDataCell(_currency.format(_totalCredit), isBold: true, color: const Color(0xFF16A34A)),
-                                  _tableDataCell(_currency.format(_closingBalance), isBold: true),
-                                ],
+                                        return TableRow(
+                                          decoration: BoxDecoration(
+                                              color: isZebra
+                                                  ? const Color(0xFFF8FAFC)
+                                                  : Colors.white),
+                                          children: [
+                                            _tableDataCell(dateVal),
+                                            _tableDataCell(refNo, isBold: true),
+                                            _tableDataCell(type),
+                                            _tableDataCell(narration),
+                                            _tableDataCell(
+                                                debit > 0
+                                                    ? _currency.format(debit)
+                                                    : '-',
+                                                color: debit > 0
+                                                    ? const Color(0xFFDC2626)
+                                                    : null),
+                                            _tableDataCell(
+                                                credit > 0
+                                                    ? _currency.format(credit)
+                                                    : '-',
+                                                color: credit > 0
+                                                    ? const Color(0xFF16A34A)
+                                                    : null),
+                                            _tableDataCell(
+                                                _currency.format(running),
+                                                isBold: true),
+                                          ],
+                                        );
+                                      }),
+                                      // Totals Footer Row
+                                      TableRow(
+                                        decoration: const BoxDecoration(
+                                            color: Color(0xFFE6F0FA)),
+                                        children: [
+                                          _tableDataCell('TOTAL', isBold: true),
+                                          _tableDataCell(
+                                              '${_entries.length} items',
+                                              isBold: true),
+                                          _tableDataCell(''),
+                                          _tableDataCell(''),
+                                          _tableDataCell(
+                                              _currency.format(_totalDebit),
+                                              isBold: true,
+                                              color: const Color(0xFFDC2626)),
+                                          _tableDataCell(
+                                              _currency.format(_totalCredit),
+                                              isBold: true,
+                                              color: const Color(0xFF16A34A)),
+                                          _tableDataCell(
+                                              _currency.format(_closingBalance),
+                                              isBold: true),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
-                ),
                     ],
                   ),
                 ),
@@ -643,7 +749,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+                color: bgColor, borderRadius: BorderRadius.circular(8)),
             child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
@@ -651,9 +758,18 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.w600)),
+                Text(title,
+                    style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: const Color(0xFF64748B),
+                        fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
-                Text(value, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF0F172A)), overflow: TextOverflow.ellipsis),
+                Text(value,
+                    style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0F172A)),
+                    overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
@@ -667,7 +783,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
         text,
-        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+        style: GoogleFonts.inter(
+            fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }

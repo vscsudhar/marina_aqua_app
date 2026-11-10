@@ -149,7 +149,9 @@ class AuthService with ListenableServiceMixin {
       notifyListeners();
       return authData.user;
     } else {
-      throw ApiException(message: response.message.isNotEmpty ? response.message : 'Login failed');
+      throw ApiException(
+          message:
+              response.message.isNotEmpty ? response.message : 'Login failed');
     }
   }
 

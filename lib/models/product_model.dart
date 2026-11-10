@@ -54,7 +54,9 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
       sku: json['sku'] as String? ?? '',
       categoryId: json['category_id'] is int
@@ -63,9 +65,15 @@ class ProductModel {
       unitId: json['unit_id'] is int
           ? json['unit_id']
           : int.tryParse(json['unit_id']?.toString() ?? ''),
-      unitName: json['unit_name'] as String? ?? json['unit']?['name'] as String? ?? 'Unit',
-      unitCode: json['unit_code'] as String? ?? json['unit']?['code'] as String? ?? '',
-      categoryName: json['category_name'] as String? ?? json['category']?['name'] as String? ?? 'General',
+      unitName: json['unit_name'] as String? ??
+          json['unit']?['name'] as String? ??
+          'Unit',
+      unitCode: json['unit_code'] as String? ??
+          json['unit']?['code'] as String? ??
+          '',
+      categoryName: json['category_name'] as String? ??
+          json['category']?['name'] as String? ??
+          'General',
       description: json['description'] as String?,
       hsnCode: json['hsn_code'] as String? ?? '2201',
       defaultPrice: _parseDouble(json['default_price']),

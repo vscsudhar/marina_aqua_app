@@ -27,7 +27,8 @@ class ExportPrintService {
       _settingsService?.settings ?? const CompanySettingModel(id: 1);
 
   static const String mimePdf = 'application/pdf';
-  static const String mimeExcel = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  static const String mimeExcel =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   static const String mimeCsv = 'text/csv;charset=utf-8';
 
   // ==========================================
@@ -81,7 +82,8 @@ class ExportPrintService {
   }
 
   /// Launch native/browser print preview using `Printing.layoutPdf`.
-  Future<void> printPdfBytes(List<int> bytes, {String title = 'Document'}) async {
+  Future<void> printPdfBytes(List<int> bytes,
+      {String title = 'Document'}) async {
     await Printing.layoutPdf(
       name: title,
       onLayout: (PdfPageFormat format) async => Uint8List.fromList(bytes),
@@ -162,26 +164,31 @@ class ExportPrintService {
     );
 
     // 1. Company and Document Title
-    final companyCell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+    final companyCell = sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
     companyCell.value = TextCellValue(_companySettings.companyName);
     companyCell.cellStyle = titleStyle;
     rowIndex++;
 
-    final titleCell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+    final titleCell = sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
     titleCell.value = TextCellValue(title);
     titleCell.cellStyle = titleStyle;
     rowIndex++;
 
     if (subtitle != null) {
-      final subCell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+      final subCell = sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
       subCell.value = TextCellValue(subtitle);
       subCell.cellStyle = subtitleStyle;
       rowIndex++;
     }
 
     if (metadata != null && metadata.isNotEmpty) {
-      final metaList = metadata.entries.map((e) => '${e.key}: ${e.value}').join(' | ');
-      final metaCell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+      final metaList =
+          metadata.entries.map((e) => '${e.key}: ${e.value}').join(' | ');
+      final metaCell = sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
       metaCell.value = TextCellValue(metaList);
       metaCell.cellStyle = subtitleStyle;
       rowIndex++;
@@ -192,7 +199,8 @@ class ExportPrintService {
 
     // 2. Table Column Headers
     for (int col = 0; col < headers.length; col++) {
-      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: rowIndex));
+      final cell = sheet.cell(
+          CellIndex.indexByColumnRow(columnIndex: col, rowIndex: rowIndex));
       cell.value = TextCellValue(headers[col]);
       cell.cellStyle = tableHeaderStyle;
       // Set reasonable column width
@@ -208,7 +216,8 @@ class ExportPrintService {
 
       for (int c = 0; c < row.length; c++) {
         final val = row[c];
-        final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: c, rowIndex: rowIndex));
+        final cell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: c, rowIndex: rowIndex));
 
         if (val is num) {
           cell.value = DoubleCellValue(val.toDouble());
@@ -226,7 +235,8 @@ class ExportPrintService {
     if (summaryRow != null && summaryRow.isNotEmpty) {
       for (int c = 0; c < summaryRow.length; c++) {
         final val = summaryRow[c];
-        final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: c, rowIndex: rowIndex));
+        final cell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: c, rowIndex: rowIndex));
         cell.value = TextCellValue(val);
         cell.cellStyle = summaryRowStyle;
       }
@@ -257,7 +267,10 @@ class ExportPrintService {
     String escape(dynamic value) {
       if (value == null) return '';
       final str = value.toString();
-      if (str.contains(',') || str.contains('"') || str.contains('\n') || str.contains('\r')) {
+      if (str.contains(',') ||
+          str.contains('"') ||
+          str.contains('\n') ||
+          str.contains('\r')) {
         return '"${str.replaceAll('"', '""')}"';
       }
       return str;
@@ -267,7 +280,8 @@ class ExportPrintService {
     buffer.writeln(escape(title));
     if (subtitle != null) buffer.writeln(escape(subtitle));
     if (metadata != null && metadata.isNotEmpty) {
-      buffer.writeln(escape(metadata.entries.map((e) => '${e.key}: ${e.value}').join(' | ')));
+      buffer.writeln(escape(
+          metadata.entries.map((e) => '${e.key}: ${e.value}').join(' | ')));
     }
     buffer.writeln();
 
@@ -301,7 +315,8 @@ class ExportPrintService {
     bool isLandscape = false,
   }) async {
     final pdf = pw.Document();
-    final pageFormat = isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4;
+    final pageFormat =
+        isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4;
 
     const brandDarkNavy = PdfColor.fromInt(0xFF003366);
     const brandAccent = PdfColor.fromInt(0xFF007791);
@@ -335,17 +350,23 @@ class ExportPrintService {
                       pw.SizedBox(height: 2),
                       pw.Text(
                         [
-                          if (_companySettings.tagline.isNotEmpty) _companySettings.tagline,
-                          if (_companySettings.address.isNotEmpty) _companySettings.address,
+                          if (_companySettings.tagline.isNotEmpty)
+                            _companySettings.tagline,
+                          if (_companySettings.address.isNotEmpty)
+                            _companySettings.address,
                         ].join(' | '),
-                        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                        style: const pw.TextStyle(
+                            fontSize: 8, color: PdfColors.grey700),
                       ),
                       pw.Text(
                         [
-                          if (_companySettings.gstin.isNotEmpty) 'GSTIN: ${_companySettings.gstin}',
-                          if (_companySettings.phone.isNotEmpty) 'Contact: ${_companySettings.phone}',
+                          if (_companySettings.gstin.isNotEmpty)
+                            'GSTIN: ${_companySettings.gstin}',
+                          if (_companySettings.phone.isNotEmpty)
+                            'Contact: ${_companySettings.phone}',
                         ].join(' | '),
-                        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                        style: const pw.TextStyle(
+                            fontSize: 8, color: PdfColors.grey700),
                       ),
                     ],
                   ),
@@ -354,12 +375,14 @@ class ExportPrintService {
                     children: [
                       pw.Text(
                         'Page ${context.pageNumber} of ${context.pagesCount}',
-                        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                        style: const pw.TextStyle(
+                            fontSize: 8, color: PdfColors.grey600),
                       ),
                       if (metadata != null && metadata.containsKey('Date'))
                         pw.Text(
                           'Date: ${metadata['Date']}',
-                          style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                          style: const pw.TextStyle(
+                              fontSize: 8, color: PdfColors.grey700),
                         ),
                     ],
                   ),
@@ -384,7 +407,10 @@ class ExportPrintService {
                 pw.Center(
                   child: pw.Text(
                     subtitle,
-                    style: pw.TextStyle(color: brandAccent, fontSize: 9, fontWeight: pw.FontWeight.bold),
+                    style: pw.TextStyle(
+                        color: brandAccent,
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold),
                   ),
                 ),
               ],
@@ -401,18 +427,21 @@ class ExportPrintService {
                   return pw.Expanded(
                     child: pw.Container(
                       margin: const pw.EdgeInsets.symmetric(horizontal: 3),
-                      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      padding: const pw.EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
                       decoration: pw.BoxDecoration(
                         color: neutralLight,
                         border: pw.Border.all(color: borderGrey, width: 0.8),
-                        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+                        borderRadius:
+                            const pw.BorderRadius.all(pw.Radius.circular(4)),
                       ),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
                             entry.key.toUpperCase(),
-                            style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey600),
+                            style: const pw.TextStyle(
+                                fontSize: 7, color: PdfColors.grey600),
                           ),
                           pw.SizedBox(height: 2),
                           pw.Text(
@@ -446,7 +475,8 @@ class ExportPrintService {
               oddRowDecoration: const pw.BoxDecoration(color: neutralLight),
               cellStyle: const pw.TextStyle(fontSize: 7.5),
               cellAlignment: pw.Alignment.centerLeft,
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3.5),
+              cellPadding:
+                  const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3.5),
               border: pw.TableBorder.all(color: borderGrey, width: 0.5),
             ),
 
@@ -456,10 +486,12 @@ class ExportPrintService {
                 border: pw.TableBorder.all(color: borderGrey, width: 0.5),
                 children: [
                   pw.TableRow(
-                    decoration: const pw.BoxDecoration(color: PdfColor.fromInt(0xFFE6F0FA)),
+                    decoration: const pw.BoxDecoration(
+                        color: PdfColor.fromInt(0xFFE6F0FA)),
                     children: summaryRow.map((text) {
                       return pw.Padding(
-                        padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                        padding: const pw.EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 4),
                         child: pw.Text(
                           text,
                           style: pw.TextStyle(
@@ -481,18 +513,21 @@ class ExportPrintService {
             margin: const pw.EdgeInsets.only(top: 10),
             padding: const pw.EdgeInsets.only(top: 4),
             decoration: const pw.BoxDecoration(
-              border: pw.Border(top: pw.BorderSide(color: borderGrey, width: 0.5)),
+              border:
+                  pw.Border(top: pw.BorderSide(color: borderGrey, width: 0.5)),
             ),
             child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 pw.Text(
                   'Generated automatically by ${_companySettings.companyName} ERP System',
-                  style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
+                  style:
+                      const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
                 ),
                 pw.Text(
                   'Confidential & Proprietary',
-                  style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
+                  style:
+                      const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
                 ),
               ],
             ),

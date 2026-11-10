@@ -36,14 +36,18 @@ class _SupplierDialogState extends State<SupplierDialog> {
   void initState() {
     super.initState();
     final s = widget.existingSupplier;
-    _codeController = TextEditingController(text: s?.code ?? 'SUP-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}');
+    _codeController = TextEditingController(
+        text: s?.code ??
+            'SUP-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}');
     _nameController = TextEditingController(text: s?.name ?? '');
-    _contactPersonController = TextEditingController(text: s?.contactPerson ?? '');
+    _contactPersonController =
+        TextEditingController(text: s?.contactPerson ?? '');
     _phoneController = TextEditingController(text: s?.phone ?? '');
     _emailController = TextEditingController(text: s?.email ?? '');
     _gstinController = TextEditingController(text: s?.gstin ?? '');
     _addressController = TextEditingController(text: s?.address ?? '');
-    _openingBalanceController = TextEditingController(text: (s?.openingBalance ?? 0.0).toStringAsFixed(2));
+    _openingBalanceController = TextEditingController(
+        text: (s?.openingBalance ?? 0.0).toStringAsFixed(2));
     _notesController = TextEditingController(text: s?.notes ?? '');
     _isActive = s?.isActive ?? true;
   }
@@ -67,14 +71,24 @@ class _SupplierDialogState extends State<SupplierDialog> {
     final payload = <String, dynamic>{
       'code': _codeController.text.trim(),
       'name': _nameController.text.trim(),
-      'contact_person': _contactPersonController.text.trim().isNotEmpty ? _contactPersonController.text.trim() : null,
+      'contact_person': _contactPersonController.text.trim().isNotEmpty
+          ? _contactPersonController.text.trim()
+          : null,
       'phone': _phoneController.text.trim(),
-      'email': _emailController.text.trim().isNotEmpty ? _emailController.text.trim() : null,
-      'gstin': _gstinController.text.trim().isNotEmpty ? _gstinController.text.trim() : null,
-      'address': _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
+      'email': _emailController.text.trim().isNotEmpty
+          ? _emailController.text.trim()
+          : null,
+      'gstin': _gstinController.text.trim().isNotEmpty
+          ? _gstinController.text.trim()
+          : null,
+      'address': _addressController.text.trim().isNotEmpty
+          ? _addressController.text.trim()
+          : null,
       'opening_balance': double.tryParse(_openingBalanceController.text) ?? 0.0,
       'is_active': _isActive,
-      'notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      'notes': _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
     };
 
     setState(() => _isSaving = true);
@@ -120,7 +134,8 @@ class _SupplierDialogState extends State<SupplierDialog> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.business, color: AppColors.primary, size: 22),
+                    child: const Icon(Icons.business,
+                        color: AppColors.primary, size: 22),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -129,12 +144,14 @@ class _SupplierDialogState extends State<SupplierDialog> {
                       children: [
                         Text(
                           isEdit ? 'Edit Supplier' : 'Add New Supplier',
-                          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.outfit(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Vendor master for raw materials, water jars, and consumables',
-                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: AppColors.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -159,45 +176,60 @@ class _SupplierDialogState extends State<SupplierDialog> {
 
                     final nameField = TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Company / Supplier Name *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Company / Supplier Name *',
+                          border: OutlineInputBorder()),
                     );
 
                     final codeField = TextFormField(
                       controller: _codeController,
-                      decoration: const InputDecoration(labelText: 'Code *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Code *', border: OutlineInputBorder()),
                     );
 
                     final contactField = TextFormField(
                       controller: _contactPersonController,
-                      decoration: const InputDecoration(labelText: 'Contact Person', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Contact Person',
+                          border: OutlineInputBorder()),
                     );
 
                     final phoneField = TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(labelText: 'Phone Number *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Phone Number *',
+                          border: OutlineInputBorder()),
                     );
 
                     final emailField = TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Email Address', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Email Address',
+                          border: OutlineInputBorder()),
                     );
 
                     final gstinField = TextFormField(
                       controller: _gstinController,
-                      decoration: const InputDecoration(labelText: 'GSTIN', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'GSTIN', border: OutlineInputBorder()),
                     );
 
                     final addressField = TextFormField(
                       controller: _addressController,
-                      decoration: const InputDecoration(labelText: 'Office / Plant Address', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Office / Plant Address',
+                          border: OutlineInputBorder()),
                     );
 
                     final openingBalField = TextFormField(
                       controller: _openingBalanceController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: 'Opening Bal (₹)', border: OutlineInputBorder()),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                          labelText: 'Opening Bal (₹)',
+                          border: OutlineInputBorder()),
                     );
 
                     return Column(
@@ -212,7 +244,9 @@ class _SupplierDialogState extends State<SupplierDialog> {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: Colors.red.shade200),
                             ),
-                            child: Text(_errorMessage!, style: GoogleFonts.inter(color: Colors.red.shade900, fontSize: 13)),
+                            child: Text(_errorMessage!,
+                                style: GoogleFonts.inter(
+                                    color: Colors.red.shade900, fontSize: 13)),
                           ),
                         if (isNarrow) ...[
                           nameField,
@@ -281,7 +315,8 @@ class _SupplierDialogState extends State<SupplierDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: Colors.grey.shade200)),
               ),
               child: Wrap(
@@ -291,7 +326,8 @@ class _SupplierDialogState extends State<SupplierDialog> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   ElevatedButton(
@@ -299,9 +335,12 @@ class _SupplierDialogState extends State<SupplierDialog> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
-                    child: Text(_isSaving ? 'Saving...' : (isEdit ? 'Update Supplier' : 'Save Supplier')),
+                    child: Text(_isSaving
+                        ? 'Saving...'
+                        : (isEdit ? 'Update Supplier' : 'Save Supplier')),
                   ),
                 ],
               ),

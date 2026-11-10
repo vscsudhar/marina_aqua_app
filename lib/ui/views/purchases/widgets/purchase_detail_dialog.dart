@@ -20,7 +20,8 @@ class PurchaseDetailDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final isCancelled = purchase.isCancelled;
 
     return Dialog(
@@ -33,15 +34,18 @@ class PurchaseDetailDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               decoration: BoxDecoration(
-                color: isCancelled ? Colors.red.shade50 : const Color(0xFFF1F5F9),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                color:
+                    isCancelled ? Colors.red.shade50 : const Color(0xFFF1F5F9),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isCancelled ? Colors.red : AppColors.primary).withValues(alpha: 0.1),
+                      color: (isCancelled ? Colors.red : AppColors.primary)
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -60,14 +64,17 @@ class PurchaseDetailDialog extends StatelessWidget {
                           runSpacing: 4,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Text(purchase.purchaseNo, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(purchase.purchaseNo,
+                                style: GoogleFonts.outfit(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
                             _statusChip(purchase.status),
                             _paymentChip(purchase.paymentStatus),
                           ],
                         ),
                         Text(
                           'Supplier: ${purchase.supplierName} • Date: ${purchase.purchaseDate}${purchase.invoiceNo != null ? ' • Invoice: ${purchase.invoiceNo}' : ''}',
-                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: AppColors.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -90,7 +97,9 @@ class PurchaseDetailDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Line items table
-                    Text('Line Items (${purchase.items.length})', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                    Text('Line Items (${purchase.items.length})',
+                        style: GoogleFonts.outfit(
+                            fontSize: 15, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
 
                     LayoutBuilder(
@@ -116,52 +125,98 @@ class PurchaseDetailDialog extends StatelessWidget {
                                   },
                                   children: [
                                     TableRow(
-                                      decoration: BoxDecoration(color: Colors.grey.shade100),
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey.shade100),
                                       children: [
                                         _tableHeader('Product / Item'),
-                                        _tableHeader('Quantity', align: TextAlign.right),
-                                        _tableHeader('Unit Cost', align: TextAlign.right),
-                                        _tableHeader('Tax %', align: TextAlign.right),
-                                        _tableHeader('Line Total', align: TextAlign.right),
+                                        _tableHeader('Quantity',
+                                            align: TextAlign.right),
+                                        _tableHeader('Unit Cost',
+                                            align: TextAlign.right),
+                                        _tableHeader('Tax %',
+                                            align: TextAlign.right),
+                                        _tableHeader('Line Total',
+                                            align: TextAlign.right),
                                       ],
                                     ),
                                     ...purchase.items.map((item) {
                                       return TableRow(
                                         decoration: BoxDecoration(
-                                          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+                                          border: Border(
+                                              top: BorderSide(
+                                                  color: Colors.grey.shade200)),
                                         ),
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 8),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Text(item.productName, style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13)),
+                                                Text(item.productName,
+                                                    style: GoogleFonts.inter(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 13)),
                                                 if (item.productSku.isNotEmpty)
-                                                  Text('SKU: ${item.productSku}', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
-                                                if (item.notes != null && item.notes!.isNotEmpty)
-                                                  Text('Note: ${item.notes}', style: GoogleFonts.inter(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey.shade600)),
+                                                  Text(
+                                                      'SKU: ${item.productSku}',
+                                                      style: GoogleFonts.inter(
+                                                          fontSize: 11,
+                                                          color: AppColors
+                                                              .textSecondary)),
+                                                if (item.notes != null &&
+                                                    item.notes!.isNotEmpty)
+                                                  Text('Note: ${item.notes}',
+                                                      style: GoogleFonts.inter(
+                                                          fontSize: 11,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                          color: Colors
+                                                              .grey.shade600)),
                                               ],
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                            child: Text('${item.quantity.toStringAsFixed(0)} ${item.unit}', textAlign: TextAlign.right, style: GoogleFonts.inter(fontSize: 13)),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                            child: Text(currencyFormat.format(item.unitCost), textAlign: TextAlign.right, style: GoogleFonts.inter(fontSize: 13)),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                            child: Text('${item.taxRate.toStringAsFixed(0)}%', textAlign: TextAlign.right, style: GoogleFonts.inter(fontSize: 13)),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 8),
                                             child: Text(
-                                              currencyFormat.format(item.totalCost),
+                                                '${item.quantity.toStringAsFixed(0)} ${item.unit}',
+                                                textAlign: TextAlign.right,
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 13)),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 8),
+                                            child: Text(
+                                                currencyFormat
+                                                    .format(item.unitCost),
+                                                textAlign: TextAlign.right,
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 13)),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 8),
+                                            child: Text(
+                                                '${item.taxRate.toStringAsFixed(0)}%',
+                                                textAlign: TextAlign.right,
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 13)),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 8),
+                                            child: Text(
+                                              currencyFormat
+                                                  .format(item.totalCost),
                                               textAlign: TextAlign.right,
-                                              style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary),
+                                              style: GoogleFonts.outfit(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13,
+                                                  color: AppColors.primary),
                                             ),
                                           ),
                                         ],
@@ -191,25 +246,37 @@ class PurchaseDetailDialog extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            _summaryRow('Subtotal', currencyFormat.format(purchase.subtotal)),
+                            _summaryRow('Subtotal',
+                                currencyFormat.format(purchase.subtotal)),
                             const SizedBox(height: 6),
-                            _summaryRow('GST Tax', '+ ${currencyFormat.format(purchase.taxAmount)}', color: Colors.blue.shade800),
+                            _summaryRow('GST Tax',
+                                '+ ${currencyFormat.format(purchase.taxAmount)}',
+                                color: Colors.blue.shade800),
                             if (purchase.discountAmount > 0) ...[
                               const SizedBox(height: 6),
-                              _summaryRow('Discount', '- ${currencyFormat.format(purchase.discountAmount)}', color: Colors.green.shade800),
+                              _summaryRow('Discount',
+                                  '- ${currencyFormat.format(purchase.discountAmount)}',
+                                  color: Colors.green.shade800),
                             ],
                             const Divider(height: 16),
-                            _summaryRow('Grand Total', currencyFormat.format(purchase.totalAmount), isBold: true, color: AppColors.primary),
+                            _summaryRow('Grand Total',
+                                currencyFormat.format(purchase.totalAmount),
+                                isBold: true, color: AppColors.primary),
                             const SizedBox(height: 6),
-                            _summaryRow('Paid (${purchase.paymentMethod})', currencyFormat.format(purchase.paidAmount), color: Colors.green.shade700),
+                            _summaryRow('Paid (${purchase.paymentMethod})',
+                                currencyFormat.format(purchase.paidAmount),
+                                color: Colors.green.shade700),
                           ],
                         ),
                       ),
                     ),
 
-                    if (purchase.notes != null && purchase.notes!.isNotEmpty) ...[
+                    if (purchase.notes != null &&
+                        purchase.notes!.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      Text('Notes / Audit Trail:', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text('Notes / Audit Trail:',
+                          style: GoogleFonts.outfit(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       Container(
                         width: double.infinity,
@@ -219,18 +286,24 @@ class PurchaseDetailDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey.shade200),
                         ),
-                        child: Text(purchase.notes!, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textPrimary)),
+                        child: Text(purchase.notes!,
+                            style: GoogleFonts.inter(
+                                fontSize: 12, color: AppColors.textPrimary)),
                       ),
                     ],
 
                     if (purchase.movements.isNotEmpty) ...[
                       const SizedBox(height: 20),
-                      Text('Inventory Movements Ledger Impact (${purchase.movements.length})', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text(
+                          'Inventory Movements Ledger Impact (${purchase.movements.length})',
+                          style: GoogleFonts.outfit(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       ...purchase.movements.map((mov) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade50,
                             borderRadius: BorderRadius.circular(6),
@@ -242,7 +315,9 @@ class PurchaseDetailDialog extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   '${mov.movementNo} • ${mov.movementType.toUpperCase()} • ${mov.productName}',
-                                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -252,7 +327,9 @@ class PurchaseDetailDialog extends StatelessWidget {
                                 style: GoogleFonts.outfit(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: mov.signedQuantity > 0 ? Colors.green.shade800 : Colors.red.shade800,
+                                  color: mov.signedQuantity > 0
+                                      ? Colors.green.shade800
+                                      : Colors.red.shade800,
                                 ),
                               ),
                             ],
@@ -270,7 +347,8 @@ class PurchaseDetailDialog extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: Border(top: BorderSide(color: Colors.grey.shade200)),
               ),
               child: Wrap(
@@ -325,7 +403,8 @@ class PurchaseDetailDialog extends StatelessWidget {
   }
 
   void _showReverseConfirmation(BuildContext context) {
-    final reasonController = TextEditingController(text: 'Goods returned / supplier cancellation');
+    final reasonController =
+        TextEditingController(text: 'Goods returned / supplier cancellation');
 
     showDialog(
       context: context,
@@ -347,7 +426,8 @@ class PurchaseDetailDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Reversing will mark this purchase as cancelled and safely decrement the received stock from product inventory with an audit reversal movement.',
-                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
+                    style: GoogleFonts.inter(
+                        fontSize: 13, color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
@@ -372,7 +452,9 @@ class PurchaseDetailDialog extends StatelessWidget {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white),
                   onPressed: () {
                     Navigator.of(ctx).pop();
                     Navigator.of(context).pop();
@@ -391,16 +473,30 @@ class PurchaseDetailDialog extends StatelessWidget {
   Widget _tableHeader(String text, {TextAlign align = TextAlign.left}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      child: Text(text, textAlign: align, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+      child: Text(text,
+          textAlign: align,
+          style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade700)),
     );
   }
 
-  Widget _summaryRow(String label, String value, {bool isBold = false, Color? color}) {
+  Widget _summaryRow(String label, String value,
+      {bool isBold = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: Colors.grey.shade700)),
-        Text(value, style: GoogleFonts.outfit(fontSize: 13, fontWeight: isBold ? FontWeight.bold : FontWeight.w600, color: color ?? AppColors.textPrimary)),
+        Text(label,
+            style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: Colors.grey.shade700)),
+        Text(value,
+            style: GoogleFonts.outfit(
+                fontSize: 13,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+                color: color ?? AppColors.textPrimary)),
       ],
     );
   }
@@ -412,11 +508,15 @@ class PurchaseDetailDialog extends StatelessWidget {
       decoration: BoxDecoration(
         color: isReceived ? Colors.green.shade50 : Colors.red.shade50,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: isReceived ? Colors.green.shade300 : Colors.red.shade300),
+        border: Border.all(
+            color: isReceived ? Colors.green.shade300 : Colors.red.shade300),
       ),
       child: Text(
         status.toUpperCase(),
-        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: isReceived ? Colors.green.shade800 : Colors.red.shade800),
+        style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: isReceived ? Colors.green.shade800 : Colors.red.shade800),
       ),
     );
   }
@@ -439,7 +539,8 @@ class PurchaseDetailDialog extends StatelessWidget {
       ),
       child: Text(
         status.replaceAll('_', ' ').toUpperCase(),
-        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: fg),
+        style: GoogleFonts.inter(
+            fontSize: 10, fontWeight: FontWeight.bold, color: fg),
       ),
     );
   }

@@ -16,7 +16,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
   const SettingsView({super.key, this.onBack});
 
   @override
-  Widget builder(BuildContext context, SettingsViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, SettingsViewModel viewModel, Widget? child) {
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
 
     return Scaffold(
@@ -54,12 +55,15 @@ class SettingsView extends StackedView<SettingsViewModel> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_outline, color: kcSuccessColor),
+                          const Icon(Icons.check_circle_outline,
+                              color: kcSuccessColor),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               viewModel.successMessage!,
-                              style: GoogleFonts.inter(color: kcSuccessColor, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.inter(
+                                  color: kcSuccessColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -82,7 +86,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
                           Expanded(
                             child: Text(
                               viewModel.errorMessage!,
-                              style: GoogleFonts.inter(color: kcErrorColor, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.inter(
+                                  color: kcErrorColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -96,15 +102,21 @@ class SettingsView extends StackedView<SettingsViewModel> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: kcBorderColor),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _tabButton(0, 'Company Profile & Logo', Icons.storefront, viewModel),
-                          _tabButton(1, 'Invoice Rules & Currency', Icons.receipt_long, viewModel),
-                          _tabButton(2, 'Bank & Remittance', Icons.account_balance, viewModel),
-                          _tabButton(3, 'Tax Rates Master', Icons.percent, viewModel, badgeCount: viewModel.taxRates.length),
+                          _tabButton(0, 'Company Profile & Logo',
+                              Icons.storefront, viewModel),
+                          _tabButton(1, 'Invoice Rules & Currency',
+                              Icons.receipt_long, viewModel),
+                          _tabButton(2, 'Bank & Remittance',
+                              Icons.account_balance, viewModel),
+                          _tabButton(
+                              3, 'Tax Rates Master', Icons.percent, viewModel,
+                              badgeCount: viewModel.taxRates.length),
                         ],
                       ),
                     ),
@@ -141,7 +153,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
     );
   }
 
-  Widget _tabButton(int index, String title, IconData icon, SettingsViewModel viewModel, {int? badgeCount}) {
+  Widget _tabButton(
+      int index, String title, IconData icon, SettingsViewModel viewModel,
+      {int? badgeCount}) {
     final isSelected = viewModel.selectedTabIndex == index;
     return InkWell(
       onTap: () => viewModel.setTab(index),
@@ -150,7 +164,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         margin: const EdgeInsets.only(right: 6),
         decoration: BoxDecoration(
-          color: isSelected ? kcPrimaryColor.withValues(alpha: 0.12) : Colors.transparent,
+          color: isSelected
+              ? kcPrimaryColor.withValues(alpha: 0.12)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -195,7 +211,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
 
   // ===================== TAB 0: PROFILE & LOGO =====================
 
-  Widget _buildProfileTab(BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
+  Widget _buildProfileTab(
+      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
     final s = viewModel.companySettings;
 
     final nameController = TextEditingController(text: s.companyName);
@@ -244,18 +261,26 @@ class SettingsView extends StackedView<SettingsViewModel> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: viewModel.previewLogoBytes != null
-                        ? Image.memory(viewModel.previewLogoBytes!, fit: BoxFit.contain)
+                        ? Image.memory(viewModel.previewLogoBytes!,
+                            fit: BoxFit.contain)
                         : (s.logoUrl != null || s.logoPath != null)
                             ? Image.network(
-                                ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? s.logoUrl ?? s.logoPath!,
-                                key: ValueKey(ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? s.logoUrl),
+                                ApiService.resolveLogoUrl(
+                                        s.logoUrl ?? s.logoPath) ??
+                                    s.logoUrl ??
+                                    s.logoPath!,
+                                key: ValueKey(ApiService.resolveLogoUrl(
+                                        s.logoUrl ?? s.logoPath) ??
+                                    s.logoUrl),
                                 fit: BoxFit.contain,
                                 errorBuilder: (_, __, ___) => const Center(
-                                  child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 36),
+                                  child: Icon(Icons.water_drop,
+                                      color: kcPrimaryColor, size: 36),
                                 ),
                               )
                             : const Center(
-                                child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 36),
+                                child: Icon(Icons.water_drop,
+                                    color: kcPrimaryColor, size: 36),
                               ),
                   ),
                 ),
@@ -266,12 +291,16 @@ class SettingsView extends StackedView<SettingsViewModel> {
                     children: [
                       Text(
                         'Upload Company Logo',
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: kcDeepNavy),
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            color: kcDeepNavy),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Displayed at the top of the application sidebar, dashboard and printed A4 tax invoices.\nSupported formats: PNG, JPG, WEBP, SVG (Max file size: 2MB).',
-                        style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: kcMediumGrey),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -280,21 +309,29 @@ class SettingsView extends StackedView<SettingsViewModel> {
                             onPressed: viewModel.isUploadingLogo
                                 ? null
                                 : () => _pickAndUploadLogo(viewModel),
-                            icon: const Icon(Icons.upload_file, size: 16, color: Colors.white),
+                            icon: const Icon(Icons.upload_file,
+                                size: 16, color: Colors.white),
                             label: Text(
-                              viewModel.isUploadingLogo ? 'Uploading...' : 'Choose Logo File',
+                              viewModel.isUploadingLogo
+                                  ? 'Uploading...'
+                                  : 'Choose Logo File',
                               style: const TextStyle(color: Colors.white),
                             ),
-                            style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kcPrimaryColor),
                           ),
-                          if (s.logoPath != null || viewModel.previewLogoBytes != null) ...[
+                          if (s.logoPath != null ||
+                              viewModel.previewLogoBytes != null) ...[
                             const SizedBox(width: 12),
                             OutlinedButton.icon(
                               onPressed: viewModel.deleteCompanyLogo,
-                              icon: const Icon(Icons.delete_outline, size: 16, color: kcErrorColor),
-                              label: const Text('Remove Logo', style: TextStyle(color: kcErrorColor)),
+                              icon: const Icon(Icons.delete_outline,
+                                  size: 16, color: kcErrorColor),
+                              label: const Text('Remove Logo',
+                                  style: TextStyle(color: kcErrorColor)),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: kcErrorColor.withValues(alpha: 0.5)),
+                                side: BorderSide(
+                                    color: kcErrorColor.withValues(alpha: 0.5)),
                               ),
                             ),
                           ],
@@ -314,45 +351,66 @@ class SettingsView extends StackedView<SettingsViewModel> {
             children: [
               Expanded(
                 flex: 2,
-                child: _buildTextField(controller: nameController, label: 'Company Legal Name *'),
+                child: _buildTextField(
+                    controller: nameController, label: 'Company Legal Name *'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTextField(controller: taglineController, label: 'Tagline / Slogan'),
+                child: _buildTextField(
+                    controller: taglineController, label: 'Tagline / Slogan'),
               ),
             ],
           ),
           const SizedBox(height: 14),
           Row(
             children: [
-              Expanded(child: _buildTextField(controller: phoneController, label: 'Phone Number *')),
+              Expanded(
+                  child: _buildTextField(
+                      controller: phoneController, label: 'Phone Number *')),
               const SizedBox(width: 16),
-              Expanded(child: _buildTextField(controller: emailController, label: 'Email Address *')),
+              Expanded(
+                  child: _buildTextField(
+                      controller: emailController, label: 'Email Address *')),
               const SizedBox(width: 16),
-              Expanded(child: _buildTextField(controller: websiteController, label: 'Website')),
+              Expanded(
+                  child: _buildTextField(
+                      controller: websiteController, label: 'Website')),
             ],
           ),
           const SizedBox(height: 14),
-          _buildTextField(controller: addressController, label: 'Registered Business Address *', maxLines: 2),
+          _buildTextField(
+              controller: addressController,
+              label: 'Registered Business Address *',
+              maxLines: 2),
           const SizedBox(height: 14),
           DropdownButtonFormField<String>(
-            initialValue: kGstSupplyCodes.any((c) => c.code == stateCodeController.text.trim())
-                ? kGstSupplyCodes.firstWhere((c) => c.code == stateCodeController.text.trim()).displayName
+            initialValue: kGstSupplyCodes
+                    .any((c) => c.code == stateCodeController.text.trim())
+                ? kGstSupplyCodes
+                    .firstWhere(
+                        (c) => c.code == stateCodeController.text.trim())
+                    .displayName
                 : null,
             decoration: const InputDecoration(
               labelText: 'Supply / State Code (Dropdown Selection)',
               border: OutlineInputBorder(),
               isDense: true,
-              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+              prefixIcon: Icon(Icons.location_on_outlined,
+                  size: 20, color: kcPrimaryColor),
             ),
             hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
-            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
-                  value: c.displayName,
-                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
-                )).toList(),
+            items: kGstSupplyCodes
+                .map((c) => DropdownMenuItem(
+                      value: c.displayName,
+                      child: Text(c.displayName,
+                          style: GoogleFonts.inter(
+                              fontSize: 13, fontWeight: FontWeight.w500)),
+                    ))
+                .toList(),
             onChanged: (val) {
               if (val != null) {
-                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                final matched =
+                    kGstSupplyCodes.firstWhere((c) => c.displayName == val);
                 stateCodeController.text = matched.code;
                 stateNameController.text = matched.stateName;
               }
@@ -361,9 +419,15 @@ class SettingsView extends StackedView<SettingsViewModel> {
           const SizedBox(height: 14),
           Row(
             children: [
-              Expanded(flex: 2, child: _buildTextField(controller: stateNameController, label: 'State Name *')),
+              Expanded(
+                  flex: 2,
+                  child: _buildTextField(
+                      controller: stateNameController, label: 'State Name *')),
               const SizedBox(width: 16),
-              Expanded(child: _buildTextField(controller: stateCodeController, label: 'State Code (e.g. 33)')),
+              Expanded(
+                  child: _buildTextField(
+                      controller: stateCodeController,
+                      label: 'State Code (e.g. 33)')),
             ],
           ),
           const SizedBox(height: 14),
@@ -414,10 +478,12 @@ class SettingsView extends StackedView<SettingsViewModel> {
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Company Profile', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Company Profile',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),
@@ -428,15 +494,20 @@ class SettingsView extends StackedView<SettingsViewModel> {
 
   // ===================== TAB 1: INVOICE RULES & CURRENCY =====================
 
-  Widget _buildInvoiceRulesTab(BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
+  Widget _buildInvoiceRulesTab(
+      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
     final s = viewModel.companySettings;
 
     final prefixController = TextEditingController(text: s.invoicePrefix);
-    final paddingController = TextEditingController(text: s.invoiceNumberPadding.toString());
-    final nextNumberController = TextEditingController(text: s.nextInvoiceNumber.toString());
-    final currencySymbolController = TextEditingController(text: s.currencySymbol);
+    final paddingController =
+        TextEditingController(text: s.invoiceNumberPadding.toString());
+    final nextNumberController =
+        TextEditingController(text: s.nextInvoiceNumber.toString());
+    final currencySymbolController =
+        TextEditingController(text: s.currencySymbol);
     final currencyCodeController = TextEditingController(text: s.currencyCode);
-    final defaultTaxController = TextEditingController(text: s.defaultTaxRate.toStringAsFixed(2));
+    final defaultTaxController =
+        TextEditingController(text: s.defaultTaxRate.toStringAsFixed(2));
     final termsController = TextEditingController(text: s.invoiceFooterNotes);
 
     return Container(
@@ -483,9 +554,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
               ),
             ],
           ),
-
           const SizedBox(height: 24),
-          _sectionHeader('Currency & Default Tax Preferences', Icons.currency_rupee),
+          _sectionHeader(
+              'Currency & Default Tax Preferences', Icons.currency_rupee),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -515,7 +586,6 @@ class SettingsView extends StackedView<SettingsViewModel> {
               ),
             ],
           ),
-
           const SizedBox(height: 24),
           _sectionHeader('Invoice Declaration', Icons.description_outlined),
           const SizedBox(height: 16),
@@ -524,7 +594,6 @@ class SettingsView extends StackedView<SettingsViewModel> {
             label: 'Standard Declaration on Invoices',
             maxLines: 3,
           ),
-
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -532,19 +601,25 @@ class SettingsView extends StackedView<SettingsViewModel> {
               onPressed: () {
                 viewModel.updateCompanySettings({
                   'invoice_prefix': prefixController.text.trim().toUpperCase(),
-                  'invoice_number_padding': int.tryParse(paddingController.text.trim()) ?? 4,
-                  'next_invoice_number': int.tryParse(nextNumberController.text.trim()) ?? 1,
+                  'invoice_number_padding':
+                      int.tryParse(paddingController.text.trim()) ?? 4,
+                  'next_invoice_number':
+                      int.tryParse(nextNumberController.text.trim()) ?? 1,
                   'currency_symbol': currencySymbolController.text.trim(),
-                  'currency_code': currencyCodeController.text.trim().toUpperCase(),
-                  'default_tax_rate': double.tryParse(defaultTaxController.text.trim()) ?? 18.0,
+                  'currency_code':
+                      currencyCodeController.text.trim().toUpperCase(),
+                  'default_tax_rate':
+                      double.tryParse(defaultTaxController.text.trim()) ?? 18.0,
                   'invoice_footer_notes': termsController.text.trim(),
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Billing Preferences', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Billing Preferences',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),
@@ -555,12 +630,14 @@ class SettingsView extends StackedView<SettingsViewModel> {
 
   // ===================== TAB 2: BANK & REMITTANCE =====================
 
-  Widget _buildBankTab(BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
+  Widget _buildBankTab(
+      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
     final s = viewModel.companySettings;
 
     final bankNameController = TextEditingController(text: s.bankName);
     final bankBranchController = TextEditingController(text: s.bankBranch);
-    final accountNumberController = TextEditingController(text: s.accountNumber);
+    final accountNumberController =
+        TextEditingController(text: s.accountNumber);
     final ifscCodeController = TextEditingController(text: s.ifscCode);
     final upiIdController = TextEditingController(text: s.upiId);
 
@@ -574,7 +651,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionHeader('Bank Account & Remittance Credentials', Icons.account_balance),
+          _sectionHeader(
+              'Bank Account & Remittance Credentials', Icons.account_balance),
           const SizedBox(height: 8),
           Text(
             'These banking details will appear on the footer of all issued tax invoices and printouts.',
@@ -584,11 +662,17 @@ class SettingsView extends StackedView<SettingsViewModel> {
           Row(
             children: [
               Expanded(
-                child: _buildTextField(controller: bankNameController, label: 'Bank Name *', hint: 'State Bank of India'),
+                child: _buildTextField(
+                    controller: bankNameController,
+                    label: 'Bank Name *',
+                    hint: 'State Bank of India'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTextField(controller: bankBranchController, label: 'Branch Name', hint: 'Thoraipakkam, Chennai'),
+                child: _buildTextField(
+                    controller: bankBranchController,
+                    label: 'Branch Name',
+                    hint: 'Thoraipakkam, Chennai'),
               ),
             ],
           ),
@@ -597,19 +681,26 @@ class SettingsView extends StackedView<SettingsViewModel> {
             children: [
               Expanded(
                 flex: 2,
-                child: _buildTextField(controller: accountNumberController, label: 'Account Number *'),
+                child: _buildTextField(
+                    controller: accountNumberController,
+                    label: 'Account Number *'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTextField(controller: ifscCodeController, label: 'IFSC Code *', hint: 'SBIN0004567'),
+                child: _buildTextField(
+                    controller: ifscCodeController,
+                    label: 'IFSC Code *',
+                    hint: 'SBIN0004567'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTextField(controller: upiIdController, label: 'UPI ID / VPA', hint: 'marinaaqua@sbi'),
+                child: _buildTextField(
+                    controller: upiIdController,
+                    label: 'UPI ID / VPA',
+                    hint: 'marinaaqua@sbi'),
               ),
             ],
           ),
-
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -624,10 +715,12 @@ class SettingsView extends StackedView<SettingsViewModel> {
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Bank Credentials', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Bank Credentials',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),
@@ -638,7 +731,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
 
   // ===================== TAB 3: TAX RATES MASTER =====================
 
-  Widget _buildTaxRatesTab(BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
+  Widget _buildTaxRatesTab(
+      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -666,8 +760,10 @@ class SettingsView extends StackedView<SettingsViewModel> {
               ElevatedButton.icon(
                 onPressed: () => _openCreateTaxDialog(context, viewModel),
                 icon: const Icon(Icons.add, size: 18, color: Colors.white),
-                label: const Text('Add Tax Slab', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                label: const Text('Add Tax Slab',
+                    style: TextStyle(color: Colors.white)),
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
               ),
             ],
           ),
@@ -684,8 +780,10 @@ class SettingsView extends StackedView<SettingsViewModel> {
                     hintText: 'Search Tax Slab...',
                     prefixIcon: const Icon(Icons.search, size: 18),
                     isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                   onSubmitted: viewModel.setTaxSearch,
                 ),
@@ -698,15 +796,26 @@ class SettingsView extends StackedView<SettingsViewModel> {
                   isExpanded: true,
                   isDense: true,
                   items: const [
-                    DropdownMenuItem(value: null, child: Text('All Statuses', overflow: TextOverflow.ellipsis)),
-                    DropdownMenuItem(value: true, child: Text('Active Only', overflow: TextOverflow.ellipsis)),
-                    DropdownMenuItem(value: false, child: Text('Inactive Only', overflow: TextOverflow.ellipsis)),
+                    DropdownMenuItem(
+                        value: null,
+                        child: Text('All Statuses',
+                            overflow: TextOverflow.ellipsis)),
+                    DropdownMenuItem(
+                        value: true,
+                        child: Text('Active Only',
+                            overflow: TextOverflow.ellipsis)),
+                    DropdownMenuItem(
+                        value: false,
+                        child: Text('Inactive Only',
+                            overflow: TextOverflow.ellipsis)),
                   ],
                   onChanged: viewModel.setTaxActiveFilter,
                   decoration: InputDecoration(
                     isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                 ),
               ),
@@ -720,7 +829,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
             Container(
               padding: const EdgeInsets.all(40),
               alignment: Alignment.center,
-              child: Text('No Tax Rates Found', style: GoogleFonts.inter(color: kcMediumGrey)),
+              child: Text('No Tax Rates Found',
+                  style: GoogleFonts.inter(color: kcMediumGrey)),
             )
           else
             SingleChildScrollView(
@@ -728,13 +838,27 @@ class SettingsView extends StackedView<SettingsViewModel> {
               child: DataTable(
                 headingRowColor: WidgetStateProperty.all(kcVeryLightGrey),
                 columns: const [
-                  DataColumn(label: Text('Tax Name', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Rate (%)', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Type', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Applicability', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Default', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.w700))),
-                  DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Tax Name',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Rate (%)',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Type',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Applicability',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Default',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Status',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                  DataColumn(
+                      label: Text('Actions',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
                 ],
                 rows: viewModel.taxRates.map((tax) {
                   return DataRow(
@@ -745,15 +869,25 @@ class SettingsView extends StackedView<SettingsViewModel> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(tax.name, style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: kcDeepNavy)),
-                            if (tax.description != null && tax.description!.isNotEmpty)
-                              Text(tax.description!, style: GoogleFonts.inter(fontSize: 11, color: kcMediumGrey)),
-                            if (tax.effectiveFrom != null || tax.effectiveTo != null)
+                            Text(tax.name,
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w700,
+                                    color: kcDeepNavy)),
+                            if (tax.description != null &&
+                                tax.description!.isNotEmpty)
+                              Text(tax.description!,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 11, color: kcMediumGrey)),
+                            if (tax.effectiveFrom != null ||
+                                tax.effectiveTo != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   'Effective: ${tax.effectiveFrom ?? 'Immediate'} → ${tax.effectiveTo ?? 'Perpetual'}',
-                                  style: GoogleFonts.inter(fontSize: 10, color: kcPrimaryDark, fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      color: kcPrimaryDark,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
                           ],
@@ -763,18 +897,25 @@ class SettingsView extends StackedView<SettingsViewModel> {
                       DataCell(
                         Text(
                           '${tax.rate.toStringAsFixed(2)}%',
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: kcPrimaryDark, fontSize: 14),
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w800,
+                              color: kcPrimaryDark,
+                              fontSize: 14),
                         ),
                       ),
                       // Type
-                      DataCell(Text(tax.taxType.toUpperCase(), style: GoogleFonts.inter(fontWeight: FontWeight.w600))),
+                      DataCell(Text(tax.taxType.toUpperCase(),
+                          style:
+                              GoogleFonts.inter(fontWeight: FontWeight.w600))),
                       // Applicability
-                      DataCell(Text(tax.applicability.toUpperCase(), style: GoogleFonts.inter(fontSize: 12))),
+                      DataCell(Text(tax.applicability.toUpperCase(),
+                          style: GoogleFonts.inter(fontSize: 12))),
                       // Default Badge
                       DataCell(
                         tax.isDefault
                             ? Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
                                   color: kcPrimaryColor.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
@@ -788,12 +929,14 @@ class SettingsView extends StackedView<SettingsViewModel> {
                                   ),
                                 ),
                               )
-                            : const Text('-', style: TextStyle(color: kcMediumGrey)),
+                            : const Text('-',
+                                style: TextStyle(color: kcMediumGrey)),
                       ),
                       // Status Badge
                       DataCell(
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: tax.isActive
                                 ? kcSuccessColor.withValues(alpha: 0.15)
@@ -805,7 +948,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
-                              color: tax.isActive ? kcSuccessColor : kcMediumGrey,
+                              color:
+                                  tax.isActive ? kcSuccessColor : kcMediumGrey,
                             ),
                           ),
                         ),
@@ -816,24 +960,35 @@ class SettingsView extends StackedView<SettingsViewModel> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined, size: 18, color: kcPrimaryDark),
+                              icon: const Icon(Icons.edit_outlined,
+                                  size: 18, color: kcPrimaryDark),
                               tooltip: 'Edit Tax Slab',
-                              onPressed: () => _openEditTaxDialog(context, viewModel, tax),
+                              onPressed: () =>
+                                  _openEditTaxDialog(context, viewModel, tax),
                             ),
                             IconButton(
                               icon: Icon(
-                                tax.isActive ? Icons.toggle_on : Icons.toggle_off,
+                                tax.isActive
+                                    ? Icons.toggle_on
+                                    : Icons.toggle_off,
                                 size: 24,
-                                color: tax.isActive ? kcSuccessColor : kcMediumGrey,
+                                color: tax.isActive
+                                    ? kcSuccessColor
+                                    : kcMediumGrey,
                               ),
-                              tooltip: tax.isActive ? 'Deactivate Tax' : 'Activate Tax',
-                              onPressed: () => viewModel.toggleTaxRateStatus(tax.id),
+                              tooltip: tax.isActive
+                                  ? 'Deactivate Tax'
+                                  : 'Activate Tax',
+                              onPressed: () =>
+                                  viewModel.toggleTaxRateStatus(tax.id),
                             ),
                             if (!tax.isDefault)
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, size: 18, color: kcErrorColor),
+                                icon: const Icon(Icons.delete_outline,
+                                    size: 18, color: kcErrorColor),
                                 tooltip: 'Delete Tax Slab',
-                                onPressed: () => viewModel.deleteTaxRate(tax.id),
+                                onPressed: () =>
+                                    viewModel.deleteTaxRate(tax.id),
                               ),
                           ],
                         ),
@@ -895,11 +1050,13 @@ class SettingsView extends StackedView<SettingsViewModel> {
         isDense: true,
         filled: true,
         fillColor: readOnly ? const Color(0xFFF1F5F9) : Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: readOnly ? kcBorderColor : kcBorderColor),
+          borderSide:
+              BorderSide(color: readOnly ? kcBorderColor : kcBorderColor),
         ),
       ),
     );
@@ -915,7 +1072,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
     );
   }
 
-  void _openEditTaxDialog(BuildContext context, SettingsViewModel viewModel, TaxRateModel tax) {
+  void _openEditTaxDialog(
+      BuildContext context, SettingsViewModel viewModel, TaxRateModel tax) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -949,7 +1107,8 @@ class SettingsView extends StackedView<SettingsViewModel> {
   }
 
   @override
-  SettingsViewModel viewModelBuilder(BuildContext context) => SettingsViewModel();
+  SettingsViewModel viewModelBuilder(BuildContext context) =>
+      SettingsViewModel();
 
   @override
   void onViewModelReady(SettingsViewModel viewModel) {
@@ -1064,7 +1223,8 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsView._sectionHeader('Company Logo & Brand Identity', Icons.image_outlined),
+          SettingsView._sectionHeader(
+              'Company Logo & Brand Identity', Icons.image_outlined),
           const SizedBox(height: 16),
           // Logo card
           Container(
@@ -1100,9 +1260,11 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                       child: Builder(
                         builder: (context) {
                           if (viewModel.previewLogoBytes != null) {
-                            return Image.memory(viewModel.previewLogoBytes!, fit: BoxFit.contain);
+                            return Image.memory(viewModel.previewLogoBytes!,
+                                fit: BoxFit.contain);
                           }
-                          final rawUrl = (s.logoUrl != null && s.logoUrl!.isNotEmpty)
+                          final rawUrl = (s.logoUrl != null &&
+                                  s.logoUrl!.isNotEmpty)
                               ? s.logoUrl
                               : ((s.logoPath != null && s.logoPath!.isNotEmpty)
                                   ? s.logoPath
@@ -1114,7 +1276,8 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                               key: ValueKey(resolved),
                               fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(Icons.water_drop, color: kcPrimaryColor, size: 40),
+                                child: Icon(Icons.water_drop,
+                                    color: kcPrimaryColor, size: 40),
                               ),
                             );
                           }
@@ -1122,11 +1285,15 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.add_photo_alternate_outlined, color: kcTextMuted, size: 36),
+                                Icon(Icons.add_photo_alternate_outlined,
+                                    color: kcTextMuted, size: 36),
                                 SizedBox(height: 4),
                                 Text(
                                   'No Logo',
-                                  style: TextStyle(fontSize: 11, color: kcMediumGrey, fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: kcMediumGrey,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -1143,33 +1310,47 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                     children: [
                       Text(
                         'Upload Company Logo',
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: kcDeepNavy),
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            color: kcDeepNavy),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Prominently displayed on the application sidebar, dashboard header, and printed A4 tax invoices.\nSupported formats: PNG, JPG, WEBP, SVG (Max file size: 2MB).',
-                        style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: kcMediumGrey),
                       ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
                           ElevatedButton.icon(
-                            onPressed: viewModel.isUploadingLogo ? null : widget.onPickLogo,
-                            icon: const Icon(Icons.upload_file, size: 16, color: Colors.white),
+                            onPressed: viewModel.isUploadingLogo
+                                ? null
+                                : widget.onPickLogo,
+                            icon: const Icon(Icons.upload_file,
+                                size: 16, color: Colors.white),
                             label: Text(
-                              viewModel.isUploadingLogo ? 'Uploading...' : 'Choose Logo File',
+                              viewModel.isUploadingLogo
+                                  ? 'Uploading...'
+                                  : 'Choose Logo File',
                               style: const TextStyle(color: Colors.white),
                             ),
-                            style: ElevatedButton.styleFrom(backgroundColor: kcPrimaryColor),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kcPrimaryColor),
                           ),
-                          if (s.logoPath != null || viewModel.previewLogoBytes != null) ...[
+                          if (s.logoPath != null ||
+                              viewModel.previewLogoBytes != null) ...[
                             const SizedBox(width: 12),
                             OutlinedButton.icon(
                               onPressed: viewModel.deleteCompanyLogo,
-                              icon: const Icon(Icons.delete_outline, size: 16, color: kcErrorColor),
-                              label: const Text('Remove Logo', style: TextStyle(color: kcErrorColor)),
+                              icon: const Icon(Icons.delete_outline,
+                                  size: 16, color: kcErrorColor),
+                              label: const Text('Remove Logo',
+                                  style: TextStyle(color: kcErrorColor)),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: kcErrorColor.withValues(alpha: 0.5)),
+                                side: BorderSide(
+                                    color: kcErrorColor.withValues(alpha: 0.5)),
                               ),
                             ),
                           ],
@@ -1183,7 +1364,8 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           ),
 
           const SizedBox(height: 24),
-          SettingsView._sectionHeader('Legal & Contact Credentials', Icons.badge_outlined),
+          SettingsView._sectionHeader(
+              'Legal & Contact Credentials', Icons.badge_outlined),
           const SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1197,16 +1379,21 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                       controller: _nameController,
                       label: 'Company Legal Name (Aqua User)',
                       readOnly: true,
-                      prefixIcon: const Icon(Icons.lock_outline, size: 18, color: kcMediumGrey),
+                      prefixIcon: const Icon(Icons.lock_outline,
+                          size: 18, color: kcMediumGrey),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.info_outline, size: 12, color: kcMediumGrey),
+                        const Icon(Icons.info_outline,
+                            size: 12, color: kcMediumGrey),
                         const SizedBox(width: 4),
                         Text(
                           'Registered via Aqua User Super Admin (read-only)',
-                          style: GoogleFonts.inter(fontSize: 11, color: kcMediumGrey, fontWeight: FontWeight.w500),
+                          style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: kcMediumGrey,
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -1215,7 +1402,10 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _taglineController, label: 'Tagline / Slogan', hint: 'Pure & Hygienic Water'),
+                child: SettingsView._buildTextField(
+                    controller: _taglineController,
+                    label: 'Tagline / Slogan',
+                    hint: 'Pure & Hygienic Water'),
               ),
             ],
           ),
@@ -1223,15 +1413,22 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           Row(
             children: [
               Expanded(
-                child: SettingsView._buildTextField(controller: _phoneController, label: 'Primary Contact Phone *'),
+                child: SettingsView._buildTextField(
+                    controller: _phoneController,
+                    label: 'Primary Contact Phone *'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _emailController, label: 'Billing Support Email *'),
+                child: SettingsView._buildTextField(
+                    controller: _emailController,
+                    label: 'Billing Support Email *'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _websiteController, label: 'Website URL', hint: 'https://marinaaqua.com'),
+                child: SettingsView._buildTextField(
+                    controller: _websiteController,
+                    label: 'Website URL',
+                    hint: 'https://marinaaqua.com'),
               ),
             ],
           ),
@@ -1239,28 +1436,39 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           SettingsView._buildTextField(
             controller: _addressController,
             label: 'Registered Office Address *',
-            hint: 'Plot No. 14, Rajiv Gandhi Salai (OMR), Chennai, Tamil Nadu - 600097',
+            hint:
+                'Plot No. 14, Rajiv Gandhi Salai (OMR), Chennai, Tamil Nadu - 600097',
             maxLines: 2,
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<String>(
-            initialValue: kGstSupplyCodes.any((c) => c.code == _stateCodeController.text.trim())
-                ? kGstSupplyCodes.firstWhere((c) => c.code == _stateCodeController.text.trim()).displayName
+            initialValue: kGstSupplyCodes
+                    .any((c) => c.code == _stateCodeController.text.trim())
+                ? kGstSupplyCodes
+                    .firstWhere(
+                        (c) => c.code == _stateCodeController.text.trim())
+                    .displayName
                 : null,
             decoration: const InputDecoration(
               labelText: 'Supply / State Code (Dropdown Selection)',
               border: OutlineInputBorder(),
               isDense: true,
-              prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: kcPrimaryColor),
+              prefixIcon: Icon(Icons.location_on_outlined,
+                  size: 20, color: kcPrimaryColor),
             ),
             hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
-            items: kGstSupplyCodes.map((c) => DropdownMenuItem(
-                  value: c.displayName,
-                  child: Text(c.displayName, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
-                )).toList(),
+            items: kGstSupplyCodes
+                .map((c) => DropdownMenuItem(
+                      value: c.displayName,
+                      child: Text(c.displayName,
+                          style: GoogleFonts.inter(
+                              fontSize: 13, fontWeight: FontWeight.w500)),
+                    ))
+                .toList(),
             onChanged: (val) {
               if (val != null) {
-                final matched = kGstSupplyCodes.firstWhere((c) => c.displayName == val);
+                final matched =
+                    kGstSupplyCodes.firstWhere((c) => c.displayName == val);
                 _stateCodeController.text = matched.code;
                 _stateNameController.text = matched.stateName;
               }
@@ -1270,11 +1478,17 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           Row(
             children: [
               Expanded(
-                child: SettingsView._buildTextField(controller: _stateNameController, label: 'State Name *', hint: 'Tamil Nadu'),
+                child: SettingsView._buildTextField(
+                    controller: _stateNameController,
+                    label: 'State Name *',
+                    hint: 'Tamil Nadu'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _stateCodeController, label: 'State Code (GST) *', hint: '33'),
+                child: SettingsView._buildTextField(
+                    controller: _stateCodeController,
+                    label: 'State Code (GST) *',
+                    hint: '33'),
               ),
             ],
           ),
@@ -1326,10 +1540,12 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Company Profile', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Company Profile',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),
@@ -1370,11 +1586,14 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
     super.initState();
     final s = widget.settings;
     _prefixController = TextEditingController(text: s.invoicePrefix);
-    _paddingController = TextEditingController(text: s.invoiceNumberPadding.toString());
-    _nextNumberController = TextEditingController(text: s.nextInvoiceNumber.toString());
+    _paddingController =
+        TextEditingController(text: s.invoiceNumberPadding.toString());
+    _nextNumberController =
+        TextEditingController(text: s.nextInvoiceNumber.toString());
     _currencySymbolController = TextEditingController(text: s.currencySymbol);
     _currencyCodeController = TextEditingController(text: s.currencyCode);
-    _defaultTaxController = TextEditingController(text: s.defaultTaxRate.toStringAsFixed(2));
+    _defaultTaxController =
+        TextEditingController(text: s.defaultTaxRate.toStringAsFixed(2));
     _termsController = TextEditingController(text: s.invoiceFooterNotes);
   }
 
@@ -1383,11 +1602,14 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
     super.didUpdateWidget(oldWidget);
     if (widget.settings != oldWidget.settings) {
       _syncIfChanged(_prefixController, widget.settings.invoicePrefix);
-      _syncIfChanged(_paddingController, widget.settings.invoiceNumberPadding.toString());
-      _syncIfChanged(_nextNumberController, widget.settings.nextInvoiceNumber.toString());
+      _syncIfChanged(
+          _paddingController, widget.settings.invoiceNumberPadding.toString());
+      _syncIfChanged(
+          _nextNumberController, widget.settings.nextInvoiceNumber.toString());
       _syncIfChanged(_currencySymbolController, widget.settings.currencySymbol);
       _syncIfChanged(_currencyCodeController, widget.settings.currencyCode);
-      _syncIfChanged(_defaultTaxController, widget.settings.defaultTaxRate.toStringAsFixed(2));
+      _syncIfChanged(_defaultTaxController,
+          widget.settings.defaultTaxRate.toStringAsFixed(2));
       _syncIfChanged(_termsController, widget.settings.invoiceFooterNotes);
     }
   }
@@ -1425,7 +1647,8 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsView._sectionHeader('Invoice Numbering Sequence & Rules', Icons.tag),
+          SettingsView._sectionHeader(
+              'Invoice Numbering Sequence & Rules', Icons.tag),
           const SizedBox(height: 8),
           Text(
             'Invoices are generated automatically in the format: {PREFIX}-{SEQUENCE} or pure sequence numbers ({SEQUENCE}) if prefix is empty.',
@@ -1459,9 +1682,9 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
               ),
             ],
           ),
-
           const SizedBox(height: 24),
-          SettingsView._sectionHeader('Currency & Default Tax Preferences', Icons.currency_rupee),
+          SettingsView._sectionHeader(
+              'Currency & Default Tax Preferences', Icons.currency_rupee),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -1491,16 +1714,15 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
               ),
             ],
           ),
-
           const SizedBox(height: 24),
-          SettingsView._sectionHeader('Invoice Declaration', Icons.description_outlined),
+          SettingsView._sectionHeader(
+              'Invoice Declaration', Icons.description_outlined),
           const SizedBox(height: 16),
           SettingsView._buildTextField(
             controller: _termsController,
             label: 'Standard Declaration on Invoices',
             maxLines: 3,
           ),
-
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -1508,19 +1730,26 @@ class _InvoiceRulesFormState extends State<_InvoiceRulesForm> {
               onPressed: () {
                 viewModel.updateCompanySettings({
                   'invoice_prefix': _prefixController.text.trim().toUpperCase(),
-                  'invoice_number_padding': int.tryParse(_paddingController.text.trim()) ?? 4,
-                  'next_invoice_number': int.tryParse(_nextNumberController.text.trim()) ?? 1,
+                  'invoice_number_padding':
+                      int.tryParse(_paddingController.text.trim()) ?? 4,
+                  'next_invoice_number':
+                      int.tryParse(_nextNumberController.text.trim()) ?? 1,
                   'currency_symbol': _currencySymbolController.text.trim(),
-                  'currency_code': _currencyCodeController.text.trim().toUpperCase(),
-                  'default_tax_rate': double.tryParse(_defaultTaxController.text.trim()) ?? 18.0,
+                  'currency_code':
+                      _currencyCodeController.text.trim().toUpperCase(),
+                  'default_tax_rate':
+                      double.tryParse(_defaultTaxController.text.trim()) ??
+                          18.0,
                   'invoice_footer_notes': _termsController.text.trim(),
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Billing Preferences', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Billing Preferences',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),
@@ -1608,7 +1837,8 @@ class _BankCredentialsFormState extends State<_BankCredentialsForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsView._sectionHeader('Bank Account & Remittance Credentials', Icons.account_balance),
+          SettingsView._sectionHeader(
+              'Bank Account & Remittance Credentials', Icons.account_balance),
           const SizedBox(height: 8),
           Text(
             'These banking details will appear on the footer of all issued tax invoices and printouts.',
@@ -1618,11 +1848,17 @@ class _BankCredentialsFormState extends State<_BankCredentialsForm> {
           Row(
             children: [
               Expanded(
-                child: SettingsView._buildTextField(controller: _bankNameController, label: 'Bank Name *', hint: 'State Bank of India'),
+                child: SettingsView._buildTextField(
+                    controller: _bankNameController,
+                    label: 'Bank Name *',
+                    hint: 'State Bank of India'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _bankBranchController, label: 'Branch Name', hint: 'Thoraipakkam, Chennai'),
+                child: SettingsView._buildTextField(
+                    controller: _bankBranchController,
+                    label: 'Branch Name',
+                    hint: 'Thoraipakkam, Chennai'),
               ),
             ],
           ),
@@ -1631,19 +1867,26 @@ class _BankCredentialsFormState extends State<_BankCredentialsForm> {
             children: [
               Expanded(
                 flex: 2,
-                child: SettingsView._buildTextField(controller: _accountNumberController, label: 'Account Number *'),
+                child: SettingsView._buildTextField(
+                    controller: _accountNumberController,
+                    label: 'Account Number *'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _ifscCodeController, label: 'IFSC Code *', hint: 'SBIN0004567'),
+                child: SettingsView._buildTextField(
+                    controller: _ifscCodeController,
+                    label: 'IFSC Code *',
+                    hint: 'SBIN0004567'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: SettingsView._buildTextField(controller: _upiIdController, label: 'UPI ID / VPA', hint: 'marinaaqua@sbi'),
+                child: SettingsView._buildTextField(
+                    controller: _upiIdController,
+                    label: 'UPI ID / VPA',
+                    hint: 'marinaaqua@sbi'),
               ),
             ],
           ),
-
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.centerRight,
@@ -1658,10 +1901,12 @@ class _BankCredentialsFormState extends State<_BankCredentialsForm> {
                 });
               },
               icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Bank Credentials', style: TextStyle(color: Colors.white)),
+              label: const Text('Save Bank Credentials',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
             ),
           ),

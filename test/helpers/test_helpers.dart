@@ -30,8 +30,10 @@ import 'test_helpers.mocks.dart';
     MockSpec<DashboardService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<ProductMasterService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<DealerService>(onMissingStub: OnMissingStub.returnDefault),
-    MockSpec<DailyCollectionService>(onMissingStub: OnMissingStub.returnDefault),
-    MockSpec<DealerLedgerReportService>(onMissingStub: OnMissingStub.returnDefault),
+    MockSpec<DailyCollectionService>(
+        onMissingStub: OnMissingStub.returnDefault),
+    MockSpec<DealerLedgerReportService>(
+        onMissingStub: OnMissingStub.returnDefault),
     MockSpec<InventoryService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<BillingService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<SettingsService>(onMissingStub: OnMissingStub.returnDefault),
@@ -189,8 +191,7 @@ MockSettingsService getAndRegisterSettingsService({
       .thenAnswer((_) async => settings);
   when(service.loadCompanySettings(forceRefresh: true))
       .thenAnswer((_) async => settings);
-  when(service.getCompanySettings())
-      .thenAnswer((_) async => settings);
+  when(service.getCompanySettings()).thenAnswer((_) async => settings);
   when(service.isInitialized).thenReturn(true);
   when(service.isLoading).thenReturn(false);
   locator.registerSingleton<SettingsService>(service);

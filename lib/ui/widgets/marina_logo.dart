@@ -31,7 +31,9 @@ class MarinaLogo extends StatelessWidget {
     Widget buildContent(String? effectiveLogo, String? effectiveName) {
       final rawLogo = (logoUrl != null && logoUrl!.isNotEmpty)
           ? logoUrl
-          : ((effectiveLogo != null && effectiveLogo.isNotEmpty) ? effectiveLogo : null);
+          : ((effectiveLogo != null && effectiveLogo.isNotEmpty)
+              ? effectiveLogo
+              : null);
 
       final finalLogo = ApiService.resolveLogoUrl(rawLogo);
 
@@ -186,7 +188,10 @@ class MarinaLogo extends StatelessWidget {
 
     // If explicit companyName and logoUrl are provided by parent (e.g. sidebar or home view),
     // use them directly without creating redundant nested Listenables
-    if (companyName != null && companyName!.isNotEmpty && logoUrl != null && logoUrl!.isNotEmpty) {
+    if (companyName != null &&
+        companyName!.isNotEmpty &&
+        logoUrl != null &&
+        logoUrl!.isNotEmpty) {
       return buildContent(logoUrl, companyName);
     }
 
@@ -216,7 +221,8 @@ class MarinaLogo extends StatelessWidget {
                   ? settings.logoPath
                   : user?.companyLogo));
 
-      final effectiveName = (companyName != null && companyName!.trim().isNotEmpty)
+      final effectiveName = (companyName != null &&
+              companyName!.trim().isNotEmpty)
           ? companyName
           : ((settingsService?.isInitialized == true &&
                   settings?.companyName != null &&

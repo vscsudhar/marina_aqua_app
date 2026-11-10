@@ -18,7 +18,8 @@ class HomeViewModel extends ReactiveViewModel {
   final _settingsService = locator<SettingsService>();
 
   @override
-  List<ListenableServiceMixin> get listenableServices => [_authService, _settingsService];
+  List<ListenableServiceMixin> get listenableServices =>
+      [_authService, _settingsService];
 
   CompanySettingModel get settings => _settingsService.settings;
 
@@ -139,7 +140,8 @@ class HomeViewModel extends ReactiveViewModel {
     } on ApiException catch (e) {
       _errorMessage = e.message;
     } catch (e) {
-      _errorMessage = 'Unable to load real-time dashboard data. Please verify your connection.';
+      _errorMessage =
+          'Unable to load real-time dashboard data. Please verify your connection.';
     } finally {
       _isLoading = false;
       notifyListeners();

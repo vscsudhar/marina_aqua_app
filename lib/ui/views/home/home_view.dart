@@ -16,6 +16,7 @@ import 'package:marina_aqua/ui/views/bottle_ledger/bottle_ledger_view.dart';
 import 'package:marina_aqua/ui/views/dealers/dealers_view.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_view.dart';
 import 'package:marina_aqua/ui/views/products/products_view.dart';
+import 'package:marina_aqua/ui/views/damaged_products/damaged_products_view.dart';
 import 'package:marina_aqua/ui/views/purchases/purchases_view.dart';
 import 'package:marina_aqua/ui/views/settings/settings_view.dart';
 import 'package:marina_aqua/ui/widgets/app_sidebar.dart';
@@ -86,6 +87,8 @@ class HomeView extends StackedView<HomeViewModel> {
         return DealersView(onBack: onBack);
       case 'products':
         return ProductsView(onBack: onBack);
+      case 'damaged_products':
+        return DamagedProductsView(onBack: onBack);
       case 'purchases':
         return PurchasesView(onBack: onBack);
       case 'invoices':

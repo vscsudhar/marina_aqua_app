@@ -37,7 +37,8 @@ class PurchasesViewModel extends BaseViewModel {
 
   List<ProductModel> _products = [];
   List<ProductModel> get products => _products;
-  List<ProductModel> get trackedProducts => _products.where((p) => p.trackStock).toList();
+  List<ProductModel> get trackedProducts =>
+      _products.where((p) => p.trackStock).toList();
 
   List<InventoryMovementModel> _movements = [];
   List<InventoryMovementModel> get movements => _movements;
@@ -131,8 +132,12 @@ class PurchasesViewModel extends BaseViewModel {
         supplierId: _selectedSupplierFilter,
         status: _selectedStatusFilter,
         search: _searchQuery.isNotEmpty ? _searchQuery : null,
-        startDate: _startDate != null ? DateFormat('yyyy-MM-dd').format(_startDate!) : null,
-        endDate: _endDate != null ? DateFormat('yyyy-MM-dd').format(_endDate!) : null,
+        startDate: _startDate != null
+            ? DateFormat('yyyy-MM-dd').format(_startDate!)
+            : null,
+        endDate: _endDate != null
+            ? DateFormat('yyyy-MM-dd').format(_endDate!)
+            : null,
       );
       _purchases = res.items;
       notifyListeners();
@@ -219,7 +224,8 @@ class PurchasesViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> openEditPurchase(BuildContext context, PurchaseModel purchase) async {
+  Future<void> openEditPurchase(
+      BuildContext context, PurchaseModel purchase) async {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -238,7 +244,8 @@ class PurchasesViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> openPurchaseDetails(BuildContext context, PurchaseModel purchase) async {
+  Future<void> openPurchaseDetails(
+      BuildContext context, PurchaseModel purchase) async {
     await showDialog(
       context: context,
       builder: (ctx) => PurchaseDetailDialog(
@@ -252,7 +259,8 @@ class PurchasesViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> openStockAdjustment(BuildContext context, [ProductModel? product]) async {
+  Future<void> openStockAdjustment(BuildContext context,
+      [ProductModel? product]) async {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -286,7 +294,8 @@ class PurchasesViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> openEditSupplier(BuildContext context, SupplierModel supplier) async {
+  Future<void> openEditSupplier(
+      BuildContext context, SupplierModel supplier) async {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -312,7 +321,8 @@ class PurchasesViewModel extends BaseViewModel {
   // ==========================================
 
   Map<String, dynamic> _preparePurchasesExportData() {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final headers = [
       'Date',
       'Purchase No',
@@ -334,7 +344,9 @@ class PurchasesViewModel extends BaseViewModel {
 
     for (final p in _purchases) {
       final parsedDate = DateTime.tryParse(p.purchaseDate);
-      final dateStr = parsedDate != null ? DateFormat('dd-MM-yyyy').format(parsedDate) : p.purchaseDate;
+      final dateStr = parsedDate != null
+          ? DateFormat('dd-MM-yyyy').format(parsedDate)
+          : p.purchaseDate;
       final sub = p.subtotal;
       final tax = p.taxAmount;
       final disc = p.discountAmount;
@@ -382,7 +394,8 @@ class PurchasesViewModel extends BaseViewModel {
         'Supplier': _suppliers
             .firstWhere(
               (s) => s.id == _selectedSupplierFilter,
-              orElse: () => const SupplierModel(id: 0, code: '', name: 'Unknown', phone: ''),
+              orElse: () => const SupplierModel(
+                  id: 0, code: '', name: 'Unknown', phone: ''),
             )
             .name,
       if (_selectedStatusFilter != null && _selectedStatusFilter!.isNotEmpty)
@@ -425,8 +438,10 @@ class PurchasesViewModel extends BaseViewModel {
         isLandscape: true,
       );
 
-      final fileName = 'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-      _exportPrintService.downloadBytes(pdfBytes, fileName, ExportPrintService.mimePdf);
+      final fileName =
+          'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      _exportPrintService.downloadBytes(
+          pdfBytes, fileName, ExportPrintService.mimePdf);
       _exportSuccessMessage = 'Purchases PDF downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export PDF failed: $e';
@@ -453,8 +468,10 @@ class PurchasesViewModel extends BaseViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
-      _exportPrintService.downloadBytes(excelBytes, fileName, ExportPrintService.mimeExcel);
+      final fileName =
+          'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
+      _exportPrintService.downloadBytes(
+          excelBytes, fileName, ExportPrintService.mimeExcel);
       _exportSuccessMessage = 'Purchases Excel downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export Excel failed: $e';
@@ -480,8 +497,10 @@ class PurchasesViewModel extends BaseViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
-      _exportPrintService.downloadBytes(csvBytes, fileName, ExportPrintService.mimeCsv);
+      final fileName =
+          'Purchase_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+      _exportPrintService.downloadBytes(
+          csvBytes, fileName, ExportPrintService.mimeCsv);
       _exportSuccessMessage = 'Purchases CSV downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export CSV failed: $e';
@@ -519,7 +538,8 @@ class PurchasesViewModel extends BaseViewModel {
   // ==========================================
 
   Map<String, dynamic> _prepareStockExportData() {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final headers = [
       'SKU',
       'Product Name',
@@ -581,7 +601,8 @@ class PurchasesViewModel extends BaseViewModel {
     ];
 
     final metadata = {
-      'Generated Date': DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now()),
+      'Generated Date':
+          DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now()),
       'Tracked SKUs': '${trackedProducts.length}',
       'Low Stock Items': '$lowStockCount',
     };
@@ -620,8 +641,10 @@ class PurchasesViewModel extends BaseViewModel {
         isLandscape: true,
       );
 
-      final fileName = 'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-      _exportPrintService.downloadBytes(pdfBytes, fileName, ExportPrintService.mimePdf);
+      final fileName =
+          'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      _exportPrintService.downloadBytes(
+          pdfBytes, fileName, ExportPrintService.mimePdf);
       _exportSuccessMessage = 'Stock report PDF downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export PDF failed: $e';
@@ -640,7 +663,8 @@ class PurchasesViewModel extends BaseViewModel {
       final data = _prepareStockExportData();
       final excelBytes = _exportPrintService.generateExcel(
         title: 'Inventory Stock & Valuation Report',
-        subtitle: '${_settingsService.settings.companyName} Product Stock Valuation',
+        subtitle:
+            '${_settingsService.settings.companyName} Product Stock Valuation',
         sheetName: 'Stock Valuation',
         headers: data['headers'] as List<String>,
         rows: data['rows'] as List<List<String>>,
@@ -648,8 +672,10 @@ class PurchasesViewModel extends BaseViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
-      _exportPrintService.downloadBytes(excelBytes, fileName, ExportPrintService.mimeExcel);
+      final fileName =
+          'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
+      _exportPrintService.downloadBytes(
+          excelBytes, fileName, ExportPrintService.mimeExcel);
       _exportSuccessMessage = 'Stock report Excel downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export Excel failed: $e';
@@ -675,8 +701,10 @@ class PurchasesViewModel extends BaseViewModel {
         metadata: data['metadata'] as Map<String, String>,
       );
 
-      final fileName = 'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
-      _exportPrintService.downloadBytes(csvBytes, fileName, ExportPrintService.mimeCsv);
+      final fileName =
+          'Stock_Valuation_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+      _exportPrintService.downloadBytes(
+          csvBytes, fileName, ExportPrintService.mimeCsv);
       _exportSuccessMessage = 'Stock report CSV downloaded ($fileName).';
     } catch (e) {
       _errorMessage = 'Export CSV failed: $e';
@@ -709,4 +737,3 @@ class PurchasesViewModel extends BaseViewModel {
     );
   }
 }
-

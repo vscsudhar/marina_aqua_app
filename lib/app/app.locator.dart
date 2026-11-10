@@ -1,4 +1,3 @@
-import '../services/user_management_service.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format width=80
 
@@ -17,6 +16,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/billing_service.dart';
 import '../services/daily_collection_service.dart';
+import '../services/damaged_product_service.dart';
 import '../services/dashboard_service.dart';
 import '../services/dealer_ledger_report_service.dart';
 import '../services/dealer_service.dart';
@@ -25,6 +25,7 @@ import '../services/inventory_service.dart';
 import '../services/product_master_service.dart';
 import '../services/settings_service.dart';
 import '../services/storage_service.dart';
+import '../services/user_management_service.dart';
 
 final locator = StackedLocator.instance;
 
@@ -51,4 +52,5 @@ Future<void> setupLocator(
   locator.registerLazySingleton(() => SettingsService());
   locator.registerLazySingleton(() => UserManagementService());
   locator.registerLazySingleton(() => ExportPrintService());
+  locator.registerLazySingleton(() => DamagedProductService());
 }

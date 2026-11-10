@@ -14,7 +14,8 @@ enum DashboardDateFilter {
 class DateFilterSelector extends StatelessWidget {
   final DashboardDateFilter activeFilter;
   final DateTime selectedDate;
-  final Function(DashboardDateFilter filter, DateTime? customDate) onFilterChanged;
+  final Function(DashboardDateFilter filter, DateTime? customDate)
+      onFilterChanged;
 
   const DateFilterSelector({
     super.key,
@@ -65,10 +66,14 @@ class DateFilterSelector extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: activeFilter == DashboardDateFilter.custom ? kcPrimaryColor : kcSurfaceWhite,
+              color: activeFilter == DashboardDateFilter.custom
+                  ? kcPrimaryColor
+                  : kcSurfaceWhite,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: activeFilter == DashboardDateFilter.custom ? kcPrimaryColor : kcBorderColor,
+                color: activeFilter == DashboardDateFilter.custom
+                    ? kcPrimaryColor
+                    : kcBorderColor,
               ),
             ),
             child: Row(
@@ -77,15 +82,21 @@ class DateFilterSelector extends StatelessWidget {
                 Icon(
                   Icons.calendar_today_rounded,
                   size: 14,
-                  color: activeFilter == DashboardDateFilter.custom ? Colors.white : kcPrimaryDark,
+                  color: activeFilter == DashboardDateFilter.custom
+                      ? Colors.white
+                      : kcPrimaryDark,
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  activeFilter == DashboardDateFilter.custom ? formattedDate : 'Calendar',
+                  activeFilter == DashboardDateFilter.custom
+                      ? formattedDate
+                      : 'Calendar',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: activeFilter == DashboardDateFilter.custom ? Colors.white : kcTextPrimary,
+                    color: activeFilter == DashboardDateFilter.custom
+                        ? Colors.white
+                        : kcTextPrimary,
                   ),
                 ),
               ],

@@ -16,7 +16,8 @@ class RecentTransactionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
 
     return Container(
       padding: const EdgeInsets.all(22),
@@ -47,7 +48,8 @@ class RecentTransactionsList extends StatelessWidget {
                         color: kcPrimaryColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.history_rounded, color: kcPrimaryColor, size: 20),
+                      child: const Icon(Icons.history_rounded,
+                          color: kcPrimaryColor, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
@@ -89,7 +91,8 @@ class RecentTransactionsList extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: transactions.length,
-              separatorBuilder: (_, __) => const Divider(color: kcBorderColor, height: 16),
+              separatorBuilder: (_, __) =>
+                  const Divider(color: kcBorderColor, height: 16),
               itemBuilder: (context, index) {
                 final tx = transactions[index];
                 final isSupply = tx.isSupply;
@@ -107,7 +110,9 @@ class RecentTransactionsList extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isSupply ? Icons.local_shipping_outlined : Icons.payments_outlined,
+                        isSupply
+                            ? Icons.local_shipping_outlined
+                            : Icons.payments_outlined,
                         color: isSupply ? kcPrimaryColor : kcSuccessColor,
                         size: 18,
                       ),
@@ -171,7 +176,8 @@ class RecentTransactionsList extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: isSupply
                                 ? kcPrimaryColor.withValues(alpha: 0.08)
@@ -210,7 +216,8 @@ class RecentTransactionsList extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.receipt_long_outlined, size: 36, color: kcLightGrey),
+            const Icon(Icons.receipt_long_outlined,
+                size: 36, color: kcLightGrey),
             const SizedBox(height: 8),
             Text(
               'No recent supplies or collections recorded.',

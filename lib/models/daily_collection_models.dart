@@ -53,7 +53,8 @@ class DailySuppliesSummary {
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
       totalQuantity: (json['total_quantity'] as num?)?.toDouble() ?? 0.0,
       paidAmount: (json['paid_amount'] as num?)?.toDouble() ?? 0.0,
-      outstandingAmount: (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
+      outstandingAmount:
+          (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
       unpaidCount: (json['unpaid_count'] as num?)?.toInt() ?? 0,
       partiallyPaidCount: (json['partially_paid_count'] as num?)?.toInt() ?? 0,
       paidCount: (json['paid_count'] as num?)?.toInt() ?? 0,
@@ -61,11 +62,14 @@ class DailySuppliesSummary {
   }
 
   String get totalAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(totalAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(totalAmount);
   String get paidAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(paidAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(paidAmount);
   String get outstandingAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(outstandingAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(outstandingAmount);
 }
 
 class DailyCollectionsSummary {
@@ -95,7 +99,8 @@ class DailyCollectionsSummary {
   }
 
   String get totalAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(totalAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(totalAmount);
 }
 
 class DailyDealerItemModel {
@@ -136,20 +141,24 @@ class DailyDealerItemModel {
       contactPerson: json['contact_person'],
       billingAddress: json['billing_address'],
       creditLimit: (json['credit_limit'] as num?)?.toDouble() ?? 0.0,
-      currentOutstanding: (json['current_outstanding'] as num?)?.toDouble() ?? 0.0,
+      currentOutstanding:
+          (json['current_outstanding'] as num?)?.toDouble() ?? 0.0,
       hasSupplyToday: json['has_supply_today'] ?? false,
       todayStatus: json['today_status'] ?? 'no_supply',
       todaySupply: json['today_supply'] != null
           ? DealerSupplyBasicModel.fromJson(json['today_supply'])
           : null,
-      todayCollectedAmount: (json['today_collected_amount'] as num?)?.toDouble() ?? 0.0,
+      todayCollectedAmount:
+          (json['today_collected_amount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   String get outstandingFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(currentOutstanding);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(currentOutstanding);
   String get collectedFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(todayCollectedAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(todayCollectedAmount);
 }
 
 class DealerSupplyBasicModel {
@@ -177,7 +186,8 @@ class DealerSupplyBasicModel {
       supplyNo: json['supply_no'] ?? '',
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
       paidAmount: (json['paid_amount'] as num?)?.toDouble() ?? 0.0,
-      outstandingAmount: (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
+      outstandingAmount:
+          (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
       paymentStatus: json['payment_status'] ?? 'unpaid',
       itemsCount: (json['items_count'] as num?)?.toInt() ?? 0,
     );
@@ -241,13 +251,15 @@ class DealerSupplyModel {
     var rawItems = json['items'];
     List<DealerSupplyItemModel> itemList = [];
     if (rawItems is List) {
-      itemList = rawItems.map((e) => DealerSupplyItemModel.fromJson(e)).toList();
+      itemList =
+          rawItems.map((e) => DealerSupplyItemModel.fromJson(e)).toList();
     }
 
     var rawPayments = json['payments'];
     List<DealerPaymentModel> paymentList = [];
     if (rawPayments is List) {
-      paymentList = rawPayments.map((e) => DealerPaymentModel.fromJson(e)).toList();
+      paymentList =
+          rawPayments.map((e) => DealerPaymentModel.fromJson(e)).toList();
     }
 
     return DealerSupplyModel(
@@ -265,7 +277,8 @@ class DealerSupplyModel {
       adjustmentAmount: (json['adjustment_amount'] as num?)?.toDouble() ?? 0.0,
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
       paidAmount: (json['paid_amount'] as num?)?.toDouble() ?? 0.0,
-      outstandingAmount: (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
+      outstandingAmount:
+          (json['outstanding_amount'] as num?)?.toDouble() ?? 0.0,
       paymentStatus: json['payment_status'] ?? 'unpaid',
       status: json['status'] ?? 'delivered',
       notes: json['notes'],
@@ -279,11 +292,14 @@ class DealerSupplyModel {
   }
 
   String get totalAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(totalAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(totalAmount);
   String get paidAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(paidAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(paidAmount);
   String get outstandingAmountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(outstandingAmount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(outstandingAmount);
 
   String get formattedTime {
     if (createdAt == null || createdAt!.isEmpty) return '';
@@ -353,9 +369,11 @@ class DealerSupplyItemModel {
   }
 
   String get appliedPriceFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2).format(appliedPrice);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2)
+          .format(appliedPrice);
   String get lineTotalFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(lineTotal);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(lineTotal);
 }
 
 class DealerPaymentModel {
@@ -417,5 +435,6 @@ class DealerPaymentModel {
   }
 
   String get amountFormatted =>
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(amount);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(amount);
 }

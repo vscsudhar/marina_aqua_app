@@ -41,7 +41,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
         surfaceTintColor: Colors.transparent,
         leading: onBack != null
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+                icon: const Icon(Icons.arrow_back_rounded,
+                    color: AppColors.textPrimary),
                 tooltip: 'Back to Dashboard',
                 onPressed: onBack,
               )
@@ -76,7 +77,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
+            icon:
+                const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
             tooltip: 'Refresh Ledger',
             onPressed: viewModel.isBusy ? null : viewModel.loadLedger,
           ),
@@ -112,94 +114,198 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                   _buildBusinessLogicNote(),
                   const SizedBox(height: 14),
 
-                  // Side-by-Side Dual Ledger Tables
+                  // Side-by-Side Dual Ledger Tables or Damage Bottle Ledger Table
                   if (viewModel.report != null) ...[
-                    if (isDesktop)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    // Mode Switcher Bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Left Side: Dealer Bottle Purchase (Without Refill)
-                          Expanded(
-                            child: BottleLedgerTable(
-                              title: viewModel.report!.dealerTable.title,
-                              headerColor: const Color(0xFF0F3460),
-                              productKeys: viewModel.report!.meta.productKeys,
-                              openingStock: viewModel.report!.openingStock,
-                              rows: viewModel.report!.dealerTable.rows,
-                              monthlyTotals: viewModel.report!.dealerTable.monthlyTotals,
-                              monthlyQtyTotals: viewModel.report!.dealerTable.monthlyQtyTotals,
-                              grandTotal: viewModel.report!.dealerTable.grandTotal,
-                              grandQtyTotal: viewModel.report!.dealerTable.grandQtyTotal,
-                              showCountColumn: true,
-                              onCellTap: (date, productKey) => _onCellTap(
-                                context,
-                                viewModel,
-                                date: date,
-                                productKey: productKey,
-                                source: 'dealer',
+                          Row(
+                            children: [
+                              Icon(
+                                viewModel.showDamageLedger
+                                    ? Icons.remove_shopping_cart_rounded
+                                    : Icons.compare_arrows_rounded,
+                                color: viewModel.showDamageLedger
+                                    ? const Color(0xFFE11D48)
+                                    : const Color(0xFF0F3460),
+                                size: 20,
                               ),
-                            ),
+                              const SizedBox(width: 8),
+                              Text(
+                                viewModel.showDamageLedger
+                                    ? 'DAMAGED BOTTLE LEDGER VIEW'
+                                    : 'BOTTLE PURCHASE & SALES DUAL LEDGER',
+                                style: GoogleFonts.outfit(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: viewModel.showDamageLedger
+                                      ? const Color(0xFFE11D48)
+                                      : const Color(0xFF0F3460),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 14),
-                          // Right Side: Supplier Bottle Purchase
-                          Expanded(
-                            child: BottleLedgerTable(
-                              title: viewModel.report!.supplierTable.title,
-                              headerColor: const Color(0xFF005F73),
-                              productKeys: viewModel.report!.meta.productKeys,
-                              openingStock: viewModel.report!.openingStock,
-                              rows: viewModel.report!.supplierTable.rows,
-                              monthlyTotals: viewModel.report!.supplierTable.monthlyTotals,
-                              grandTotal: viewModel.report!.supplierTable.grandTotal,
-                              onCellTap: (date, productKey) => _onCellTap(
-                                context,
-                                viewModel,
-                                date: date,
-                                productKey: productKey,
-                                source: 'supplier',
+                          SegmentedButton<bool>(
+                            segments: const [
+                              ButtonSegment<bool>(
+                                value: false,
+                                label: Text('Dual Purchase Ledger'),
+                                icon: Icon(Icons.compare_arrows_rounded,
+                                    size: 16),
                               ),
-                            ),
+                              ButtonSegment<bool>(
+                                value: true,
+                                label: Text('Damage Bottle Ledger'),
+                                icon: Icon(Icons.remove_shopping_cart_rounded,
+                                    size: 16),
+                              ),
+                            ],
+                            selected: {viewModel.showDamageLedger},
+                            onSelectionChanged: (Set<bool> sel) {
+                              viewModel.toggleDamageLedger(sel.first);
+                            },
                           ),
                         ],
-                      )
-                    else ...[
-                      // Mobile / Tablet stacked
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    if (viewModel.showDamageLedger) ...[
+                      // Single Full Width Damage Bottle Ledger Table
                       BottleLedgerTable(
-                        title: viewModel.report!.dealerTable.title,
-                        headerColor: const Color(0xFF0F3460),
+                        title: viewModel.report!.damageTable?.title ??
+                            'Damage Bottle Ledger',
+                        headerColor: const Color(0xFFE11D48),
                         productKeys: viewModel.report!.meta.productKeys,
                         openingStock: viewModel.report!.openingStock,
-                        rows: viewModel.report!.dealerTable.rows,
-                        monthlyTotals: viewModel.report!.dealerTable.monthlyTotals,
-                        monthlyQtyTotals: viewModel.report!.dealerTable.monthlyQtyTotals,
-                        grandTotal: viewModel.report!.dealerTable.grandTotal,
-                        grandQtyTotal: viewModel.report!.dealerTable.grandQtyTotal,
+                        rows: viewModel.report!.damageTable?.rows ?? [],
+                        monthlyTotals:
+                            viewModel.report!.damageTable?.monthlyTotals ?? {},
+                        monthlyQtyTotals:
+                            viewModel.report!.damageTable?.monthlyQtyTotals ??
+                                {},
+                        grandTotal:
+                            viewModel.report!.damageTable?.grandTotal ?? 0.0,
+                        grandQtyTotal:
+                            viewModel.report!.damageTable?.grandQtyTotal ?? 0.0,
                         showCountColumn: true,
                         onCellTap: (date, productKey) => _onCellTap(
                           context,
                           viewModel,
                           date: date,
                           productKey: productKey,
-                          source: 'dealer',
+                          source: 'damage',
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      BottleLedgerTable(
-                        title: viewModel.report!.supplierTable.title,
-                        headerColor: const Color(0xFF005F73),
-                        productKeys: viewModel.report!.meta.productKeys,
-                        openingStock: viewModel.report!.openingStock,
-                        rows: viewModel.report!.supplierTable.rows,
-                        monthlyTotals: viewModel.report!.supplierTable.monthlyTotals,
-                        grandTotal: viewModel.report!.supplierTable.grandTotal,
-                        onCellTap: (date, productKey) => _onCellTap(
-                          context,
-                          viewModel,
-                          date: date,
-                          productKey: productKey,
-                          source: 'supplier',
+                    ] else ...[
+                      // Dual Dealer & Supplier Tables
+                      if (isDesktop)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left Side: Dealer Bottle Purchase (Without Refill)
+                            Expanded(
+                              child: BottleLedgerTable(
+                                title: viewModel.report!.dealerTable.title,
+                                headerColor: const Color(0xFF0F3460),
+                                productKeys: viewModel.report!.meta.productKeys,
+                                openingStock: viewModel.report!.openingStock,
+                                rows: viewModel.report!.dealerTable.rows,
+                                monthlyTotals:
+                                    viewModel.report!.dealerTable.monthlyTotals,
+                                monthlyQtyTotals: viewModel
+                                    .report!.dealerTable.monthlyQtyTotals,
+                                grandTotal:
+                                    viewModel.report!.dealerTable.grandTotal,
+                                grandQtyTotal:
+                                    viewModel.report!.dealerTable.grandQtyTotal,
+                                showCountColumn: true,
+                                onCellTap: (date, productKey) => _onCellTap(
+                                  context,
+                                  viewModel,
+                                  date: date,
+                                  productKey: productKey,
+                                  source: 'dealer',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            // Right Side: Supplier Bottle Purchase
+                            Expanded(
+                              child: BottleLedgerTable(
+                                title: viewModel.report!.supplierTable.title,
+                                headerColor: const Color(0xFF005F73),
+                                productKeys: viewModel.report!.meta.productKeys,
+                                openingStock: viewModel.report!.openingStock,
+                                rows: viewModel.report!.supplierTable.rows,
+                                monthlyTotals: viewModel
+                                    .report!.supplierTable.monthlyTotals,
+                                grandTotal:
+                                    viewModel.report!.supplierTable.grandTotal,
+                                onCellTap: (date, productKey) => _onCellTap(
+                                  context,
+                                  viewModel,
+                                  date: date,
+                                  productKey: productKey,
+                                  source: 'supplier',
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      else ...[
+                        // Mobile / Tablet stacked
+                        BottleLedgerTable(
+                          title: viewModel.report!.dealerTable.title,
+                          headerColor: const Color(0xFF0F3460),
+                          productKeys: viewModel.report!.meta.productKeys,
+                          openingStock: viewModel.report!.openingStock,
+                          rows: viewModel.report!.dealerTable.rows,
+                          monthlyTotals:
+                              viewModel.report!.dealerTable.monthlyTotals,
+                          monthlyQtyTotals:
+                              viewModel.report!.dealerTable.monthlyQtyTotals,
+                          grandTotal: viewModel.report!.dealerTable.grandTotal,
+                          grandQtyTotal:
+                              viewModel.report!.dealerTable.grandQtyTotal,
+                          showCountColumn: true,
+                          onCellTap: (date, productKey) => _onCellTap(
+                            context,
+                            viewModel,
+                            date: date,
+                            productKey: productKey,
+                            source: 'dealer',
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        BottleLedgerTable(
+                          title: viewModel.report!.supplierTable.title,
+                          headerColor: const Color(0xFF005F73),
+                          productKeys: viewModel.report!.meta.productKeys,
+                          openingStock: viewModel.report!.openingStock,
+                          rows: viewModel.report!.supplierTable.rows,
+                          monthlyTotals:
+                              viewModel.report!.supplierTable.monthlyTotals,
+                          grandTotal:
+                              viewModel.report!.supplierTable.grandTotal,
+                          onCellTap: (date, productKey) => _onCellTap(
+                            context,
+                            viewModel,
+                            date: date,
+                            productKey: productKey,
+                            source: 'supplier',
+                          ),
+                        ),
+                      ],
                     ],
                     const SizedBox(height: 20),
 
@@ -217,8 +323,18 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
     BottleLedgerViewModel viewModel,
   ) {
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     final years = List.generate(7, (i) => DateTime.now().year - 3 + i);
 
@@ -315,7 +431,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         ? null
                         : (val) {
                             if (val != null) {
-                              viewModel.changeMonth(val, viewModel.selectedYear);
+                              viewModel.changeMonth(
+                                  val, viewModel.selectedYear);
                             }
                           },
                   ),
@@ -349,7 +466,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         ? null
                         : (val) {
                             if (val != null) {
-                              viewModel.changeMonth(viewModel.selectedMonth, val);
+                              viewModel.changeMonth(
+                                  viewModel.selectedMonth, val);
                             }
                           },
                   ),
@@ -370,6 +488,36 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Damage Bottle Ledger Toggle Button
+              ElevatedButton.icon(
+                onPressed: () => viewModel.toggleDamageLedger(),
+                icon: Icon(
+                  viewModel.showDamageLedger
+                      ? Icons.compare_arrows_rounded
+                      : Icons.remove_shopping_cart_rounded,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  viewModel.showDamageLedger
+                      ? 'Show Dual Purchase Ledger'
+                      : 'Damage Bottle Ledger',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: viewModel.showDamageLedger
+                      ? const Color(0xFF0F3460)
+                      : const Color(0xFFE11D48),
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+              const SizedBox(width: 8),
+
               // Download PDF Button
               ElevatedButton.icon(
                 onPressed: viewModel.isExporting ? null : viewModel.downloadPdf,
@@ -377,15 +525,18 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                     ? const SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.picture_as_pdf_rounded, size: 16),
                 label: const Text('Download PDF'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0F3460),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -398,8 +549,10 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF0F3460),
                   side: const BorderSide(color: Color(0xFF0F3460)),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
@@ -419,7 +572,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, color: Color(0xFF1D4ED8), size: 18),
+          const Icon(Icons.info_outline_rounded,
+              color: Color(0xFF1D4ED8), size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -438,8 +592,10 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
 
   Widget _buildAlertBanner({required String message, required bool isError}) {
     final bgColor = isError ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4);
-    final borderColor = isError ? const Color(0xFFFECACA) : const Color(0xFFBBF7D0);
-    final textColor = isError ? const Color(0xFF991B1B) : const Color(0xFF166534);
+    final borderColor =
+        isError ? const Color(0xFFFECACA) : const Color(0xFFBBF7D0);
+    final textColor =
+        isError ? const Color(0xFF991B1B) : const Color(0xFF166534);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -452,7 +608,9 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
       child: Row(
         children: [
           Icon(
-            isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
+            isError
+                ? Icons.error_outline_rounded
+                : Icons.check_circle_outline_rounded,
             color: textColor,
             size: 18,
           ),
@@ -460,7 +618,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.inter(fontSize: 12, color: textColor, fontWeight: FontWeight.w500),
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: textColor, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -475,12 +634,14 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
     double totalOpening = 0.0;
     double totalInward = 0.0;
     double totalOutward = 0.0;
+    double totalDamaged = 0.0;
     double totalClosing = 0.0;
 
     for (final it in register) {
       totalOpening += it.openingQty;
       totalInward += it.supplierInwardQty;
       totalOutward += it.dealerOutwardQty;
+      totalDamaged += it.damagedOutwardQty;
       totalClosing += it.closingQty;
     }
 
@@ -508,7 +669,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
               color: const Color(0xFF1E293B),
               child: Row(
                 children: [
-                  const Icon(Icons.inventory_rounded, color: Colors.white, size: 18),
+                  const Icon(Icons.inventory_rounded,
+                      color: Colors.white, size: 18),
                   const SizedBox(width: 8),
                   Text(
                     'MONTHLY BOTTLE STOCK REGISTER – QUANTITY AUDIT SUMMARY',
@@ -534,16 +696,20 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                   dataRowMaxHeight: 34,
                   horizontalMargin: 12,
                   columnSpacing: 14,
-                  headingRowColor: WidgetStateProperty.all(Colors.grey.shade100),
+                  headingRowColor:
+                      WidgetStateProperty.all(Colors.grey.shade100),
                   border: TableBorder(
-                    horizontalInside: BorderSide(color: Colors.grey.shade200, width: 0.8),
-                    verticalInside: BorderSide(color: Colors.grey.shade200, width: 0.8),
+                    horizontalInside:
+                        BorderSide(color: Colors.grey.shade200, width: 0.8),
+                    verticalInside:
+                        BorderSide(color: Colors.grey.shade200, width: 0.8),
                   ),
                   columns: [
                     const DataColumn(
                       label: Text(
                         'Particulars',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 11),
                       ),
                     ),
                     for (final pk in productKeys)
@@ -551,14 +717,16 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         label: Text(
                           pk,
                           textAlign: TextAlign.right,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
                         ),
                       ),
                     const DataColumn(
                       label: Text(
                         'Grand Total',
                         textAlign: TextAlign.right,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 11),
                       ),
                     ),
                   ],
@@ -570,22 +738,34 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         const DataCell(
                           Text(
                             'Opening Stock (Qty)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF92400E)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF92400E)),
                           ),
                         ),
                         for (final pk in productKeys)
                           DataCell(
                             Text(
-                              _findRegisterItem(register, pk)?.openingQty.toStringAsFixed(0) ?? '0',
+                              _findRegisterItem(register, pk)
+                                      ?.openingQty
+                                      .toStringAsFixed(0) ??
+                                  '0',
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: Color(0xFF92400E)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  color: Color(0xFF92400E)),
                             ),
                           ),
                         DataCell(
                           Text(
                             totalOpening.toStringAsFixed(0),
                             textAlign: TextAlign.right,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF92400E)),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF92400E)),
                           ),
                         ),
                       ],
@@ -598,22 +778,34 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         const DataCell(
                           Text(
                             '(+) Supplier Purchases Inward (Qty)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF065F46)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF065F46)),
                           ),
                         ),
                         for (final pk in productKeys)
                           DataCell(
                             Text(
-                              _findRegisterItem(register, pk)?.supplierInwardQty.toStringAsFixed(0) ?? '0',
+                              _findRegisterItem(register, pk)
+                                      ?.supplierInwardQty
+                                      .toStringAsFixed(0) ??
+                                  '0',
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: Color(0xFF065F46)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  color: Color(0xFF065F46)),
                             ),
                           ),
                         DataCell(
                           Text(
                             totalInward.toStringAsFixed(0),
                             textAlign: TextAlign.right,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF065F46)),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF065F46)),
                           ),
                         ),
                       ],
@@ -626,22 +818,74 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         const DataCell(
                           Text(
                             '(-) Dealer Sales Outward [Without Refill] (Qty)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF991B1B)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF991B1B)),
                           ),
                         ),
                         for (final pk in productKeys)
                           DataCell(
                             Text(
-                              _findRegisterItem(register, pk)?.dealerOutwardQty.toStringAsFixed(0) ?? '0',
+                              _findRegisterItem(register, pk)
+                                      ?.dealerOutwardQty
+                                      .toStringAsFixed(0) ??
+                                  '0',
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: Color(0xFF991B1B)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  color: Color(0xFF991B1B)),
                             ),
                           ),
                         DataCell(
                           Text(
                             totalOutward.toStringAsFixed(0),
                             textAlign: TextAlign.right,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF991B1B)),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF991B1B)),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // (-) Damaged Bottles Outward (Qty)
+                    DataRow(
+                      color: WidgetStateProperty.all(const Color(0xFFFEE2E2)),
+                      cells: [
+                        const DataCell(
+                          Text(
+                            '(-) Damaged Bottles Outward (Qty)',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF991B1B)),
+                          ),
+                        ),
+                        for (final pk in productKeys)
+                          DataCell(
+                            Text(
+                              _findRegisterItem(register, pk)
+                                      ?.damagedOutwardQty
+                                      .toStringAsFixed(0) ??
+                                  '0',
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  color: Color(0xFF991B1B)),
+                            ),
+                          ),
+                        DataCell(
+                          Text(
+                            totalDamaged.toStringAsFixed(0),
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF991B1B)),
                           ),
                         ),
                       ],
@@ -654,22 +898,34 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         const DataCell(
                           Text(
                             '(=) Closing Stock (Qty)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF0F172A)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF0F172A)),
                           ),
                         ),
                         for (final pk in productKeys)
                           DataCell(
                             Text(
-                              _findRegisterItem(register, pk)?.closingQty.toStringAsFixed(0) ?? '0',
+                              _findRegisterItem(register, pk)
+                                      ?.closingQty
+                                      .toStringAsFixed(0) ??
+                                  '0',
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF0F172A)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                  color: Color(0xFF0F172A)),
                             ),
                           ),
                         DataCell(
                           Text(
                             totalClosing.toStringAsFixed(0),
                             textAlign: TextAlign.right,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF0F172A)),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                color: Color(0xFF0F172A)),
                           ),
                         ),
                       ],
@@ -714,4 +970,3 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
     );
   }
 }
-

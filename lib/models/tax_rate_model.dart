@@ -29,9 +29,13 @@ class TaxRateModel {
 
   factory TaxRateModel.fromJson(Map<String, dynamic> json) {
     return TaxRateModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
-      rate: (json['rate'] != null) ? double.tryParse(json['rate'].toString()) ?? 0.0 : 0.0,
+      rate: (json['rate'] != null)
+          ? double.tryParse(json['rate'].toString()) ?? 0.0
+          : 0.0,
       taxType: json['tax_type'] as String? ?? 'gst',
       applicability: json['applicability'] as String? ?? 'all',
       effectiveFrom: json['effective_from'] as String?,

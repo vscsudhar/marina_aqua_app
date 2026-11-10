@@ -50,7 +50,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       when(productService.getAllProducts(activeOnly: true))
@@ -78,7 +79,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -93,7 +95,8 @@ void main() {
       )).called(1);
     });
 
-    test('setStatusFilter updates selectedStatusFilter and re-fetches dealers', () async {
+    test('setStatusFilter updates selectedStatusFilter and re-fetches dealers',
+        () async {
       final dealerService = locator<DealerService>();
 
       when(dealerService.getDealers(
@@ -103,7 +106,8 @@ void main() {
         isActive: true,
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -128,7 +132,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -140,9 +145,14 @@ void main() {
 
     test('saveDealer calls createDealer when dealerId is null', () async {
       final dealerService = locator<DealerService>();
-      final payload = {'name': 'New Dealer', 'code': 'DLR-NEW', 'phone': '+91 90000 00000'};
+      final payload = {
+        'name': 'New Dealer',
+        'code': 'DLR-NEW',
+        'phone': '+91 90000 00000'
+      };
 
-      when(dealerService.createDealer(payload)).thenAnswer((_) async => testDealer);
+      when(dealerService.createDealer(payload))
+          .thenAnswer((_) async => testDealer);
       when(dealerService.getDealers(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -150,7 +160,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -169,7 +180,8 @@ void main() {
       final dealerService = locator<DealerService>();
       final updateData = {'name': 'Updated Name'};
 
-      when(dealerService.updateDealer(1, updateData)).thenAnswer((_) async => testDealer);
+      when(dealerService.updateDealer(1, updateData))
+          .thenAnswer((_) async => testDealer);
       when(dealerService.getDealers(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -177,7 +189,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -190,7 +203,8 @@ void main() {
       final dealerService = locator<DealerService>();
 
       final inactiveDealer = testDealer.copyWith(isActive: false);
-      when(dealerService.toggleDealerStatus(1)).thenAnswer((_) async => inactiveDealer);
+      when(dealerService.toggleDealerStatus(1))
+          .thenAnswer((_) async => inactiveDealer);
       when(dealerService.getDealers(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -198,7 +212,8 @@ void main() {
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testDealer],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();

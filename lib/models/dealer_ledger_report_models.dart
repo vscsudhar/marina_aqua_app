@@ -50,9 +50,12 @@ class MonthlyLedgerReportModel {
       dates: (json['dates'] as List? ?? [])
           .map((d) => LedgerDateRowModel.fromJson(_toMap(d)))
           .toList(),
-      period1Summary: LedgerPeriodSummaryModel.fromJson(_toMap(json['period1_summary'])),
-      period2Summary: LedgerPeriodSummaryModel.fromJson(_toMap(json['period2_summary'])),
-      monthSummary: LedgerMonthSummaryModel.fromJson(_toMap(json['month_summary'])),
+      period1Summary:
+          LedgerPeriodSummaryModel.fromJson(_toMap(json['period1_summary'])),
+      period2Summary:
+          LedgerPeriodSummaryModel.fromJson(_toMap(json['period2_summary'])),
+      monthSummary:
+          LedgerMonthSummaryModel.fromJson(_toMap(json['month_summary'])),
       productBreakdown: (json['product_breakdown'] as List? ?? [])
           .map((p) => LedgerProductBreakdownModel.fromJson(_toMap(p)))
           .toList(),

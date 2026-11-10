@@ -59,7 +59,8 @@ void main() {
     ];
 
     test('initialize loads company settings and tax rates', () async {
-      when(settingsService.getCompanySettings()).thenAnswer((_) async => testSettings);
+      when(settingsService.getCompanySettings())
+          .thenAnswer((_) async => testSettings);
       when(settingsService.getTaxRates(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -68,7 +69,8 @@ void main() {
         taxType: anyNamed('taxType'),
       )).thenAnswer((_) async => PaginatedList(
             items: testTaxRates,
-            meta: const PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = SettingsViewModel(
@@ -78,31 +80,38 @@ void main() {
 
       await viewModel.initialize();
 
-      expect(viewModel.companySettings.companyName, 'Marina Aqua Pure Water Co.');
+      expect(
+          viewModel.companySettings.companyName, 'Marina Aqua Pure Water Co.');
       expect(viewModel.companySettings.currencySymbol, '₹');
       expect(viewModel.companySettings.defaultTaxRate, 18.0);
       expect(viewModel.taxRates.length, 2);
       expect(viewModel.taxRates.first.rate, 18.0);
     });
 
-    test('updateCompanySettings calls service, sets success message and updates companySettings', () async {
+    test(
+        'updateCompanySettings calls service, sets success message and updates companySettings',
+        () async {
       const updatedModel = CompanySettingModel(
         id: 1,
         companyName: 'Marina Aqua Updated Private Limited',
         phone: '+91 99999 88888',
         email: 'billing@marinaaqua.com',
       );
-      when(settingsService.updateCompanySettings(any)).thenAnswer((_) async => updatedModel);
+      when(settingsService.updateCompanySettings(any))
+          .thenAnswer((_) async => updatedModel);
 
       final viewModel = SettingsViewModel(settingsService: settingsService);
-      await viewModel.updateCompanySettings({'company_name': 'Marina Aqua Updated Private Limited'});
+      await viewModel.updateCompanySettings(
+          {'company_name': 'Marina Aqua Updated Private Limited'});
 
       verify(settingsService.updateCompanySettings(any)).called(1);
       expect(viewModel.successMessage, contains('saved successfully'));
-      expect(viewModel.companySettings.companyName, 'Marina Aqua Updated Private Limited');
+      expect(viewModel.companySettings.companyName,
+          'Marina Aqua Updated Private Limited');
     });
 
-    test('pickAndUploadLogo rejects invalid file formats and oversized files', () async {
+    test('pickAndUploadLogo rejects invalid file formats and oversized files',
+        () async {
       final viewModel = SettingsViewModel(settingsService: settingsService);
 
       // 1. Invalid extension (PDF)
@@ -139,12 +148,14 @@ void main() {
       );
 
       expect(success, isTrue);
-      verify(settingsService.uploadCompanyLogo(any, 'valid_logo.png')).called(1);
+      verify(settingsService.uploadCompanyLogo(any, 'valid_logo.png'))
+          .called(1);
       expect(viewModel.successMessage, contains('uploaded and updated'));
     });
 
     test('deleteCompanyLogo removes logo from settings', () async {
-      when(settingsService.deleteCompanyLogo()).thenAnswer((_) async => testSettings);
+      when(settingsService.deleteCompanyLogo())
+          .thenAnswer((_) async => testSettings);
 
       final viewModel = SettingsViewModel(settingsService: settingsService);
       await viewModel.deleteCompanyLogo();
@@ -155,7 +166,8 @@ void main() {
     });
 
     test('createTaxRate delegates to service and reloads list', () async {
-      when(settingsService.createTaxRate(any)).thenAnswer((_) async => testTaxRates.first);
+      when(settingsService.createTaxRate(any))
+          .thenAnswer((_) async => testTaxRates.first);
       when(settingsService.getTaxRates(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -164,9 +176,11 @@ void main() {
         taxType: anyNamed('taxType'),
       )).thenAnswer((_) async => PaginatedList(
             items: testTaxRates,
-            meta: const PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
-      when(settingsService.getCompanySettings()).thenAnswer((_) async => testSettings);
+      when(settingsService.getCompanySettings())
+          .thenAnswer((_) async => testSettings);
 
       final viewModel = SettingsViewModel(settingsService: settingsService);
       await viewModel.createTaxRate({'name': 'GST 5%', 'rate': 5.0});
@@ -176,7 +190,8 @@ void main() {
     });
 
     test('toggleTaxRateStatus updates tax active state', () async {
-      when(settingsService.toggleTaxRateStatus(1)).thenAnswer((_) async => testTaxRates.first);
+      when(settingsService.toggleTaxRateStatus(1))
+          .thenAnswer((_) async => testTaxRates.first);
       when(settingsService.getTaxRates(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -185,7 +200,8 @@ void main() {
         taxType: anyNamed('taxType'),
       )).thenAnswer((_) async => PaginatedList(
             items: testTaxRates,
-            meta: const PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
           ));
 
       final viewModel = SettingsViewModel(settingsService: settingsService);
@@ -205,7 +221,8 @@ void main() {
         taxType: anyNamed('taxType'),
       )).thenAnswer((_) async => PaginatedList(
             items: [testTaxRates.first],
-            meta: const PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 1),
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 1),
           ));
 
       final viewModel = SettingsViewModel(settingsService: settingsService);

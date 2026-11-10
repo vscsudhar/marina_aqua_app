@@ -23,7 +23,8 @@ class BillingService {
   }
 
   /// Update company profile settings via centralized SettingsService
-  Future<CompanySettingModel> updateCompanySettings(Map<String, dynamic> data) async {
+  Future<CompanySettingModel> updateCompanySettings(
+      Map<String, dynamic> data) async {
     return _settingsService.updateCompanySettings(data);
   }
 
@@ -91,7 +92,8 @@ class BillingService {
   }
 
   /// Validate if an invoice number is available
-  Future<Map<String, dynamic>> validateInvoiceNumber(String invoiceNo, {int? excludeId}) async {
+  Future<Map<String, dynamic>> validateInvoiceNumber(String invoiceNo,
+      {int? excludeId}) async {
     final response = await _apiService.client.post(
       '/invoices/validate-number',
       data: {
@@ -103,7 +105,8 @@ class BillingService {
   }
 
   /// Change existing invoice number
-  Future<InvoiceModel> updateInvoiceNumber(int id, String newInvoiceNo, {String? reason}) async {
+  Future<InvoiceModel> updateInvoiceNumber(int id, String newInvoiceNo,
+      {String? reason}) async {
     final response = await _apiService.client.patch(
       '/invoices/$id/number',
       data: {
@@ -151,21 +154,25 @@ class BillingService {
   }
 
   /// Create credit note for finalized invoice
-  Future<CreditNoteModel> createCreditNote(int id, Map<String, dynamic> data) async {
+  Future<CreditNoteModel> createCreditNote(
+      int id, Map<String, dynamic> data) async {
     final response = await _apiService.client.post(
       '/invoices/$id/credit-note',
       data: data,
     );
-    return CreditNoteModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return CreditNoteModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Record payment against invoice
-  Future<InvoicePaymentModel> recordPayment(int id, Map<String, dynamic> data) async {
+  Future<InvoicePaymentModel> recordPayment(
+      int id, Map<String, dynamic> data) async {
     final response = await _apiService.client.post(
       '/invoices/$id/payments',
       data: data,
     );
-    return InvoicePaymentModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return InvoicePaymentModel.fromJson(
+        response.data['data'] as Map<String, dynamic>);
   }
 
   /// Delete draft invoice

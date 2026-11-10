@@ -1006,6 +1006,15 @@ class MockAuthService extends _i1.Mock implements _i23.AuthService {
       ) as int);
 
   @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   _i21.Future<bool> initializeSession() => (super.noSuchMethod(
         Invocation.method(
           #initializeSession,
@@ -1014,6 +1023,16 @@ class MockAuthService extends _i1.Mock implements _i23.AuthService {
         returnValue: _i21.Future<bool>.value(false),
         returnValueForMissingStub: _i21.Future<bool>.value(false),
       ) as _i21.Future<bool>);
+
+  @override
+  _i21.Future<_i2.UserModel?> refreshProfile() => (super.noSuchMethod(
+        Invocation.method(
+          #refreshProfile,
+          [],
+        ),
+        returnValue: _i21.Future<_i2.UserModel?>.value(),
+        returnValueForMissingStub: _i21.Future<_i2.UserModel?>.value(),
+      ) as _i21.Future<_i2.UserModel?>);
 
   @override
   _i21.Future<_i2.UserModel> login({
@@ -1092,15 +1111,6 @@ class MockAuthService extends _i1.Mock implements _i23.AuthService {
         Invocation.method(
           #removeListener,
           [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void notifyListeners() => super.noSuchMethod(
-        Invocation.method(
-          #notifyListeners,
-          [],
         ),
         returnValueForMissingStub: null,
       );
@@ -3706,6 +3716,90 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
       ) as _i21.Future<_i16.InvoiceModel>);
 
   @override
+  _i21.Future<String> getNextInvoiceNumber({String? prefix}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getNextInvoiceNumber,
+          [],
+          {#prefix: prefix},
+        ),
+        returnValue: _i21.Future<String>.value(_i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getNextInvoiceNumber,
+            [],
+            {#prefix: prefix},
+          ),
+        )),
+        returnValueForMissingStub:
+            _i21.Future<String>.value(_i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getNextInvoiceNumber,
+            [],
+            {#prefix: prefix},
+          ),
+        )),
+      ) as _i21.Future<String>);
+
+  @override
+  _i21.Future<Map<String, dynamic>> validateInvoiceNumber(
+    String? invoiceNo, {
+    int? excludeId,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #validateInvoiceNumber,
+          [invoiceNo],
+          {#excludeId: excludeId},
+        ),
+        returnValue:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i21.Future<Map<String, dynamic>>);
+
+  @override
+  _i21.Future<_i16.InvoiceModel> updateInvoiceNumber(
+    int? id,
+    String? newInvoiceNo, {
+    String? reason,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateInvoiceNumber,
+          [
+            id,
+            newInvoiceNo,
+          ],
+          {#reason: reason},
+        ),
+        returnValue: _i21.Future<_i16.InvoiceModel>.value(_FakeInvoiceModel_21(
+          this,
+          Invocation.method(
+            #updateInvoiceNumber,
+            [
+              id,
+              newInvoiceNo,
+            ],
+            {#reason: reason},
+          ),
+        )),
+        returnValueForMissingStub:
+            _i21.Future<_i16.InvoiceModel>.value(_FakeInvoiceModel_21(
+          this,
+          Invocation.method(
+            #updateInvoiceNumber,
+            [
+              id,
+              newInvoiceNo,
+            ],
+            {#reason: reason},
+          ),
+        )),
+      ) as _i21.Future<_i16.InvoiceModel>);
+
+  @override
   _i21.Future<_i16.InvoiceModel> createInvoice(Map<String, dynamic>? data) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -3954,6 +4048,50 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
       ) as String);
 
   @override
+  String getInvoiceHtmlUrl(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #getInvoiceHtmlUrl,
+          [id],
+        ),
+        returnValue: _i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getInvoiceHtmlUrl,
+            [id],
+          ),
+        ),
+        returnValueForMissingStub: _i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getInvoiceHtmlUrl,
+            [id],
+          ),
+        ),
+      ) as String);
+
+  @override
+  String getPublicInvoiceHtmlUrl(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #getPublicInvoiceHtmlUrl,
+          [id],
+        ),
+        returnValue: _i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getPublicInvoiceHtmlUrl,
+            [id],
+          ),
+        ),
+        returnValueForMissingStub: _i19.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getPublicInvoiceHtmlUrl,
+            [id],
+          ),
+        ),
+      ) as String);
+
+  @override
   _i21.Future<List<int>> downloadPdfBytes(int? id) => (super.noSuchMethod(
         Invocation.method(
           #downloadPdfBytes,
@@ -4001,6 +4139,15 @@ class MockSettingsService extends _i1.Mock implements _i33.SettingsService {
         returnValue: 0,
         returnValueForMissingStub: 0,
       ) as int);
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
 
   @override
   _i21.Future<void> init() => (super.noSuchMethod(
@@ -4373,15 +4520,6 @@ class MockSettingsService extends _i1.Mock implements _i33.SettingsService {
         Invocation.method(
           #removeListener,
           [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void notifyListeners() => super.noSuchMethod(
-        Invocation.method(
-          #notifyListeners,
-          [],
         ),
         returnValueForMissingStub: null,
       );

@@ -58,16 +58,19 @@ void main() {
     test('init calls getCategories, getUnits and getProducts', () async {
       final service = locator<ProductMasterService>();
 
-      when(service.getCategories(page: 1, perPage: 50, search: anyNamed('search')))
+      when(service.getCategories(
+              page: 1, perPage: 50, search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testCategory],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
 
       when(service.getUnits(page: 1, perPage: 50, search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testUnit],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
 
       when(service.getProducts(
@@ -80,7 +83,8 @@ void main() {
         lowStock: anyNamed('lowStock'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -108,7 +112,8 @@ void main() {
       expect(model.selectedTabIndex, 2);
     });
 
-    test('toggleLowStockFilter toggles lowStockOnly and refreshes products', () async {
+    test('toggleLowStockFilter toggles lowStockOnly and refreshes products',
+        () async {
       final service = locator<ProductMasterService>();
 
       when(service.getProducts(
@@ -121,7 +126,8 @@ void main() {
         lowStock: true,
       )).thenAnswer((_) async => const PaginatedList(
             items: [],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 0, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 0, lastPage: 1),
           ));
 
       final model = getModel();
@@ -141,10 +147,12 @@ void main() {
       )).called(1);
     });
 
-    test('saveProduct with productId calls updateProduct and re-fetches data', () async {
+    test('saveProduct with productId calls updateProduct and re-fetches data',
+        () async {
       final service = locator<ProductMasterService>();
 
-      when(service.updateProduct(1, {'name': 'Updated Can'})).thenAnswer((_) async => testProduct);
+      when(service.updateProduct(1, {'name': 'Updated Can'}))
+          .thenAnswer((_) async => testProduct);
       when(service.getProducts(
         page: anyNamed('page'),
         perPage: anyNamed('perPage'),
@@ -155,17 +163,26 @@ void main() {
         lowStock: anyNamed('lowStock'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
-      when(service.getCategories(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search')))
+      when(service.getCategories(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testCategory],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
-      when(service.getUnits(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search')))
+      when(service.getUnits(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testUnit],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
 
       final model = getModel();
@@ -183,11 +200,13 @@ void main() {
       )).called(1);
     });
 
-    test('toggleProductStatus toggles isActive locally after API call', () async {
+    test('toggleProductStatus toggles isActive locally after API call',
+        () async {
       final service = locator<ProductMasterService>();
 
       final inactiveProduct = testProduct.copyWith(isActive: false);
-      when(service.toggleProductStatus(1)).thenAnswer((_) async => inactiveProduct);
+      when(service.toggleProductStatus(1))
+          .thenAnswer((_) async => inactiveProduct);
 
       when(service.getProducts(
         page: anyNamed('page'),
@@ -199,7 +218,8 @@ void main() {
         lowStock: anyNamed('lowStock'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
-            meta: PaginationMeta(currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
           ));
 
       final model = getModel();
@@ -218,12 +238,17 @@ void main() {
         code: 'PACK',
         description: anyNamed('description'),
         isActive: true,
-      )).thenAnswer((_) async => const CategoryModel(id: 2, name: 'Packaging', code: 'PACK', isActive: true));
+      )).thenAnswer((_) async => const CategoryModel(
+          id: 2, name: 'Packaging', code: 'PACK', isActive: true));
 
-      when(service.getCategories(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search')))
+      when(service.getCategories(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testCategory],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
 
       final model = getModel();
@@ -237,7 +262,8 @@ void main() {
       )).called(1);
     });
 
-    test('saveUnit creates unit with preset/custom codes and refetches', () async {
+    test('saveUnit creates unit with preset/custom codes and refetches',
+        () async {
       final service = locator<ProductMasterService>();
 
       when(service.createUnit(
@@ -245,12 +271,17 @@ void main() {
         code: 'NOS',
         description: anyNamed('description'),
         isActive: true,
-      )).thenAnswer((_) async => const UnitModel(id: 2, name: 'Numbers', code: 'NOS', isActive: true));
+      )).thenAnswer((_) async =>
+          const UnitModel(id: 2, name: 'Numbers', code: 'NOS', isActive: true));
 
-      when(service.getUnits(page: anyNamed('page'), perPage: anyNamed('perPage'), search: anyNamed('search')))
+      when(service.getUnits(
+              page: anyNamed('page'),
+              perPage: anyNamed('perPage'),
+              search: anyNamed('search')))
           .thenAnswer((_) async => const PaginatedList(
                 items: [testUnit],
-                meta: PaginationMeta(currentPage: 1, perPage: 50, total: 1, lastPage: 1),
+                meta: PaginationMeta(
+                    currentPage: 1, perPage: 50, total: 1, lastPage: 1),
               ));
 
       final model = getModel();

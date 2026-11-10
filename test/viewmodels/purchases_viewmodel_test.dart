@@ -17,8 +17,10 @@ void main() {
     setUp(() => registerServices());
     tearDown(() => locator.reset());
 
-    const testPagination = PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 1);
-    const emptyPagination = PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 0);
+    const testPagination =
+        PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 1);
+    const emptyPagination =
+        PaginationMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 0);
 
     const testSupplier = SupplierModel(
       id: 1,
@@ -84,12 +86,16 @@ void main() {
       ],
     );
 
-    test('init calls getInventorySummary, getSuppliersDropdown, getProducts and getPurchases', () async {
+    test(
+        'init calls getInventorySummary, getSuppliersDropdown, getProducts and getPurchases',
+        () async {
       final inventoryService = locator<InventoryService>();
       final productService = locator<ProductMasterService>();
 
-      when(inventoryService.getInventorySummary()).thenAnswer((_) async => testSummary);
-      when(inventoryService.getSuppliersDropdown()).thenAnswer((_) async => [testSupplier]);
+      when(inventoryService.getInventorySummary())
+          .thenAnswer((_) async => testSummary);
+      when(inventoryService.getSuppliersDropdown())
+          .thenAnswer((_) async => [testSupplier]);
       when(productService.getProducts(perPage: 100)).thenAnswer(
         (_) async => const PaginatedList<ProductModel>(
           items: [testProduct],
@@ -119,18 +125,24 @@ void main() {
       expect(model.errorMessage, isNull);
     });
 
-    test('setTab updates selectedTabIndex and triggers lazy data loading', () async {
+    test('setTab updates selectedTabIndex and triggers lazy data loading',
+        () async {
       final inventoryService = locator<InventoryService>();
-      when(inventoryService.getInventorySummary()).thenAnswer((_) async => testSummary);
+      when(inventoryService.getInventorySummary())
+          .thenAnswer((_) async => testSummary);
       when(inventoryService.getSuppliersDropdown()).thenAnswer((_) async => []);
-      when(locator<ProductMasterService>().getProducts(perPage: 100)).thenAnswer(
-        (_) async => const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
+      when(locator<ProductMasterService>().getProducts(perPage: 100))
+          .thenAnswer(
+        (_) async =>
+            const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
       );
       when(inventoryService.getPurchases()).thenAnswer(
-        (_) async => const PaginatedList<PurchaseModel>(items: [], meta: emptyPagination),
+        (_) async => const PaginatedList<PurchaseModel>(
+            items: [], meta: emptyPagination),
       );
       when(inventoryService.getInventoryMovements(search: null)).thenAnswer(
-        (_) async => const PaginatedList<InventoryMovementModel>(items: [], meta: emptyPagination),
+        (_) async => const PaginatedList<InventoryMovementModel>(
+            items: [], meta: emptyPagination),
       );
 
       final model = getModel();
@@ -143,24 +155,29 @@ void main() {
 
     test('search updates searchQuery and reloads purchases', () async {
       final inventoryService = locator<InventoryService>();
-      when(inventoryService.getInventorySummary()).thenAnswer((_) async => testSummary);
+      when(inventoryService.getInventorySummary())
+          .thenAnswer((_) async => testSummary);
       when(inventoryService.getSuppliersDropdown()).thenAnswer((_) async => []);
-      when(locator<ProductMasterService>().getProducts(perPage: 100)).thenAnswer(
-        (_) async => const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
+      when(locator<ProductMasterService>().getProducts(perPage: 100))
+          .thenAnswer(
+        (_) async =>
+            const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
       );
       when(inventoryService.getPurchases(
         supplierId: null,
         status: null,
         search: null,
       )).thenAnswer(
-        (_) async => const PaginatedList<PurchaseModel>(items: [], meta: emptyPagination),
+        (_) async => const PaginatedList<PurchaseModel>(
+            items: [], meta: emptyPagination),
       );
       when(inventoryService.getPurchases(
         supplierId: null,
         status: null,
         search: 'PUR-001',
       )).thenAnswer(
-        (_) async => const PaginatedList<PurchaseModel>(items: [testPurchase], meta: testPagination),
+        (_) async => const PaginatedList<PurchaseModel>(
+            items: [testPurchase], meta: testPagination),
       );
 
       final model = getModel();
@@ -170,19 +187,26 @@ void main() {
       expect(model.searchQuery, 'PUR-001');
     });
 
-    test('setSupplierFilter updates selectedSupplierFilter and re-fetches purchases', () async {
+    test(
+        'setSupplierFilter updates selectedSupplierFilter and re-fetches purchases',
+        () async {
       final inventoryService = locator<InventoryService>();
-      when(inventoryService.getInventorySummary()).thenAnswer((_) async => testSummary);
-      when(inventoryService.getSuppliersDropdown()).thenAnswer((_) async => [testSupplier]);
-      when(locator<ProductMasterService>().getProducts(perPage: 100)).thenAnswer(
-        (_) async => const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
+      when(inventoryService.getInventorySummary())
+          .thenAnswer((_) async => testSummary);
+      when(inventoryService.getSuppliersDropdown())
+          .thenAnswer((_) async => [testSupplier]);
+      when(locator<ProductMasterService>().getProducts(perPage: 100))
+          .thenAnswer(
+        (_) async =>
+            const PaginatedList<ProductModel>(items: [], meta: emptyPagination),
       );
       when(inventoryService.getPurchases(
         supplierId: anyNamed('supplierId'),
         status: anyNamed('status'),
         search: anyNamed('search'),
       )).thenAnswer(
-        (_) async => const PaginatedList<PurchaseModel>(items: [], meta: emptyPagination),
+        (_) async => const PaginatedList<PurchaseModel>(
+            items: [], meta: emptyPagination),
       );
 
       final model = getModel();
@@ -192,25 +216,34 @@ void main() {
       expect(model.selectedSupplierFilter, 1);
     });
 
-    test('refresh re-fetches all metrics, purchases, movements, and products', () async {
+    test('refresh re-fetches all metrics, purchases, movements, and products',
+        () async {
       final inventoryService = locator<InventoryService>();
-      when(inventoryService.getInventorySummary()).thenAnswer((_) async => testSummary);
-      when(inventoryService.getSuppliersDropdown()).thenAnswer((_) async => [testSupplier]);
-      when(locator<ProductMasterService>().getProducts(perPage: 100)).thenAnswer(
-        (_) async => const PaginatedList<ProductModel>(items: [testProduct], meta: testPagination),
+      when(inventoryService.getInventorySummary())
+          .thenAnswer((_) async => testSummary);
+      when(inventoryService.getSuppliersDropdown())
+          .thenAnswer((_) async => [testSupplier]);
+      when(locator<ProductMasterService>().getProducts(perPage: 100))
+          .thenAnswer(
+        (_) async => const PaginatedList<ProductModel>(
+            items: [testProduct], meta: testPagination),
       );
       when(inventoryService.getPurchases(
         supplierId: anyNamed('supplierId'),
         status: anyNamed('status'),
         search: anyNamed('search'),
       )).thenAnswer(
-        (_) async => const PaginatedList<PurchaseModel>(items: [testPurchase], meta: testPagination),
+        (_) async => const PaginatedList<PurchaseModel>(
+            items: [testPurchase], meta: testPagination),
       );
-      when(inventoryService.getInventoryMovements(search: anyNamed('search'))).thenAnswer(
-        (_) async => const PaginatedList<InventoryMovementModel>(items: [], meta: emptyPagination),
+      when(inventoryService.getInventoryMovements(search: anyNamed('search')))
+          .thenAnswer(
+        (_) async => const PaginatedList<InventoryMovementModel>(
+            items: [], meta: emptyPagination),
       );
       when(inventoryService.getStockAdjustments()).thenAnswer(
-        (_) async => const PaginatedList<StockAdjustmentModel>(items: [], meta: emptyPagination),
+        (_) async => const PaginatedList<StockAdjustmentModel>(
+            items: [], meta: emptyPagination),
       );
 
       final model = getModel();

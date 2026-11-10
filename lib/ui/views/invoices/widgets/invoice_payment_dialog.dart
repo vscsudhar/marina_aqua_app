@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/common/ui_helpers.dart';
 
 class InvoicePaymentDialog extends StatefulWidget {
   final InvoiceModel invoice;
@@ -22,7 +23,7 @@ class InvoicePaymentDialog extends StatefulWidget {
 class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
   final _formKey = GlobalKey<FormState>();
   final currencyFormat =
-      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   late TextEditingController _amountController;
   late DateTime _paymentDate;
@@ -124,7 +125,7 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          'Invoice: ${widget.invoice.invoiceNo} • Due: ${currencyFormat.format(widget.invoice.balanceDue)}',
+                          'Invoice: ${widget.invoice.invoiceNo} • Due: ${formatAmount(widget.invoice.balanceDue)}',
                           style: GoogleFonts.inter(
                               color: Colors.white70, fontSize: 12),
                           maxLines: 2,
@@ -181,7 +182,7 @@ class _InvoicePaymentDialogState extends State<InvoicePaymentDialog> {
                         decoration: InputDecoration(
                           labelText: 'Payment Amount (₹) *',
                           helperText:
-                              'Current outstanding: ${currencyFormat.format(widget.invoice.balanceDue)}',
+                              'Current outstanding: ${formatAmount(widget.invoice.balanceDue)}',
                           isDense: true,
                           border: const OutlineInputBorder(),
                         ),

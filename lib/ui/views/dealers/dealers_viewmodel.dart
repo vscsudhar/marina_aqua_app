@@ -49,7 +49,8 @@ class DealersViewModel extends BaseViewModel {
   // KPI Metrics
   int get totalDealersCount => _dealerMeta.total;
   int get activeDealersCount => _dealers.where((d) => d.isActive).length;
-  double get totalOutstandingBalance => _dealers.fold(0.0, (acc, d) => acc + d.currentOutstanding);
+  double get totalOutstandingBalance =>
+      _dealers.fold(0.0, (acc, d) => acc + d.currentOutstanding);
 
   Future<void> init() async {
     await Future.wait([
@@ -64,7 +65,8 @@ class DealersViewModel extends BaseViewModel {
 
   Future<void> fetchCatalogProducts() async {
     try {
-      _catalogProducts = await _productMasterService.getAllProducts(activeOnly: true);
+      _catalogProducts =
+          await _productMasterService.getAllProducts(activeOnly: true);
       notifyListeners();
     } catch (_) {
       // Ignore or log quietly
@@ -145,7 +147,8 @@ class DealersViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> confirmDeleteDealer(BuildContext context, DealerModel dealer) async {
+  Future<void> confirmDeleteDealer(
+      BuildContext context, DealerModel dealer) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
