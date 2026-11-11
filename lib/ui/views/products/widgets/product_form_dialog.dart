@@ -39,6 +39,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   late final TextEditingController _minStockController;
   late final TextEditingController _descriptionController;
 
+  late String _productType;
+  bool get _isRefill => _productType == 'refill';
+
   int? _selectedCategoryId;
   int? _selectedUnitId;
   late List<UnitModel> _units;
@@ -49,8 +52,22 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
   static const List<Map<String, dynamic>> productPresets = [
     {
+      'name': '20L Water Can Refill',
+      'sku': 'CAN-20L-REFILL',
+      'type': 'refill',
+      'hsn': '2201',
+      'price': '25.00',
+      'cost': '0.00',
+      'tax': '18.0',
+      'reorder': '0',
+      'stock': '0',
+      'unit_code': 'CAN',
+      'category_code': 'WATER',
+    },
+    {
       'name': '20-Litre Water Can',
       'sku': 'CAN-20L',
+      'type': 'normal',
       'hsn': '2201',
       'price': '35.00',
       'cost': '18.00',
@@ -174,6 +191,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _selectedCategoryId = p?.categoryId ??
         (widget.categories.isNotEmpty ? widget.categories.first.id : null);
     _selectedUnitId = p?.unitId ?? (_units.isNotEmpty ? _units.first.id : null);
+    _productType = p?.productType ?? 'normal';
     _trackStock = p?.trackStock ?? true;
     _isActive = p?.isActive ?? true;
   }
@@ -194,6 +212,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
   void _applyPreset(Map<String, dynamic> preset) {
     setState(() {
+      if (preset['type'] != null) {
+        _productType = preset['type'];
+      }
       _nameController.text = preset['name'];
       _skuController.text = preset['sku'];
       _hsnController.text = preset['hsn'];
@@ -252,6 +273,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     final payload = <String, dynamic>{
       'name': _nameController.text.trim(),
       'sku': _skuController.text.trim().toUpperCase(),
+      'product_type': _productType,
       'category_id': _selectedCategoryId,
       'unit_id': _selectedUnitId,
       'hsn_code': _hsnController.text.trim().isEmpty
@@ -259,18 +281,24 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           : _hsnController.text.trim(),
       'default_price':
           double.tryParse(_defaultPriceController.text.trim()) ?? 0.0,
-      'cost_price': double.tryParse(_costPriceController.text.trim()) ?? 0.0,
       'tax_rate': double.tryParse(_taxRateController.text.trim()) ?? 0.0,
-      'current_stock':
-          double.tryParse(_currentStockController.text.trim()) ?? 0.0,
-      'track_stock': _trackStock,
-      'min_stock_level':
-          double.tryParse(_minStockController.text.trim()) ?? 0.0,
       'description': _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
       'is_active': _isActive,
     };
+
+    if (_isRefill) {
+      payload['track_stock'] = false;
+    } else {
+      payload['cost_price'] =
+          double.tryParse(_costPriceController.text.trim()) ?? 0.0;
+      payload['current_stock'] =
+          double.tryParse(_currentStockController.text.trim()) ?? 0.0;
+      payload['track_stock'] = _trackStock;
+      payload['min_stock_level'] =
+          double.tryParse(_minStockController.text.trim()) ?? 0.0;
+    }
 
     try {
       await widget.onSave(payload);
@@ -686,6 +714,211 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             ),
                             const SizedBox(height: 16),
                           ],
+                          // Dedicated Product Type Selection
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 18),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: kcVeryLightGrey,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: kcBorderColor),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.tune_rounded,
+                                        size: 16, color: kcPrimaryDark),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'Product Type *',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: kcTextPrimary,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (_isRefill)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              kcAquaCyan.withValues(alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          border: Border.all(
+                                              color: kcAquaCyan
+                                                  .withValues(alpha: 0.4)),
+                                        ),
+                                        child: const Text(
+                                          'Refill Mode Active',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: kcPrimaryDark,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(
+                                              () => _productType = 'normal');
+                                        },
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 10),
+                                          decoration: BoxDecoration(
+                                            color: !_isRefill
+                                                ? kcPrimaryColor
+                                                    .withValues(alpha: 0.08)
+                                                : Colors.white,
+                                            border: Border.all(
+                                              color: !_isRefill
+                                                  ? kcPrimaryColor
+                                                  : kcBorderColor,
+                                              width: !_isRefill ? 1.8 : 1.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.inventory_2_rounded,
+                                                color: !_isRefill
+                                                    ? kcPrimaryColor
+                                                    : kcMediumGrey,
+                                                size: 18,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Normal Product',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: !_isRefill
+                                                            ? kcPrimaryColor
+                                                            : kcTextPrimary,
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      'Standard inventory & purchase cost',
+                                                      style: TextStyle(
+                                                          fontSize: 10.5,
+                                                          color: kcTextSecondary),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (!_isRefill)
+                                                const Icon(
+                                                    Icons.check_circle_rounded,
+                                                    color: kcPrimaryColor,
+                                                    size: 16),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(
+                                              () => _productType = 'refill');
+                                        },
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 10),
+                                          decoration: BoxDecoration(
+                                            color: _isRefill
+                                                ? kcAquaCyan
+                                                    .withValues(alpha: 0.12)
+                                                : Colors.white,
+                                            border: Border.all(
+                                              color: _isRefill
+                                                  ? kcAquaCyan
+                                                  : kcBorderColor,
+                                              width: _isRefill ? 1.8 : 1.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.autorenew_rounded,
+                                                color: _isRefill
+                                                    ? kcPrimaryDark
+                                                    : kcMediumGrey,
+                                                size: 18,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Refill Product',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: _isRefill
+                                                            ? kcPrimaryDark
+                                                            : kcTextPrimary,
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      'Refill service (no purchase/stock)',
+                                                      style: TextStyle(
+                                                          fontSize: 10.5,
+                                                          color: kcTextSecondary),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (_isRefill)
+                                                const Icon(
+                                                    Icons.check_circle_rounded,
+                                                    color: kcPrimaryDark,
+                                                    size: 16),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                           // Row 1: Product Name & SKU
                           if (isNarrow) ...[
                             nameField,
@@ -719,43 +952,64 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           ],
                           const SizedBox(height: 16),
                           // Row 3: Prices (Sale Price, Purchase Cost, Tax Rate)
-                          if (isNarrow) ...[
-                            priceField,
-                            const SizedBox(height: 16),
-                            costField,
-                            const SizedBox(height: 16),
-                            taxField,
+                          if (_isRefill) ...[
+                            if (isNarrow) ...[
+                              priceField,
+                              const SizedBox(height: 16),
+                              taxField,
+                            ] else ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(flex: 3, child: priceField),
+                                  const SizedBox(width: 16),
+                                  Expanded(flex: 2, child: taxField),
+                                ],
+                              ),
+                            ],
                           ] else ...[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: priceField),
-                                const SizedBox(width: 16),
-                                Expanded(child: costField),
-                                const SizedBox(width: 16),
-                                Expanded(child: taxField),
-                              ],
-                            ),
+                            if (isNarrow) ...[
+                              priceField,
+                              const SizedBox(height: 16),
+                              costField,
+                              const SizedBox(height: 16),
+                              taxField,
+                            ] else ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(child: priceField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: costField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: taxField),
+                                ],
+                              ),
+                            ],
                           ],
                           const SizedBox(height: 16),
-                          // Row 4: Stock Tracking, Initial/Current Stock & Reorder Level
-                          if (isNarrow) ...[
+                          // Row 4: HSN / SAC Code & Stock Tracking
+                          if (_isRefill) ...[
                             hsnField,
-                            const SizedBox(height: 16),
-                            minStockField,
-                            const SizedBox(height: 16),
-                            currentStockField,
                           ] else ...[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: hsnField),
-                                const SizedBox(width: 16),
-                                Expanded(child: minStockField),
-                                const SizedBox(width: 16),
-                                Expanded(child: currentStockField),
-                              ],
-                            ),
+                            if (isNarrow) ...[
+                              hsnField,
+                              const SizedBox(height: 16),
+                              minStockField,
+                              const SizedBox(height: 16),
+                              currentStockField,
+                            ] else ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(child: hsnField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: minStockField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: currentStockField),
+                                ],
+                              ),
+                            ],
                           ],
                           const SizedBox(height: 16),
                           // Row 5: Description
@@ -772,18 +1026,22 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                           ),
                           const SizedBox(height: 12),
                           // Switches: Stock Tracking & Active Status
-                          if (isNarrow) ...[
-                            trackStockTile,
-                            const SizedBox(height: 8),
+                          if (_isRefill) ...[
                             activeTile,
                           ] else ...[
-                            Row(
-                              children: [
-                                Expanded(child: trackStockTile),
-                                const SizedBox(width: 16),
-                                Expanded(child: activeTile),
-                              ],
-                            ),
+                            if (isNarrow) ...[
+                              trackStockTile,
+                              const SizedBox(height: 8),
+                              activeTile,
+                            ] else ...[
+                              Row(
+                                children: [
+                                  Expanded(child: trackStockTile),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: activeTile),
+                                ],
+                              ),
+                            ],
                           ],
                         ],
                       );

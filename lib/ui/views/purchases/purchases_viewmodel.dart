@@ -38,7 +38,7 @@ class PurchasesViewModel extends BaseViewModel {
   List<ProductModel> _products = [];
   List<ProductModel> get products => _products;
   List<ProductModel> get trackedProducts =>
-      _products.where((p) => p.trackStock).toList();
+      _products.where((p) => p.isNormal && p.trackStock).toList();
 
   List<InventoryMovementModel> _movements = [];
   List<InventoryMovementModel> get movements => _movements;

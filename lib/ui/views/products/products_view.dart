@@ -190,6 +190,15 @@ class ProductsView extends StackedView<ProductsViewModel> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildMetricTile(
+              label: 'Refill Products',
+              value: viewModel.refillProductsCount.toString(),
+              icon: Icons.autorenew_rounded,
+              color: kcPrimaryDark,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildMetricTile(
               label: 'Low Stock Alert',
               value: viewModel.lowStockProductsCount.toString(),
               icon: Icons.warning_amber_rounded,
@@ -445,7 +454,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
           ),
           // Category Filter
           SizedBox(
-            width: 200,
+            width: 180,
             child: DropdownButtonFormField<int?>(
               initialValue: viewModel.selectedCategoryFilter,
               isExpanded: true,
@@ -475,6 +484,46 @@ class ProductsView extends StackedView<ProductsViewModel> {
                     )),
               ],
               onChanged: viewModel.setCategoryFilter,
+            ),
+          ),
+          // Product Type Filter (Normal / Refill)
+          SizedBox(
+            width: 150,
+            child: DropdownButtonFormField<String?>(
+              initialValue: viewModel.selectedProductTypeFilter,
+              isExpanded: true,
+              isDense: true,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              hint: const Text('Type: All',
+                  style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis),
+              items: const [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text('Type: All',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
+                ),
+                DropdownMenuItem<String?>(
+                  value: 'normal',
+                  child: Text('Normal Only',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
+                ),
+                DropdownMenuItem<String?>(
+                  value: 'refill',
+                  child: Text('Refill Only',
+                      style: TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
+                ),
+              ],
+              onChanged: viewModel.setProductTypeFilter,
             ),
           ),
           // Status Filter
@@ -658,6 +707,34 @@ class ProductsView extends StackedView<ProductsViewModel> {
                                     color: kcTextSecondary),
                               ),
                             ),
+                            if (product.isRefill) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: kcPrimaryColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                      color: kcPrimaryColor.withValues(alpha: 0.3)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.autorenew_rounded,
+                                        size: 10, color: kcPrimaryDark),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      'REFILL',
+                                      style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          color: kcPrimaryDark),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                             if (product.hsnCode.isNotEmpty) ...[
                               const SizedBox(width: 6),
                               Text(
@@ -697,51 +774,67 @@ class ProductsView extends StackedView<ProductsViewModel> {
                     ),
                   ),
                   DataCell(
-                    Text(
-                      '₹${product.costPrice.toStringAsFixed(2)}',
-                      style:
-                          const TextStyle(fontSize: 12, color: kcTextSecondary),
-                    ),
+                    product.isRefill
+                        ? const Text(
+                            '— (Refill)',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: kcMediumGrey,
+                                fontStyle: FontStyle.italic),
+                          )
+                        : Text(
+                            '₹${product.costPrice.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                                fontSize: 12, color: kcTextSecondary),
+                          ),
                   ),
                   DataCell(
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          product.currentStock.toStringAsFixed(0),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: product.isLowStock
-                                ? kcErrorColor
-                                : kcTextPrimary,
-                          ),
-                        ),
-                        Text(
-                          ' / min ${product.minStockLevel.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                              fontSize: 11, color: kcMediumGrey),
-                        ),
-                        if (product.isLowStock) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: kcErrorColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'LOW',
-                              style: TextStyle(
-                                  fontSize: 9,
+                    product.isRefill
+                        ? const Text(
+                            'N/A (Refill)',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: kcMediumGrey,
+                                fontStyle: FontStyle.italic),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                product.currentStock.toStringAsFixed(0),
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: kcErrorColor),
-                            ),
+                                  fontSize: 13,
+                                  color: product.isLowStock
+                                      ? kcErrorColor
+                                      : kcTextPrimary,
+                                ),
+                              ),
+                              Text(
+                                ' / min ${product.minStockLevel.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                    fontSize: 11, color: kcMediumGrey),
+                              ),
+                              if (product.isLowStock) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: kcErrorColor.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'LOW',
+                                    style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        color: kcErrorColor),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
-                        ],
-                      ],
-                    ),
                   ),
                   DataCell(
                     Switch(
@@ -798,7 +891,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
         color: kcSurfaceWhite,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: product.isLowStock
+          color: (product.isNormal && product.isLowStock)
               ? kcErrorColor.withValues(alpha: 0.3)
               : kcBorderColor,
         ),
@@ -818,22 +911,57 @@ class ProductsView extends StackedView<ProductsViewModel> {
                       color: kcTextPrimary),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: product.isActive
-                      ? kcSuccessColor.withValues(alpha: 0.12)
-                      : kcMediumGrey.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  product.isActive ? 'Active' : 'Inactive',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: product.isActive ? kcSuccessColor : kcMediumGrey,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (product.isRefill) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: kcPrimaryColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                            color: kcPrimaryColor.withValues(alpha: 0.3)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.autorenew_rounded,
+                              size: 11, color: kcPrimaryDark),
+                          SizedBox(width: 4),
+                          Text(
+                            'Refill',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: kcPrimaryDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: product.isActive
+                          ? kcSuccessColor.withValues(alpha: 0.12)
+                          : kcMediumGrey.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      product.isActive ? 'Active' : 'Inactive',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: product.isActive ? kcSuccessColor : kcMediumGrey,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -885,9 +1013,17 @@ class ProductsView extends StackedView<ProductsViewModel> {
                   const Text('Cost Price',
                       style: TextStyle(fontSize: 10, color: kcMediumGrey)),
                   Text(
-                    '₹${product.costPrice.toStringAsFixed(2)}',
-                    style:
-                        const TextStyle(fontSize: 13, color: kcTextSecondary),
+                    product.isRefill
+                        ? '— (Refill)'
+                        : '₹${product.costPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: product.isRefill
+                            ? kcMediumGrey
+                            : kcTextSecondary,
+                        fontStyle: product.isRefill
+                            ? FontStyle.italic
+                            : FontStyle.normal),
                   ),
                 ],
               ),
@@ -896,24 +1032,33 @@ class ProductsView extends StackedView<ProductsViewModel> {
                 children: [
                   const Text('Physical Stock',
                       style: TextStyle(fontSize: 10, color: kcMediumGrey)),
-                  Row(
-                    children: [
-                      Text(
-                        product.currentStock.toStringAsFixed(0),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color:
-                              product.isLowStock ? kcErrorColor : kcTextPrimary,
+                  product.isRefill
+                      ? const Text(
+                          'N/A (Refill)',
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: kcMediumGrey,
+                              fontStyle: FontStyle.italic),
+                        )
+                      : Row(
+                          children: [
+                            Text(
+                              product.currentStock.toStringAsFixed(0),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: product.isLowStock
+                                    ? kcErrorColor
+                                    : kcTextPrimary,
+                              ),
+                            ),
+                            if (product.isLowStock) ...[
+                              const SizedBox(width: 4),
+                              const Icon(Icons.warning,
+                                  size: 14, color: kcErrorColor),
+                            ],
+                          ],
                         ),
-                      ),
-                      if (product.isLowStock) ...[
-                        const SizedBox(width: 4),
-                        const Icon(Icons.warning,
-                            size: 14, color: kcErrorColor),
-                      ],
-                    ],
-                  ),
                 ],
               ),
             ],

@@ -74,7 +74,7 @@ class DamagedProductsViewModel extends BaseViewModel {
   Future<void> _loadProducts() async {
     try {
       final res =
-          await _productService.getProducts(perPage: 100, isActive: true);
+          await _productService.getProducts(perPage: 100, isActive: true, productType: 'normal');
       _products = res.items;
     } catch (_) {
       // Products catalog fetch error handled gracefully
@@ -339,15 +339,19 @@ class DamagedProductsViewModel extends BaseViewModel {
 
     try {
       final queryParams = <String, dynamic>{};
-      if (_selectedProductId != null)
+      if (_selectedProductId != null) {
         queryParams['product_id'] = _selectedProductId;
-      if (_startDate != null)
+      }
+      if (_startDate != null) {
         queryParams['start_date'] =
             DateFormat('yyyy-MM-dd').format(_startDate!);
-      if (_endDate != null)
+      }
+      if (_endDate != null) {
         queryParams['end_date'] = DateFormat('yyyy-MM-dd').format(_endDate!);
-      if (_searchQuery.trim().isNotEmpty)
+      }
+      if (_searchQuery.trim().isNotEmpty) {
         queryParams['search'] = _searchQuery.trim();
+      }
 
       await _exportService.downloadFromApi(
         endpoint: '/damaged-products/export-pdf',

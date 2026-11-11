@@ -33,8 +33,9 @@ class DailyCollectionService {
   }) async {
     final queryParams = <String, dynamic>{};
     if (date != null) queryParams['date'] = date;
-    if (search != null && search.trim().isNotEmpty)
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
     if (status != null && status.isNotEmpty) queryParams['status'] = status;
 
     final response = await _apiService.client.get(
@@ -71,10 +72,12 @@ class DailyCollectionService {
     if (date != null) queryParams['date'] = date;
     if (month != null) queryParams['month'] = month;
     if (year != null) queryParams['year'] = year;
-    if (paymentStatus != null && paymentStatus.isNotEmpty)
+    if (paymentStatus != null && paymentStatus.isNotEmpty) {
       queryParams['payment_status'] = paymentStatus;
-    if (search != null && search.trim().isNotEmpty)
+    }
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
 
     final response = await _apiService.client.get(
       '/supplies',
@@ -151,8 +154,9 @@ class DailyCollectionService {
 
     if (dealerId != null) queryParams['dealer_id'] = dealerId;
     if (date != null) queryParams['date'] = date;
-    if (paymentMethod != null && paymentMethod.isNotEmpty)
+    if (paymentMethod != null && paymentMethod.isNotEmpty) {
       queryParams['payment_method'] = paymentMethod;
+    }
 
     final response = await _apiService.client.get(
       '/payments',

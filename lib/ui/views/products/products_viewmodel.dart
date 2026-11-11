@@ -35,6 +35,9 @@ class ProductsViewModel extends BaseViewModel {
   int? _selectedCategoryFilter;
   int? get selectedCategoryFilter => _selectedCategoryFilter;
 
+  String? _selectedProductTypeFilter;
+  String? get selectedProductTypeFilter => _selectedProductTypeFilter;
+
   int? _selectedUnitFilter;
   int? get selectedUnitFilter => _selectedUnitFilter;
 
@@ -79,7 +82,10 @@ class ProductsViewModel extends BaseViewModel {
   // Summary Metrics
   int get totalProductsCount => _productMeta.total;
   int get activeProductsCount => _products.where((p) => p.isActive).length;
-  int get lowStockProductsCount => _products.where((p) => p.isLowStock).length;
+  int get normalProductsCount => _products.where((p) => p.isNormal).length;
+  int get refillProductsCount => _products.where((p) => p.isRefill).length;
+  int get lowStockProductsCount =>
+      _products.where((p) => p.isNormal && p.isLowStock).length;
 
   Future<void> init() async {
     await Future.wait([
@@ -112,6 +118,7 @@ class ProductsViewModel extends BaseViewModel {
         page: page,
         perPage: 15,
         search: _productSearchQuery,
+        productType: _selectedProductTypeFilter,
         categoryId: _selectedCategoryFilter,
         unitId: _selectedUnitFilter,
         isActive: _selectedStatusFilter,
@@ -140,6 +147,11 @@ class ProductsViewModel extends BaseViewModel {
     fetchProducts(page: 1);
   }
 
+  void setProductTypeFilter(String? productType) {
+    _selectedProductTypeFilter = productType;
+    fetchProducts(page: 1);
+  }
+
   void setUnitFilter(int? unitId) {
     _selectedUnitFilter = unitId;
     fetchProducts(page: 1);
@@ -158,6 +170,7 @@ class ProductsViewModel extends BaseViewModel {
   void clearProductFilters() {
     _productSearchQuery = '';
     _selectedCategoryFilter = null;
+    _selectedProductTypeFilter = null;
     _selectedUnitFilter = null;
     _selectedStatusFilter = null;
     _lowStockOnly = false;

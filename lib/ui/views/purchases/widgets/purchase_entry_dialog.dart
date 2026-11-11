@@ -380,8 +380,9 @@ class _PurchaseEntryDialogState extends State<PurchaseEntryDialog> {
                             onChanged: (val) {
                               setState(() {
                                 _selectedSupplier = val;
-                                if (val != null)
+                                if (val != null) {
                                   _supplierNameController.text = val.name;
+                                }
                               });
                             },
                           ),
@@ -715,8 +716,9 @@ class _PurchaseEntryDialogState extends State<PurchaseEntryDialog> {
                                           child: Text('Credit / Unpaid')),
                                     ],
                                     onChanged: (val) {
-                                      if (val != null)
+                                      if (val != null) {
                                         setState(() => _paymentMethod = val);
+                                      }
                                     },
                                   ),
                                 ),

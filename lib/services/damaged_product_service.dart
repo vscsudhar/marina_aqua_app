@@ -26,12 +26,15 @@ class DamagedProductService {
 
     if (productId != null) queryParams['product_id'] = productId;
     if (reason != null && reason.isNotEmpty) queryParams['reason'] = reason;
-    if (startDate != null && startDate.isNotEmpty)
+    if (startDate != null && startDate.isNotEmpty) {
       queryParams['start_date'] = startDate;
-    if (endDate != null && endDate.isNotEmpty)
+    }
+    if (endDate != null && endDate.isNotEmpty) {
       queryParams['end_date'] = endDate;
-    if (search != null && search.trim().isNotEmpty)
+    }
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
 
     final response = await _apiService.client.get(
       '/damaged-products',
@@ -111,12 +114,15 @@ class DamagedProductService {
   }) async {
     final queryParams = <String, dynamic>{};
     if (productId != null) queryParams['product_id'] = productId;
-    if (startDate != null && startDate.isNotEmpty)
+    if (startDate != null && startDate.isNotEmpty) {
       queryParams['start_date'] = startDate;
-    if (endDate != null && endDate.isNotEmpty)
+    }
+    if (endDate != null && endDate.isNotEmpty) {
       queryParams['end_date'] = endDate;
-    if (search != null && search.trim().isNotEmpty)
+    }
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
 
     final response = await _apiService.client.get(
       '/damaged-products/export-pdf',

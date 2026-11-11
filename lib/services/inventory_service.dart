@@ -106,8 +106,9 @@ class InventoryService {
       queryParams['start_date'] = startDate;
       queryParams['end_date'] = endDate;
     }
-    if (search != null && search.trim().isNotEmpty)
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
 
     final response = await _apiService.client.get(
       '/purchases',
@@ -193,14 +194,16 @@ class InventoryService {
       'per_page': perPage ?? 20,
     };
     if (productId != null) queryParams['product_id'] = productId;
-    if (movementType != null && movementType.isNotEmpty)
+    if (movementType != null && movementType.isNotEmpty) {
       queryParams['movement_type'] = movementType;
+    }
     if (startDate != null && endDate != null) {
       queryParams['start_date'] = startDate;
       queryParams['end_date'] = endDate;
     }
-    if (search != null && search.trim().isNotEmpty)
+    if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
 
     final response = await _apiService.client.get(
       '/inventory/movements',
@@ -232,8 +235,9 @@ class InventoryService {
       'per_page': perPage ?? 15,
     };
     if (productId != null) queryParams['product_id'] = productId;
-    if (adjustmentType != null && adjustmentType.isNotEmpty)
+    if (adjustmentType != null && adjustmentType.isNotEmpty) {
       queryParams['adjustment_type'] = adjustmentType;
+    }
 
     final response = await _apiService.client.get(
       '/inventory/adjustments',

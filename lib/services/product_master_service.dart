@@ -322,6 +322,7 @@ class ProductMasterService {
     int? page,
     int? perPage,
     String? search,
+    String? productType,
     int? categoryId,
     int? unitId,
     bool? isActive,
@@ -335,6 +336,9 @@ class ProductMasterService {
     };
     if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
+    }
+    if (productType != null && productType.trim().isNotEmpty) {
+      queryParams['product_type'] = productType.trim();
     }
     if (categoryId != null && categoryId > 0) {
       queryParams['category_id'] = categoryId;

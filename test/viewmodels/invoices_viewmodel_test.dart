@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
@@ -258,14 +259,10 @@ void main() {
       expect(viewModel.successMessage, 'Payment recorded successfully!');
     });
 
-    test('downloadInvoicePdf gets raw bytes from service', () async {
-      when(billingService.downloadPdfBytes(101))
-          .thenAnswer((_) async => [37, 80, 68, 70]);
-
+    test('downloadInvoicePdf generates invoice pdf and sets success message', () async {
       final viewModel = InvoicesViewModel(billingService: billingService);
       await viewModel.downloadInvoicePdf(testInvoices.first);
 
-      verify(billingService.downloadPdfBytes(101)).called(1);
       expect(viewModel.successMessage, contains('downloaded'));
     });
   });

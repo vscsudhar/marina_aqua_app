@@ -646,7 +646,7 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                         return DropdownMenuItem<ProductModel>(
                           value: prod,
                           child: Text(
-                            '${prod.name} (${prod.unitName})',
+                            '${prod.isRefill ? "${prod.name} [Refill]" : prod.name} (${prod.unitName})',
                             style: GoogleFonts.inter(
                                 fontSize: 13, fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,

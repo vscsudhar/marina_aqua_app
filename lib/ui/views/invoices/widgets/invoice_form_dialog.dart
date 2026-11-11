@@ -1032,7 +1032,10 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                       items: widget.products.map((p) {
                                         return DropdownMenuItem(
                                           value: p,
-                                          child: Text(p.name,
+                                          child: Text(
+                                              p.isRefill
+                                                  ? '${p.name} (Refill)'
+                                                  : p.name,
                                               overflow: TextOverflow.ellipsis),
                                         );
                                       }).toList(),

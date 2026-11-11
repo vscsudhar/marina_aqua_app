@@ -505,7 +505,7 @@ class _SupplyEntryDialogState extends State<SupplyEntryDialog> {
               return DropdownMenuItem<int>(
                 value: p.id,
                 child: Text(
-                  '${p.name} (${p.unit})',
+                  '${p.isRefill ? "${p.name} [Refill]" : p.name} (${p.unit})',
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.w600),
                   overflow: TextOverflow.ellipsis,

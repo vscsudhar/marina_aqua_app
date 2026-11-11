@@ -5,6 +5,7 @@ class ProductModel {
   final int id;
   final String name;
   final String sku;
+  final String productType;
   final int? categoryId;
   final int? unitId;
   final String unitName;
@@ -30,6 +31,7 @@ class ProductModel {
     required this.id,
     required this.name,
     required this.sku,
+    this.productType = 'normal',
     this.categoryId,
     this.unitId,
     this.unitName = 'Unit',
@@ -52,13 +54,20 @@ class ProductModel {
     this.updatedAt,
   });
 
+  bool get isRefill => productType == 'refill';
+  bool get isNormal => productType != 'refill';
+
   factory ProductModel.fromJson(Map<String, dynamic> json) {
+    final type = json['product_type'] as String? ?? 'normal';
+    final isRefillType = type == 'refill';
+
     return ProductModel(
       id: json['id'] is int
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? '',
       sku: json['sku'] as String? ?? '',
+      productType: type,
       categoryId: json['category_id'] is int
           ? json['category_id']
           : int.tryParse(json['category_id']?.toString() ?? ''),
@@ -79,10 +88,10 @@ class ProductModel {
       defaultPrice: _parseDouble(json['default_price']),
       costPrice: _parseDouble(json['cost_price']),
       taxRate: _parseDouble(json['tax_rate']),
-      currentStock: _parseDouble(json['current_stock']),
-      trackStock: json['track_stock'] == true || json['track_stock'] == 1,
-      minStockLevel: _parseDouble(json['min_stock_level']),
-      isLowStock: json['is_low_stock'] == true || json['is_low_stock'] == 1,
+      currentStock: isRefillType ? 0.0 : _parseDouble(json['current_stock']),
+      trackStock: !isRefillType && (json['track_stock'] == true || json['track_stock'] == 1),
+      minStockLevel: isRefillType ? 0.0 : _parseDouble(json['min_stock_level']),
+      isLowStock: !isRefillType && (json['is_low_stock'] == true || json['is_low_stock'] == 1),
       isActive: json['is_active'] == true || json['is_active'] == 1,
       isReferenced: json['is_referenced'] == true || json['is_referenced'] == 1,
       category: json['category'] is Map<String, dynamic>
@@ -107,16 +116,17 @@ class ProductModel {
     return {
       'name': name,
       'sku': sku,
+      'product_type': productType,
       'category_id': categoryId,
       'unit_id': unitId,
       'description': description,
       'hsn_code': hsnCode,
       'default_price': defaultPrice,
-      'cost_price': costPrice,
+      'cost_price': isRefill ? null : costPrice,
       'tax_rate': taxRate,
-      'current_stock': currentStock,
-      'track_stock': trackStock,
-      'min_stock_level': minStockLevel,
+      'current_stock': isRefill ? null : currentStock,
+      'track_stock': isRefill ? false : trackStock,
+      'min_stock_level': isRefill ? null : minStockLevel,
       'is_active': isActive,
     };
   }
@@ -125,6 +135,7 @@ class ProductModel {
     int? id,
     String? name,
     String? sku,
+    String? productType,
     int? categoryId,
     int? unitId,
     String? unitName,
@@ -150,6 +161,7 @@ class ProductModel {
       id: id ?? this.id,
       name: name ?? this.name,
       sku: sku ?? this.sku,
+      productType: productType ?? this.productType,
       categoryId: categoryId ?? this.categoryId,
       unitId: unitId ?? this.unitId,
       unitName: unitName ?? this.unitName,

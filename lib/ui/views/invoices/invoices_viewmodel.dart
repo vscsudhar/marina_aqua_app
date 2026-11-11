@@ -357,13 +357,25 @@ class InvoicesViewModel extends ReactiveViewModel {
     notifyListeners();
 
     try {
-      final bytes = await _billingService.downloadPdfBytes(invoice.id);
-      final filename = 'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
+      final bytes = await _exportPrintService.generateInvoicePdf(
+          invoice, companySettings);
+      final filename =
+          'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
       _exportPrintService.downloadBytes(
           bytes, filename, ExportPrintService.mimePdf);
       _successMessage = 'Invoice PDF downloaded ($filename).';
     } catch (e) {
-      _errorMessage = 'PDF download failed: ${e.toString()}';
+      // Fallback to backend download if client generation had an issue
+      try {
+        final bytes = await _billingService.downloadPdfBytes(invoice.id);
+        final filename =
+            'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
+        _exportPrintService.downloadBytes(
+            bytes, filename, ExportPrintService.mimePdf);
+        _successMessage = 'Invoice PDF downloaded ($filename).';
+      } catch (err) {
+        _errorMessage = 'PDF download failed: ${err.toString()}';
+      }
     } finally {
       _isDownloadingPdf = false;
       notifyListeners();
@@ -376,13 +388,23 @@ class InvoicesViewModel extends ReactiveViewModel {
     notifyListeners();
 
     try {
-      final bytes = await _billingService.downloadPdfBytes(invoice.id);
+      final bytes = await _exportPrintService.generateInvoicePdf(
+          invoice, companySettings);
       await _exportPrintService.printPdfBytes(bytes,
           title: 'Invoice ${invoice.invoiceNo}');
       _successMessage =
           'Print preview launched for invoice ${invoice.invoiceNo}.';
     } catch (e) {
-      _errorMessage = 'Print invoice failed: ${e.toString()}';
+      // Fallback to backend download if client generation had an issue
+      try {
+        final bytes = await _billingService.downloadPdfBytes(invoice.id);
+        await _exportPrintService.printPdfBytes(bytes,
+            title: 'Invoice ${invoice.invoiceNo}');
+        _successMessage =
+            'Print preview launched for invoice ${invoice.invoiceNo}.';
+      } catch (err) {
+        _errorMessage = 'Print invoice failed: ${err.toString()}';
+      }
     } finally {
       _isDownloadingPdf = false;
       notifyListeners();

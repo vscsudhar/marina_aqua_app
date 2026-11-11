@@ -393,7 +393,7 @@ class _DamagedProductFormDialogState extends State<DamagedProductFormDialog> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<ProductModel>(
-                        value: _selectedProduct,
+                        initialValue: _selectedProduct,
                         isExpanded: true,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.water_drop_rounded,
@@ -601,7 +601,7 @@ class _DamagedProductFormDialogState extends State<DamagedProductFormDialog> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _selectedReason,
+                        initialValue: _selectedReason,
                         isExpanded: true,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.report_problem_outlined,

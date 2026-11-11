@@ -244,7 +244,7 @@ class DamagedProductsView extends StackedView<DamagedProductsViewModel> {
           SizedBox(
             width: isDesktop ? 220 : 180,
             child: DropdownButtonFormField<int?>(
-              value: viewModel.selectedProductId,
+              initialValue: viewModel.selectedProductId,
               isExpanded: true,
               decoration: InputDecoration(
                 hintText: 'Filter by Product',
