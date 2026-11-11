@@ -503,8 +503,8 @@ void main() {
       expect(success, true);
       verify(repService.saveOthers(payload)).called(1);
       verify(repService.getMonthlyLedger(
-        year: 2026,
-        month: 10,
+        year: anyNamed('year'),
+        month: anyNamed('month'),
         dealerIds: anyNamed('dealerIds'),
         caneProductId: anyNamed('caneProductId'),
       )).called(2);

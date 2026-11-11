@@ -2016,6 +2016,7 @@ class MockProductMasterService extends _i1.Mock
     int? unitId,
     bool? isActive,
     bool? lowStock,
+    String? productType,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2029,6 +2030,7 @@ class MockProductMasterService extends _i1.Mock
             #unitId: unitId,
             #isActive: isActive,
             #lowStock: lowStock,
+            #productType: productType,
           },
         ),
         returnValue: _i21.Future<_i7.PaginatedList<_i10.ProductModel>>.value(

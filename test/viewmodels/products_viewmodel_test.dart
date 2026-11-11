@@ -81,6 +81,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: anyNamed('lowStock'),
+        productType: anyNamed('productType'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
             meta: PaginationMeta(
@@ -124,6 +125,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: true,
+        productType: anyNamed('productType'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [],
             meta: PaginationMeta(
@@ -144,6 +146,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: true,
+        productType: anyNamed('productType'),
       )).called(1);
     });
 
@@ -161,6 +164,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: anyNamed('lowStock'),
+        productType: anyNamed('productType'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
             meta: PaginationMeta(
@@ -197,6 +201,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: anyNamed('lowStock'),
+        productType: anyNamed('productType'),
       )).called(1);
     });
 
@@ -216,6 +221,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: anyNamed('lowStock'),
+        productType: anyNamed('productType'),
       )).thenAnswer((_) async => const PaginatedList(
             items: [testProduct],
             meta: PaginationMeta(
@@ -306,6 +312,7 @@ void main() {
         unitId: anyNamed('unitId'),
         isActive: anyNamed('isActive'),
         lowStock: anyNamed('lowStock'),
+        productType: anyNamed('productType'),
       )).thenThrow(ApiException(message: 'Database query timeout'));
 
       final model = getModel();
@@ -313,6 +320,111 @@ void main() {
 
       expect(model.isLoadingProducts, false);
       expect(model.productsError, 'Database query timeout');
+    });
+
+    test('refill product configuration, getters, and low stock exclusion', () {
+      const normalProduct = ProductModel(
+        id: 1,
+        name: '20L Bottle Jar',
+        sku: 'JAR-20L',
+        productType: 'normal',
+        defaultPrice: 150.0,
+        costPrice: 80.0,
+        currentStock: 5.0,
+        minStockLevel: 20.0,
+        trackStock: true,
+        isLowStock: true,
+      );
+
+      const refillProduct = ProductModel(
+        id: 2,
+        name: '20L Water Refill',
+        sku: 'REFILL-20L',
+        productType: 'refill',
+        defaultPrice: 35.0,
+        costPrice: 0.0,
+        currentStock: 0.0,
+        minStockLevel: 0.0,
+        trackStock: false,
+        isLowStock: false,
+      );
+
+      expect(normalProduct.isNormal, true);
+      expect(normalProduct.isRefill, false);
+      expect(refillProduct.isNormal, false);
+      expect(refillProduct.isRefill, true);
+
+      // Serialization test
+      final json = refillProduct.toJson();
+      expect(json['product_type'], 'refill');
+      expect(json['cost_price'], null);
+      expect(json['current_stock'], null);
+      expect(json['min_stock_level'], null);
+      expect(json['track_stock'], false);
+
+      final fromJson = ProductModel.fromJson({
+        'id': 2,
+        'name': '20L Water Refill',
+        'sku': 'REFILL-20L',
+        'product_type': 'refill',
+        'default_price': '35.00',
+        'cost_price': null,
+        'current_stock': null,
+        'min_stock_level': null,
+        'track_stock': false,
+        'is_low_stock': false,
+      });
+      expect(fromJson.isRefill, true);
+      expect(fromJson.defaultPrice, 35.0);
+      expect(fromJson.costPrice, 0.0);
+    });
+
+    test('setProductTypeFilter updates filter and refetches products', () async {
+      final service = locator<ProductMasterService>();
+
+      when(service.getProducts(
+        page: anyNamed('page'),
+        perPage: anyNamed('perPage'),
+        search: anyNamed('search'),
+        categoryId: anyNamed('categoryId'),
+        unitId: anyNamed('unitId'),
+        isActive: anyNamed('isActive'),
+        lowStock: anyNamed('lowStock'),
+        productType: 'refill',
+      )).thenAnswer((_) async => const PaginatedList(
+            items: [
+              ProductModel(
+                id: 2,
+                name: 'Refill Water',
+                sku: 'REF-01',
+                productType: 'refill',
+                defaultPrice: 30.0,
+              ),
+            ],
+            meta: PaginationMeta(
+                currentPage: 1, perPage: 15, total: 1, lastPage: 1),
+          ));
+
+      final model = getModel();
+      model.setProductTypeFilter('refill');
+      await Future.delayed(Duration.zero);
+
+      expect(model.selectedProductTypeFilter, 'refill');
+      expect(model.products.length, 1);
+      expect(model.products.first.isRefill, true);
+      expect(model.refillProductsCount, 1);
+      expect(model.normalProductsCount, 0);
+
+      verify(service.getProducts(
+        page: 1,
+        perPage: 15,
+        search: anyNamed('search'),
+        categoryId: anyNamed('categoryId'),
+        unitId: anyNamed('unitId'),
+        isActive: anyNamed('isActive'),
+        lowStock: anyNamed('lowStock'),
+        productType: 'refill',
+      )).called(1);
     });
   });
 }
