@@ -696,7 +696,7 @@ class SettingsView extends StackedView<SettingsViewModel> {
               Expanded(
                 child: _buildTextField(
                     controller: upiIdController,
-                    label: 'UPI ID / VPA',
+                    label: 'UPI ID / VPA (Optional)',
                     hint: 'marinaaqua@sbi'),
               ),
             ],
@@ -1875,7 +1875,7 @@ class _BankCredentialsFormState extends State<_BankCredentialsForm> {
               Expanded(
                 child: SettingsView._buildTextField(
                     controller: _upiIdController,
-                    label: 'UPI ID / VPA',
+                    label: 'UPI ID / VPA (Optional)',
                     hint: 'marinaaqua@sbi'),
               ),
             ],

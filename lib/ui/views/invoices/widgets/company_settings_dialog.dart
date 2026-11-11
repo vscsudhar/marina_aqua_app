@@ -592,7 +592,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           );
                           final upiField = _buildTextField(
                             controller: _upiIdController,
-                            label: 'UPI ID / VPA',
+                            label: 'UPI ID / VPA (Optional)',
                             hintText: 'marinaaqua@sbi',
                           );
 

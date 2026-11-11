@@ -1103,7 +1103,7 @@ class ExportPrintService {
                                     fontSize: 7.5,
                                     fontWeight: pw.FontWeight.bold)),
                             pw.Text(
-                                'IFSC: ${settings.ifscCode} | UPI: ${settings.upiId}',
+                                'IFSC: ${settings.ifscCode}${settings.upiId.trim().isNotEmpty ? " | UPI: ${settings.upiId.trim()}" : ""}',
                                 style: const pw.TextStyle(fontSize: 7.5)),
                           ],
                         ),

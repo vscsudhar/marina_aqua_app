@@ -593,7 +593,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600)),
                                     Text(
-                                        'IFSC: ${companySettings.ifscCode} | UPI: ${companySettings.upiId}',
+                                        'IFSC: ${companySettings.ifscCode}${companySettings.upiId.trim().isNotEmpty ? " | UPI: ${companySettings.upiId.trim()}" : ""}',
                                         style: GoogleFonts.inter(
                                             fontSize: 11,
                                             color: kcTextSecondary)),
