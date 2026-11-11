@@ -54,12 +54,25 @@ class ProductModel {
     this.updatedAt,
   });
 
-  bool get isRefill => productType == 'refill';
-  bool get isNormal => productType != 'refill';
+  bool get isRefill =>
+      productType == 'refill' ||
+      name.toLowerCase().contains('refill') ||
+      name.toLowerCase().contains('refil') ||
+      sku.toLowerCase().contains('refill');
+  bool get isNormal => !isRefill;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    final type = json['product_type'] as String? ?? 'normal';
-    final isRefillType = type == 'refill';
+    final rawName = json['name'] as String? ?? '';
+    final rawSku = json['sku'] as String? ?? '';
+    final rawType = json['product_type'] as String?;
+    final isNameOrSkuRefill = rawName.toLowerCase().contains('refill') ||
+        rawName.toLowerCase().contains('refil') ||
+        rawSku.toLowerCase().contains('refill');
+
+    final type = (rawType == 'refill' || (rawType == null && isNameOrSkuRefill))
+        ? 'refill'
+        : (rawType ?? 'normal');
+    final isRefillType = type == 'refill' || isNameOrSkuRefill;
 
     return ProductModel(
       id: json['id'] is int

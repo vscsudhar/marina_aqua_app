@@ -377,6 +377,24 @@ void main() {
       expect(fromJson.isRefill, true);
       expect(fromJson.defaultPrice, 35.0);
       expect(fromJson.costPrice, 0.0);
+
+      // Case A: Product Type is refill, but word 'refill' is missing in name (e.g. '10litre')
+      const refillWithoutWordInName = ProductModel(
+        id: 3,
+        name: '10litre',
+        sku: '1',
+        productType: 'refill',
+      );
+      expect(refillWithoutWordInName.isRefill, true);
+
+      // Case B: Word 'refill' in name, but product_type is not provided (legacy compatibility)
+      final legacyRefillByName = ProductModel.fromJson({
+        'id': 4,
+        'name': '20L Can Refill Pack',
+        'sku': 'CAN-04',
+        'default_price': '30.00',
+      });
+      expect(legacyRefillByName.isRefill, true);
     });
 
     test('setProductTypeFilter updates filter and refetches products', () async {
