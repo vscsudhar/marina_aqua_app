@@ -774,9 +774,14 @@ class ExportPrintService {
     // down to the bottom details section (Bank details, summary totals, signature),
     // calculate the empty rows needed to fill the vertical space.
     // A single A4 page comfortably accommodates ~13-14 rows before the bottom details.
+    final String effectiveDisclaimer =
+        (invoice.terms != null && invoice.terms!.trim().isNotEmpty)
+            ? invoice.terms!.trim()
+            : settings.invoiceFooterNotes.trim();
+
     final bool hasExtraNotes =
         (invoice.notes != null && invoice.notes!.trim().isNotEmpty) ||
-            (invoice.terms != null && invoice.terms!.length > 60) ||
+            effectiveDisclaimer.length > 50 ||
             (invoice.customerAddress != null &&
                 invoice.customerAddress!.length > 50);
 
@@ -1214,17 +1219,47 @@ class ExportPrintService {
                         ),
                         pw.SizedBox(height: 6),
                         if (invoice.notes != null &&
-                            invoice.notes!.isNotEmpty) ...[
-                          pw.Text('Notes: ${invoice.notes}',
+                            invoice.notes!.trim().isNotEmpty) ...[
+                          pw.Text('Notes: ${invoice.notes!.trim()}',
                               style: const pw.TextStyle(
                                   fontSize: 7, color: PdfColors.grey700)),
                           pw.SizedBox(height: 3),
                         ],
-                        pw.Text(
-                          invoice.terms ?? settings.invoiceFooterNotes,
-                          style: const pw.TextStyle(
-                              fontSize: 6.5, color: PdfColors.grey600),
-                        ),
+                        if (effectiveDisclaimer.isNotEmpty) ...[
+                          pw.Container(
+                            padding: const pw.EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 4),
+                            decoration: pw.BoxDecoration(
+                              color: neutralLight,
+                              border:
+                                  pw.Border.all(color: borderGrey, width: 0.5),
+                              borderRadius: const pw.BorderRadius.all(
+                                  pw.Radius.circular(3)),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  'Declaration / Disclaimer:',
+                                  style: pw.TextStyle(
+                                    fontSize: 7,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: brandDarkNavy,
+                                  ),
+                                ),
+                                pw.SizedBox(height: 1.5),
+                                pw.Text(
+                                  effectiveDisclaimer,
+                                  style: const pw.TextStyle(
+                                    fontSize: 6.5,
+                                    color: PdfColors.grey800,
+                                    lineSpacing: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

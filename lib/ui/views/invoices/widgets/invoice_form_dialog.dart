@@ -240,7 +240,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _paidAmountController.text = inv.paidAmount.toStringAsFixed(2);
       _notesController.text = inv.notes ?? '';
       _termsController.text =
-          inv.terms ?? widget.companySettings.invoiceFooterNotes;
+          (inv.terms != null && inv.terms!.trim().isNotEmpty)
+              ? inv.terms!
+              : widget.companySettings.invoiceFooterNotes;
 
       _rows = inv.items.map((it) {
         final prod = widget.products.cast<ProductModel?>().firstWhere(
@@ -598,7 +600,11 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         'place_of_supply': _placeOfSupplyController.text.trim(),
         'is_interstate': _isInterstate,
         'notes': _notesController.text.trim(),
-        'terms': _termsController.text.trim(),
+        'terms': _termsController.text.trim().isNotEmpty
+            ? _termsController.text.trim()
+            : (widget.companySettings.invoiceFooterNotes.trim().isNotEmpty
+                ? widget.companySettings.invoiceFooterNotes.trim()
+                : null),
         'status': isFinal ? 'finalized' : 'draft',
         'is_final': isFinal,
         'items': itemsPayload,
@@ -1567,7 +1573,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 controller: _termsController,
                 maxLines: 2,
                 decoration: const InputDecoration(
-                  labelText: 'Declaration',
+                  labelText: 'Declaration / Invoice Disclaimer',
                   hintText:
                       'We declare that this invoice shows the actual price of the goods...',
                   isDense: true,

@@ -641,9 +641,9 @@ class InvoicePreviewDialog extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               if (invoice.notes != null &&
-                                  invoice.notes!.isNotEmpty) ...[
+                                  invoice.notes!.trim().isNotEmpty) ...[
                                 Text(
-                                  'Notes: ${invoice.notes}',
+                                  'Notes: ${invoice.notes!.trim()}',
                                   style: GoogleFonts.inter(
                                       fontSize: 11,
                                       fontStyle: FontStyle.italic,
@@ -651,12 +651,49 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 6),
                               ],
-                              Text(
-                                invoice.terms ??
-                                    companySettings.invoiceFooterNotes,
-                                style: GoogleFonts.inter(
-                                    fontSize: 10, color: kcMediumGrey),
-                              ),
+                              Builder(builder: (context) {
+                                final effectiveDisclaimer = (invoice.terms !=
+                                            null &&
+                                        invoice.terms!.trim().isNotEmpty)
+                                    ? invoice.terms!.trim()
+                                    : companySettings.invoiceFooterNotes.trim();
+                                if (effectiveDisclaimer.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: kcVeryLightGrey,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: kcBorderColor),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Declaration / Disclaimer:',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: kcDeepNavy,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        effectiveDisclaimer,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10,
+                                          color: kcTextPrimary,
+                                          height: 1.35,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
                             ],
                           );
 
