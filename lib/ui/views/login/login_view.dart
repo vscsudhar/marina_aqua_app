@@ -512,64 +512,6 @@ class LoginView extends StackedView<LoginViewModel> {
                     ),
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Demo Quick Credentials Fill
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: kcVeryLightGrey,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kcBorderColor),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Admin Initial Account',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: kcTextSecondary,
-                        ),
-                      ),
-                      Text(
-                        'admin@marinaaqua.com',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: kcPrimaryDark,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: viewModel.fillDemoAdmin,
-                  style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    'Auto-fill',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: kcPrimaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

@@ -73,8 +73,8 @@ class DamagedProductsViewModel extends BaseViewModel {
 
   Future<void> _loadProducts() async {
     try {
-      final res =
-          await _productService.getProducts(perPage: 100, isActive: true, productType: 'normal');
+      final res = await _productService.getProducts(
+          perPage: 100, isActive: true, productType: 'normal');
       _products = res.items;
     } catch (_) {
       // Products catalog fetch error handled gracefully

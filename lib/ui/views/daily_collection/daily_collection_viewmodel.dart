@@ -217,10 +217,55 @@ class DailyCollectionViewModel extends BaseViewModel {
     }
   }
 
+  Future<bool> deleteSupply(int id) async {
+    setBusy(true);
+    try {
+      await _collectionService.deleteSupply(id);
+      await refreshAll();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
   Future<bool> recordPayment(Map<String, dynamic> payload) async {
     setBusy(true);
     try {
       await _collectionService.recordPayment(payload);
+      await refreshAll();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  Future<bool> updatePayment(int id, Map<String, dynamic> payload) async {
+    setBusy(true);
+    try {
+      await _collectionService.updatePayment(id, payload);
+      await refreshAll();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  Future<bool> deletePayment(int id) async {
+    setBusy(true);
+    try {
+      await _collectionService.deletePayment(id);
       await refreshAll();
       return true;
     } catch (e) {

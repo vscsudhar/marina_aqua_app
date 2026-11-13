@@ -88,30 +88,50 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       final startStr = DateFormat('yyyy-MM-dd').format(_startDate);
       final endStr = DateFormat('yyyy-MM-dd').format(_endDate);
 
-      final data = await _dealerService.getDealerLedger(
-        widget.dealer.id,
-        startDate: startStr,
-        endDate: endStr,
-      );
+      Map<String, dynamic> data;
+      try {
+        data = await _dealerService.getDealerStatement(
+          widget.dealer.id,
+          startDate: startStr,
+          endDate: endStr,
+        );
+      } catch (_) {
+        data = await _dealerService.getDealerLedger(
+          widget.dealer.id,
+          startDate: startStr,
+          endDate: endStr,
+        );
+      }
 
-      final rawEntries = (data['entries'] as List? ?? []);
+      final rawEntries =
+          (data['transactions'] ?? data['entries']) as List? ?? [];
       _entries =
           rawEntries.map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
-      _openingBalance = (data['opening_balance'] is num)
-          ? (data['opening_balance'] as num).toDouble()
-          : widget.dealer.openingBalance;
-      _closingBalance = (data['current_outstanding'] is num)
-          ? (data['current_outstanding'] as num).toDouble()
-          : widget.dealer.currentOutstanding;
+      final summary = data['summary'] as Map<String, dynamic>?;
+      if (summary != null) {
+        _openingBalance =
+            (summary['opening_balance'] as num?)?.toDouble() ?? 0.0;
+        _closingBalance =
+            (summary['closing_balance'] as num?)?.toDouble() ?? 0.0;
+        _totalDebit = (summary['total_debit'] as num?)?.toDouble() ?? 0.0;
+        _totalCredit = (summary['total_credit'] as num?)?.toDouble() ?? 0.0;
+      } else {
+        _openingBalance = (data['opening_balance'] is num)
+            ? (data['opening_balance'] as num).toDouble()
+            : widget.dealer.openingBalance;
+        _closingBalance = (data['current_outstanding'] is num)
+            ? (data['current_outstanding'] as num).toDouble()
+            : widget.dealer.currentOutstanding;
 
-      _totalDebit = 0;
-      _totalCredit = 0;
-      for (final e in _entries) {
-        _totalDebit +=
-            (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
-        _totalCredit +=
-            (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
+        _totalDebit = 0;
+        _totalCredit = 0;
+        for (final e in _entries) {
+          _totalDebit +=
+              (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
+          _totalCredit +=
+              (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
+        }
       }
 
       setState(() => _isLoading = false);

@@ -121,7 +121,9 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
     final payload = <String, dynamic>{
       'name': _nameController.text.trim(),
       'code': _codeController.text.trim().toUpperCase(),
-      'phone': _phoneController.text.trim(),
+      'phone': _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
       'contact_person': _contactPersonController.text.trim().isEmpty
           ? null
           : _contactPersonController.text.trim(),
@@ -329,17 +331,12 @@ class _DealerFormDialogState extends State<DealerFormDialog> {
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               decoration: const InputDecoration(
-                                labelText: 'Contact Phone Number *',
+                                labelText: 'Contact Phone Number (Optional)',
                                 hintText: '+91 94441 23456',
                                 border: OutlineInputBorder(),
                                 prefixIcon: Icon(Icons.phone),
                               ),
-                              validator: (val) {
-                                if (val == null || val.trim().isEmpty) {
-                                  return 'Phone number is required';
-                                }
-                                return null;
-                              },
+                              validator: (val) => null,
                             ),
                           ),
                           const SizedBox(width: 16),

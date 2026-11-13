@@ -1,11 +1,11 @@
 {
-    "name": "marina_aqua",
-    "short_name": "marina_aqua",
+    "name": "SS AquaFlow",
+    "short_name": "SS AquaFlow",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "SS AquaFlow — Dealer Management System",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

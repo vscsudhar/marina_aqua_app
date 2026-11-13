@@ -716,7 +716,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                                   color: kcPrimaryColor.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                      color: kcPrimaryColor.withValues(alpha: 0.3)),
+                                      color: kcPrimaryColor.withValues(
+                                          alpha: 0.3)),
                                 ),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -944,8 +945,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                     const SizedBox(width: 6),
                   ],
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: product.isActive
                           ? kcSuccessColor.withValues(alpha: 0.12)
@@ -1018,9 +1019,8 @@ class ProductsView extends StackedView<ProductsViewModel> {
                         : '₹${product.costPrice.toStringAsFixed(2)}',
                     style: TextStyle(
                         fontSize: 13,
-                        color: product.isRefill
-                            ? kcMediumGrey
-                            : kcTextSecondary,
+                        color:
+                            product.isRefill ? kcMediumGrey : kcTextSecondary,
                         fontStyle: product.isRefill
                             ? FontStyle.italic
                             : FontStyle.normal),

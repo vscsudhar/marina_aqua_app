@@ -77,6 +77,11 @@ class InvoicesViewModel extends ReactiveViewModel {
   String? _statusFilter;
   String? get statusFilter => _statusFilter;
 
+  String _activeInvoiceType = 'with_gst'; // 'with_gst' or 'without_gst'
+  String get activeInvoiceType => _activeInvoiceType;
+  bool get isWithoutGstTab => _activeInvoiceType == 'without_gst';
+  bool get isWithGstTab => _activeInvoiceType == 'with_gst';
+
   String? _paymentStatusFilter;
   String? get paymentStatusFilter => _paymentStatusFilter;
 
@@ -160,6 +165,7 @@ class InvoicesViewModel extends ReactiveViewModel {
         dealerId: _dealerFilter,
         status: _statusFilter,
         paymentStatus: _paymentStatusFilter,
+        invoiceType: _activeInvoiceType,
         startDate: _startDate,
         endDate: _endDate,
         search: _search,
@@ -185,6 +191,13 @@ class InvoicesViewModel extends ReactiveViewModel {
     _statusFilter = (status != null && status.isNotEmpty && status != 'all')
         ? status
         : null;
+    _currentPage = 1;
+    loadInvoices();
+  }
+
+  void setActiveInvoiceType(String type) {
+    if (_activeInvoiceType == type) return;
+    _activeInvoiceType = type;
     _currentPage = 1;
     loadInvoices();
   }
@@ -351,16 +364,36 @@ class InvoicesViewModel extends ReactiveViewModel {
     }
   }
 
-  Future<void> downloadInvoicePdf(InvoiceModel invoice) async {
+  Future<void> downloadInvoicePdf(
+    InvoiceModel invoice, {
+    List<String>? copyTitles,
+    String? copyLabelName,
+  }) async {
     _isDownloadingPdf = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final bytes = await _exportPrintService.generateInvoicePdf(
-          invoice, companySettings);
-      final filename =
-          'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
+      final safeInvoiceNo =
+          invoice.invoiceNo.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+      final effectiveCopyName =
+          (copyLabelName != null && copyLabelName.isNotEmpty)
+              ? copyLabelName.replaceAll(' ', '_')
+              : 'Original_Copy';
+      final filename = 'Invoice_${safeInvoiceNo}_$effectiveCopyName.pdf';
+
+      final effectiveTitles = copyTitles ??
+          [
+            invoice.isWithoutGst
+                ? 'ORIGINAL FOR CUSTOMER'
+                : 'ORIGINAL FOR RECIPIENT'
+          ];
+
+      final bytes = await _exportPrintService.generateInvoiceMultiCopyPdf(
+        invoice,
+        effectiveTitles,
+        companySettings,
+      );
       _exportPrintService.downloadBytes(
           bytes, filename, ExportPrintService.mimePdf);
       _successMessage = 'Invoice PDF downloaded ($filename).';
@@ -368,8 +401,13 @@ class InvoicesViewModel extends ReactiveViewModel {
       // Fallback to backend download if client generation had an issue
       try {
         final bytes = await _billingService.downloadPdfBytes(invoice.id);
-        final filename =
-            'Invoice_${invoice.invoiceNo.replaceAll('/', '_')}.pdf';
+        final safeInvoiceNo =
+            invoice.invoiceNo.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+        final effectiveCopyName =
+            (copyLabelName != null && copyLabelName.isNotEmpty)
+                ? copyLabelName.replaceAll(' ', '_')
+                : 'Original_Copy';
+        final filename = 'Invoice_${safeInvoiceNo}_$effectiveCopyName.pdf';
         _exportPrintService.downloadBytes(
             bytes, filename, ExportPrintService.mimePdf);
         _successMessage = 'Invoice PDF downloaded ($filename).';
@@ -382,16 +420,33 @@ class InvoicesViewModel extends ReactiveViewModel {
     }
   }
 
-  Future<void> printInvoice(InvoiceModel invoice) async {
+  Future<void> printInvoice(
+    InvoiceModel invoice, {
+    List<String>? copyTitles,
+    String? copyLabelName,
+  }) async {
     _isDownloadingPdf = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final bytes = await _exportPrintService.generateInvoicePdf(
-          invoice, companySettings);
-      await _exportPrintService.printPdfBytes(bytes,
-          title: 'Invoice ${invoice.invoiceNo}');
+      final effectiveTitles = copyTitles ??
+          [
+            invoice.isWithoutGst
+                ? 'ORIGINAL FOR CUSTOMER'
+                : 'ORIGINAL FOR RECIPIENT'
+          ];
+
+      final bytes = await _exportPrintService.generateInvoiceMultiCopyPdf(
+        invoice,
+        effectiveTitles,
+        companySettings,
+      );
+      await _exportPrintService.printPdfBytes(
+        bytes,
+        title:
+            'Invoice ${invoice.invoiceNo}${copyLabelName != null ? " ($copyLabelName)" : ""}',
+      );
       _successMessage =
           'Print preview launched for invoice ${invoice.invoiceNo}.';
     } catch (e) {

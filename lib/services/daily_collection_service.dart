@@ -130,11 +130,37 @@ class DailyCollectionService {
     return DealerSupplyModel.fromJson(data);
   }
 
+  /// Delete a supply delivery and reverse inventory & ledger entries.
+  Future<void> deleteSupply(int id) async {
+    await _apiService.client.delete('/supplies/$id');
+  }
+
   /// Record a payment collection (either standalone or linked to a supply).
   Future<DealerPaymentModel> recordPayment(Map<String, dynamic> payload) async {
     final response = await _apiService.client.post('/payments', data: payload);
     final data = response.data['data'] as Map<String, dynamic>;
     return DealerPaymentModel.fromJson(data);
+  }
+
+  /// Fetch payment details by ID.
+  Future<DealerPaymentModel> getPayment(int id) async {
+    final response = await _apiService.client.get('/payments/$id');
+    final data = response.data['data'] as Map<String, dynamic>;
+    return DealerPaymentModel.fromJson(data);
+  }
+
+  /// Update an existing payment collection and recalculate supply & ledger.
+  Future<DealerPaymentModel> updatePayment(
+      int id, Map<String, dynamic> payload) async {
+    final response =
+        await _apiService.client.put('/payments/$id', data: payload);
+    final data = response.data['data'] as Map<String, dynamic>;
+    return DealerPaymentModel.fromJson(data);
+  }
+
+  /// Delete a payment collection and update linked supply & ledger.
+  Future<void> deletePayment(int id) async {
+    await _apiService.client.delete('/payments/$id');
   }
 
   /// List payment transactions.

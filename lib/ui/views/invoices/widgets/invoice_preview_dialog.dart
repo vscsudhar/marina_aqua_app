@@ -75,7 +75,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         Text(
-                          'Tax Invoice Preview — ${invoice.invoiceNo}',
+                          '${invoice.isWithoutGst ? "Invoice" : "Tax Invoice"} Preview — ${invoice.invoiceNo}',
                           style: GoogleFonts.inter(
                             color: Colors.white,
                             fontSize: 15,
@@ -231,7 +231,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         Text(
                                           effectiveCompanyName,
                                           style: GoogleFonts.inter(
-                                            fontSize: 18,
+                                            fontSize: 22,
                                             fontWeight: FontWeight.w800,
                                             color: kcDeepNavy,
                                           ),
@@ -254,7 +254,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                               Text(
                                 companySettings.address,
                                 style: GoogleFonts.inter(
-                                    fontSize: 12, color: kcTextSecondary),
+                                    fontSize: 13.5, color: kcTextSecondary),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -296,7 +296,9 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  'TAX INVOICE',
+                                  invoice.isWithoutGst
+                                      ? 'INVOICE'
+                                      : 'TAX INVOICE',
                                   style: GoogleFonts.inter(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -305,7 +307,29 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2.5),
+                                decoration: BoxDecoration(
+                                  color: kcBackgroundColor,
+                                  border: Border.all(
+                                      color: kcBorderColor, width: 1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  invoice.isWithoutGst
+                                      ? 'ORIGINAL FOR CUSTOMER'
+                                      : 'ORIGINAL FOR RECIPIENT',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: kcDeepNavy,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
                               _metaRow('Invoice No:', invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
@@ -448,7 +472,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: invoice.isWithoutGst ? 28 : 20),
 
                       // Line Items Table with horizontal scroll safety
                       LayoutBuilder(
@@ -460,18 +484,28 @@ class InvoicePreviewDialog extends StatelessWidget {
                               child: Table(
                                 border: TableBorder.all(
                                     color: kcBorderColor, width: 1),
-                                columnWidths: const {
-                                  0: FixedColumnWidth(40), // Sl
-                                  1: FlexColumnWidth(3), // Description
-                                  2: FlexColumnWidth(1), // HSN
-                                  3: FlexColumnWidth(1), // Qty
-                                  4: FlexColumnWidth(1.2), // Rate
-                                  5: FlexColumnWidth(1), // Disc
-                                  6: FlexColumnWidth(1.3), // Taxable
-                                  7: FlexColumnWidth(
-                                      1.6), // Tax Split (CGST + SGST or IGST)
-                                  8: FlexColumnWidth(1.4), // Total
-                                },
+                                columnWidths: invoice.isWithoutGst
+                                    ? const {
+                                        0: FixedColumnWidth(40), // Sl
+                                        1: FlexColumnWidth(3.5), // Description
+                                        2: FlexColumnWidth(1.2), // HSN
+                                        3: FlexColumnWidth(1.2), // Qty
+                                        4: FlexColumnWidth(1.4), // Rate
+                                        5: FlexColumnWidth(1.2), // Disc
+                                        6: FlexColumnWidth(1.6), // Total
+                                      }
+                                    : const {
+                                        0: FixedColumnWidth(40), // Sl
+                                        1: FlexColumnWidth(3), // Description
+                                        2: FlexColumnWidth(1), // HSN
+                                        3: FlexColumnWidth(1), // Qty
+                                        4: FlexColumnWidth(1.2), // Rate
+                                        5: FlexColumnWidth(1), // Disc
+                                        6: FlexColumnWidth(1.3), // Taxable
+                                        7: FlexColumnWidth(
+                                            1.6), // Tax Split (CGST + SGST or IGST)
+                                        8: FlexColumnWidth(1.4), // Total
+                                      },
                                 children: [
                                   TableRow(
                                     decoration: const BoxDecoration(
@@ -494,15 +528,17 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       _pCell('Disc (₹)',
                                           isHeader: true,
                                           align: TextAlign.right),
-                                      _pCell('Taxable (₹)',
-                                          isHeader: true,
-                                          align: TextAlign.right),
-                                      _pCell(
-                                          !invoice.isInterstate
-                                              ? 'GST Split (CGST+SGST)'
-                                              : 'IGST (₹)',
-                                          isHeader: true,
-                                          align: TextAlign.right),
+                                      if (!invoice.isWithoutGst) ...[
+                                        _pCell('Taxable (₹)',
+                                            isHeader: true,
+                                            align: TextAlign.right),
+                                        _pCell(
+                                            !invoice.isInterstate
+                                                ? 'GST Split (CGST+SGST)'
+                                                : 'IGST (₹)',
+                                            isHeader: true,
+                                            align: TextAlign.right),
+                                      ],
                                       _pCell('Total (₹)',
                                           isHeader: true,
                                           align: TextAlign.right),
@@ -528,19 +564,22 @@ class InvoicePreviewDialog extends StatelessWidget {
                                                     .toStringAsFixed(2)
                                                 : '-',
                                             align: TextAlign.right),
-                                        _pCell(
-                                            it.taxableAmount.toStringAsFixed(2),
-                                            align: TextAlign.right),
-                                        _pCell(
-                                          !invoice.isInterstate
-                                              ? (it.taxRate > 0
-                                                  ? 'CGST (${it.cgstRate.toStringAsFixed(it.cgstRate % 1 == 0 ? 0 : 1)}%): ${it.cgstAmount.toStringAsFixed(2)}\nSGST (${it.sgstRate.toStringAsFixed(it.sgstRate % 1 == 0 ? 0 : 1)}%): ${it.sgstAmount.toStringAsFixed(2)}'
-                                                  : '0.00 (0%)')
-                                              : (it.taxRate > 0
-                                                  ? 'IGST (${it.igstRate.toStringAsFixed(0)}%): ${it.igstAmount.toStringAsFixed(2)}'
-                                                  : '0.00 (0%)'),
-                                          align: TextAlign.right,
-                                        ),
+                                        if (!invoice.isWithoutGst) ...[
+                                          _pCell(
+                                              it.taxableAmount
+                                                  .toStringAsFixed(2),
+                                              align: TextAlign.right),
+                                          _pCell(
+                                            !invoice.isInterstate
+                                                ? (it.taxRate > 0
+                                                    ? 'CGST (${it.cgstRate.toStringAsFixed(it.cgstRate % 1 == 0 ? 0 : 1)}%): ${it.cgstAmount.toStringAsFixed(2)}\nSGST (${it.sgstRate.toStringAsFixed(it.sgstRate % 1 == 0 ? 0 : 1)}%): ${it.sgstAmount.toStringAsFixed(2)}'
+                                                    : '0.00 (0%)')
+                                                : (it.taxRate > 0
+                                                    ? 'IGST (${it.igstRate.toStringAsFixed(0)}%): ${it.igstAmount.toStringAsFixed(2)}'
+                                                    : '0.00 (0%)'),
+                                            align: TextAlign.right,
+                                          ),
+                                        ],
                                         _pCell(it.lineTotal.toStringAsFixed(2),
                                             align: TextAlign.right,
                                             isBold: true),
@@ -629,17 +668,19 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 _sumRow('Discount:',
                                     '- ${formatAmount(invoice.discountTotal)}',
                                     color: kcErrorColor),
-                              _sumRow('Taxable Amount:',
-                                  formatAmount(invoice.taxableAmount),
-                                  isBold: true),
-                              if (!invoice.isInterstate) ...[
-                                _sumRow(
-                                    'CGST:', formatAmount(invoice.cgstAmount)),
-                                _sumRow(
-                                    'SGST:', formatAmount(invoice.sgstAmount)),
-                              ] else ...[
-                                _sumRow(
-                                    'IGST:', formatAmount(invoice.igstAmount)),
+                              if (!invoice.isWithoutGst) ...[
+                                _sumRow('Taxable Amount:',
+                                    formatAmount(invoice.taxableAmount),
+                                    isBold: true),
+                                if (!invoice.isInterstate) ...[
+                                  _sumRow('CGST:',
+                                      formatAmount(invoice.cgstAmount)),
+                                  _sumRow('SGST:',
+                                      formatAmount(invoice.sgstAmount)),
+                                ] else ...[
+                                  _sumRow('IGST:',
+                                      formatAmount(invoice.igstAmount)),
+                                ],
                               ],
                               _sumRow(
                                 'Round Off:',

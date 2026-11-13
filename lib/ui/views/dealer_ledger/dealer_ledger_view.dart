@@ -7,6 +7,7 @@ import 'package:marina_aqua/ui/widgets/marina_logo.dart';
 import 'package:marina_aqua/models/dealer_ledger_report_models.dart';
 import 'dealer_ledger_viewmodel.dart';
 import 'widgets/dealer_ledger_table.dart';
+import 'widgets/ledger_cell_transactions_dialog.dart';
 import 'widgets/others_entry_dialog.dart';
 
 class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
@@ -97,6 +98,14 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
                       onOthersTap: (date, others) => _openOthersDialog(
                           context, viewModel,
                           initialDate: date, existingOthers: others),
+                      onDealerCellTap: (dealer, date, entry) =>
+                          LedgerCellTransactionsDialog.show(
+                        context,
+                        dealer: dealer,
+                        date: date,
+                        cellEntry: entry,
+                        onTransactionModified: () => viewModel.generateReport(),
+                      ),
                     ),
                     const SizedBox(height: 20),
 

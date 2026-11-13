@@ -397,7 +397,8 @@ void main() {
       expect(legacyRefillByName.isRefill, true);
     });
 
-    test('setProductTypeFilter updates filter and refetches products', () async {
+    test('setProductTypeFilter updates filter and refetches products',
+        () async {
       final service = locator<ProductMasterService>();
 
       when(service.getProducts(

@@ -408,6 +408,7 @@ class InvoiceModel {
   final String? customerGstin;
   final String placeOfSupply;
   final bool isInterstate;
+  final String invoiceType;
   final int? dealerSupplyId;
   final String? dealerSupplyNo;
   final double subtotal;
@@ -452,6 +453,7 @@ class InvoiceModel {
     this.customerGstin,
     this.placeOfSupply = '33-Tamil Nadu',
     this.isInterstate = false,
+    this.invoiceType = 'with_gst',
     this.dealerSupplyId,
     this.dealerSupplyNo,
     this.subtotal = 0.0,
@@ -487,6 +489,8 @@ class InvoiceModel {
   bool get isDraft => status.toLowerCase() == 'draft';
   bool get isFinalized => status.toLowerCase() == 'finalized';
   bool get isCancelled => status.toLowerCase() == 'cancelled';
+  bool get isWithoutGst => invoiceType.toLowerCase() == 'without_gst';
+  bool get isWithGst => !isWithoutGst;
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     return InvoiceModel(
@@ -506,6 +510,11 @@ class InvoiceModel {
       customerGstin: json['customer_gstin'] as String?,
       placeOfSupply: json['place_of_supply'] as String? ?? '33-Tamil Nadu',
       isInterstate: json['is_interstate'] == true || json['is_interstate'] == 1,
+      invoiceType: json['invoice_type'] as String? ??
+          (((json['tax_total'] != null &&
+                  (double.tryParse(json['tax_total'].toString()) ?? 0.0) > 0))
+              ? 'with_gst'
+              : 'with_gst'),
       dealerSupplyId: json['dealer_supply_id'] is int
           ? json['dealer_supply_id']
           : int.tryParse(json['dealer_supply_id']?.toString() ?? ''),

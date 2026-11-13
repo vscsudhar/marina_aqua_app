@@ -8,12 +8,16 @@ class DealerLedgerTable extends StatelessWidget {
   final MonthlyLedgerReportModel report;
   final bool isDetailedMode;
   final void Function(DateTime date, LedgerDayOthersEntry others)? onOthersTap;
+  final void Function(
+          LedgerDealerModel dealer, String date, LedgerDealerDayEntry? entry)?
+      onDealerCellTap;
 
   const DealerLedgerTable({
     super.key,
     required this.report,
     required this.isDetailedMode,
     this.onOthersTap,
+    this.onDealerCellTap,
   });
 
   @override
@@ -478,33 +482,37 @@ class DealerLedgerTable extends StatelessWidget {
             ),
             ...dealers.map((d) {
               final ent = day.dealers[d.id];
-              return Container(
-                width: dealerW,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  border: Border(
-                      right: BorderSide(color: AppColors.border, width: 0.5)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('${ent?.caneQty ?? 0} cans',
-                        style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF0369A1))),
-                    if ((ent?.fillingAmount ?? 0) > 0)
-                      Text(fmt.format(ent!.fillingAmount),
+              return InkWell(
+                onTap: () => onDealerCellTap?.call(d, day.date, ent),
+                child: Container(
+                  width: dealerW,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                        right: BorderSide(color: AppColors.border, width: 0.5)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('${ent?.caneQty ?? 0} cans',
                           style: GoogleFonts.inter(
-                              fontSize: 9, color: const Color(0xFF3730A3))),
-                    if ((ent?.paymentsReceived ?? 0) > 0)
-                      Text('${fmt.format(ent!.paymentsReceived)} pd',
-                          style: GoogleFonts.inter(
-                              fontSize: 9,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF15803D))),
-                  ],
+                              color: const Color(0xFF0369A1))),
+                      if ((ent?.fillingAmount ?? 0) > 0)
+                        Text(fmt.format(ent!.fillingAmount),
+                            style: GoogleFonts.inter(
+                                fontSize: 9, color: const Color(0xFF3730A3))),
+                      if ((ent?.paymentsReceived ?? 0) > 0)
+                        Text('${fmt.format(ent!.paymentsReceived)} pd',
+                            style: GoogleFonts.inter(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF15803D))),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -588,20 +596,17 @@ class DealerLedgerTable extends StatelessWidget {
           ...dealers.map((d) {
             final ent = day.dealers[d.id];
             final q = ent?.caneQty ?? 0;
-            final p = ent?.paymentsReceived ?? 0.0;
-            final text = q > 0 ? '$q' : (p > 0 ? '₹${p.round()} pd' : '-');
+            final text = q > 0 ? '$q' : '-';
             return _cell(text, dealerW,
                 fontSize: 10,
-                bold: q > 0 || p > 0,
-                textColor:
-                    p > 0 ? const Color(0xFF15803D) : AppColors.textPrimary);
+                bold: q > 0,
+                textColor: AppColors.textPrimary,
+                onTap: () => onDealerCellTap?.call(d, day.date, ent),
+                tooltip:
+                    'Tap to view transactions for ${d.name} on ${day.formatted}');
           }),
           _cell(
-            day.others.caneQty > 0
-                ? '${day.others.caneQty}'
-                : (day.others.paymentsReceived > 0
-                    ? '₹${day.others.paymentsReceived.round()} pd'
-                    : '-'),
+            day.others.caneQty > 0 ? '${day.others.caneQty}' : '-',
             othersW,
             fontSize: 10,
             bgColor: const Color(0x0A0284C7),

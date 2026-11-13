@@ -1069,7 +1069,7 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
-              labelText: 'Collection Amount (₹) *',
+              labelText: 'Collection Amount (₹) (Optional)',
               labelStyle: GoogleFonts.inter(fontSize: 12),
               prefixIcon: const Icon(Icons.currency_rupee_rounded,
                   size: 20, color: kcSuccessColor),
@@ -1085,9 +1085,12 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               setState(() {});
             },
             validator: (val) {
-              final numVal = double.tryParse(val ?? '');
-              if (numVal == null || numVal <= 0) {
-                return 'Enter a valid amount greater than zero.';
+              if (val == null || val.trim().isEmpty) {
+                return null; // Empty is allowed (defaults to 0 / unpaid supply)
+              }
+              final numVal = double.tryParse(val.trim());
+              if (numVal == null || numVal < 0) {
+                return 'Enter a valid amount (0 or more).';
               }
               return null;
             },
@@ -1246,10 +1249,61 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final amount = double.parse(_amountController.text.trim());
+    final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
+
+    if (_items.isEmpty && amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Please select products for supply, or enter a collection amount.')),
+      );
+      return;
+    }
+
+    final todayBill = _items.fold(0.0, (sum, it) => sum + it.lineTotal);
+    final currentOut = widget.dealer.currentOutstanding > 0
+        ? widget.dealer.currentOutstanding
+        : 0.0;
+    final maxAllowed =
+        _items.isNotEmpty ? (todayBill + currentOut) : currentOut;
+
+    // Outstanding validation
+    if (amount > maxAllowed && maxAllowed > 0) {
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded,
+                  color: Colors.orange, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Outstanding Limit Exceeded',
+                style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ],
+          ),
+          content: Text(
+            'Current outstanding amount is only ₹${maxAllowed.toStringAsFixed(0)}. You cannot collect more than the outstanding amount.',
+            style: GoogleFonts.inter(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
 
     if (_items.isNotEmpty) {
       // Validate that all items have product selected and quantity > 0
@@ -1271,7 +1325,61 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
           return;
         }
       }
+    }
 
+    bool includeInLedger = true;
+    if (amount > 0) {
+      final promptResult = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              const Icon(Icons.help_outline_rounded,
+                  color: kcPrimaryDark, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Include in Ledger?',
+                style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ],
+          ),
+          content: Text(
+            '₹${amount.toStringAsFixed(0)} collected successfully. Do you want to include this payment in the Dealer Ledger Amount section?',
+            style: GoogleFonts.inter(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('No',
+                  style: TextStyle(
+                      color: kcMediumGrey, fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kcPrimaryDark,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Yes',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      if (promptResult != null) {
+        includeInLedger = promptResult;
+      }
+    }
+
+    if (!mounted) return;
+
+    if (_items.isNotEmpty) {
       final payload = <String, dynamic>{
         '_is_supply': true,
         'dealer_id': widget.dealer.id,
@@ -1293,6 +1401,7 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         'payment_notes': _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
+        'include_in_ledger_amount': includeInLedger,
         'idempotency_key':
             'COL-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
       };
@@ -1312,6 +1421,7 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         'notes': _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
+        'include_in_ledger_amount': includeInLedger,
         'idempotency_key':
             'PAY-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
       };

@@ -64,6 +64,22 @@ class DealerLedgerReportService {
     return DailyOtherTransactionModel.fromJson(data);
   }
 
+  /// Fetches underlying source transactions contributing to a dealer cell on a given date.
+  Future<Map<String, dynamic>> getCellTransactions({
+    required int dealerId,
+    required String date,
+  }) async {
+    final response = await _apiService.client.get(
+      '/reports/dealer-ledger/cell-transactions',
+      queryParameters: {
+        'dealer_id': dealerId,
+        'date': date,
+      },
+    );
+    final data = response.data['data'] as Map<String, dynamic>;
+    return data;
+  }
+
   /// Returns full URL for PDF export.
   String getExportPdfUrl({
     required int year,

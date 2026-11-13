@@ -745,13 +745,13 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color:
-                                              kcAquaCyan.withValues(alpha: 0.15),
+                                          color: kcAquaCyan.withValues(
+                                              alpha: 0.15),
                                           borderRadius:
                                               BorderRadius.circular(4),
                                           border: Border.all(
-                                              color: kcAquaCyan
-                                                  .withValues(alpha: 0.4)),
+                                              color: kcAquaCyan.withValues(
+                                                  alpha: 0.4)),
                                         ),
                                         child: const Text(
                                           'Refill Mode Active',
@@ -773,15 +773,14 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                           setState(
                                               () => _productType = 'normal');
                                         },
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 10),
                                           decoration: BoxDecoration(
                                             color: !_isRefill
-                                                ? kcPrimaryColor
-                                                    .withValues(alpha: 0.08)
+                                                ? kcPrimaryColor.withValues(
+                                                    alpha: 0.08)
                                                 : Colors.white,
                                             border: Border.all(
                                               color: !_isRefill
@@ -822,7 +821,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                                       'Standard inventory & purchase cost',
                                                       style: TextStyle(
                                                           fontSize: 10.5,
-                                                          color: kcTextSecondary),
+                                                          color:
+                                                              kcTextSecondary),
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -847,15 +847,14 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                           setState(
                                               () => _productType = 'refill');
                                         },
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 10),
                                           decoration: BoxDecoration(
                                             color: _isRefill
-                                                ? kcAquaCyan
-                                                    .withValues(alpha: 0.12)
+                                                ? kcAquaCyan.withValues(
+                                                    alpha: 0.12)
                                                 : Colors.white,
                                             border: Border.all(
                                               color: _isRefill
@@ -896,7 +895,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                                       'Refill service (no purchase/stock)',
                                                       style: TextStyle(
                                                           fontSize: 10.5,
-                                                          color: kcTextSecondary),
+                                                          color:
+                                                              kcTextSecondary),
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,

@@ -9,12 +9,14 @@ import '../../../common/app_colors.dart';
 class SupplyDetailsDialog extends StatelessWidget {
   final DealerSupplyModel supply;
   final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
   final VoidCallback? onRecordPayment;
 
   const SupplyDetailsDialog({
     super.key,
     required this.supply,
     this.onEdit,
+    this.onDelete,
     this.onRecordPayment,
   });
 
@@ -470,6 +472,20 @@ class SupplyDetailsDialog extends StatelessWidget {
               },
               icon: const Icon(Icons.edit_rounded, size: 16),
               label: const Text('Edit Supply'),
+            ),
+          if (onDelete != null)
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onDelete?.call();
+              },
+              icon: const Icon(Icons.delete_outline,
+                  size: 16, color: kcErrorColor),
+              label:
+                  const Text('Delete', style: TextStyle(color: kcErrorColor)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: kcErrorColor),
+              ),
             ),
           if (supply.outstandingAmount > 0 && onRecordPayment != null)
             ElevatedButton.icon(

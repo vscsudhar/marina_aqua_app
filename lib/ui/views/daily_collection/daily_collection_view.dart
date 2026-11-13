@@ -1488,21 +1488,41 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                             fontWeight: FontWeight.w800,
                             color: kcPrimaryDark),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.visibility_rounded,
                             color: kcPrimaryDark),
+                        tooltip: 'View Supply',
                         onPressed: () async {
                           final details =
                               await viewModel.fetchSupplyDetails(s.id);
                           if (details != null && context.mounted) {
                             showDialog(
                               context: context,
-                              builder: (_) =>
-                                  SupplyDetailsDialog(supply: details),
+                              builder: (_) => SupplyDetailsDialog(
+                                supply: details,
+                                onEdit: () => _showEditSupplyDialog(
+                                    context, viewModel, details),
+                                onDelete: () => _showDeleteSupplyConfirmation(
+                                    context, viewModel, details),
+                              ),
                             );
                           }
                         },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined,
+                            size: 20, color: kcPrimaryDark),
+                        tooltip: 'Edit Collection Entry',
+                        onPressed: () =>
+                            _showEditSupplyDialog(context, viewModel, s),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline,
+                            size: 20, color: kcErrorColor),
+                        tooltip: 'Delete Collection Entry',
+                        onPressed: () => _showDeleteSupplyConfirmation(
+                            context, viewModel, s),
                       ),
                     ],
                   ),
@@ -1622,17 +1642,718 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                   ],
                 ),
               ),
-              Text(
-                p.amountFormatted,
-                style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: kcSuccessColor),
+              Row(
+                children: [
+                  Text(
+                    p.amountFormatted,
+                    style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: kcSuccessColor),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined,
+                        size: 20, color: kcPrimaryDark),
+                    tooltip: 'Edit Payment',
+                    onPressed: () =>
+                        _showEditPaymentDialog(context, viewModel, p),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline,
+                        size: 20, color: kcErrorColor),
+                    tooltip: 'Delete Payment',
+                    onPressed: () =>
+                        _showDeletePaymentConfirmation(context, viewModel, p),
+                  ),
+                ],
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _showEditSupplyDialog(BuildContext context,
+      DailyCollectionViewModel viewModel, DealerSupplyModel supply) {
+    showDialog(
+      context: context,
+      builder: (_) => EditCollectionSupplyDialog(
+        supply: supply,
+        onSave: (payload) => viewModel.updateSupply(supply.id, payload),
+      ),
+    );
+  }
+
+  void _showDeleteSupplyConfirmation(BuildContext context,
+      DailyCollectionViewModel viewModel, DealerSupplyModel supply) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.delete_outline, color: kcErrorColor, size: 24),
+            const SizedBox(width: 8),
+            Text('Delete Collection Entry',
+                style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete collection entry "${supply.supplyNo}" for ${supply.dealerName ?? 'Dealer'}? This will reverse the supply and all linked ledger transactions.',
+          style: GoogleFonts.inter(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kcErrorColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              viewModel.deleteSupply(supply.id);
+            },
+            child: const Text('Delete',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditPaymentDialog(BuildContext context,
+      DailyCollectionViewModel viewModel, DealerPaymentModel payment) {
+    showDialog(
+      context: context,
+      builder: (_) => EditPaymentEntryDialog(
+        payment: payment,
+        onSave: (payload) => viewModel.updatePayment(payment.id, payload),
+      ),
+    );
+  }
+
+  void _showDeletePaymentConfirmation(BuildContext context,
+      DailyCollectionViewModel viewModel, DealerPaymentModel payment) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.delete_outline, color: kcErrorColor, size: 24),
+            const SizedBox(width: 8),
+            Text('Delete Payment Entry',
+                style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete payment "${payment.paymentNo}" of ${payment.amountFormatted} for ${payment.dealerName ?? 'Dealer'}? This will update the dealer balance and ledger.',
+          style: GoogleFonts.inter(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kcErrorColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              viewModel.deletePayment(payment.id);
+            },
+            child: const Text('Delete',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EditCollectionSupplyDialog extends StatefulWidget {
+  final DealerSupplyModel supply;
+  final Function(Map<String, dynamic> payload) onSave;
+
+  const EditCollectionSupplyDialog({
+    super.key,
+    required this.supply,
+    required this.onSave,
+  });
+
+  @override
+  State<EditCollectionSupplyDialog> createState() =>
+      _EditCollectionSupplyDialogState();
+}
+
+class _EditCollectionSupplyDialogState
+    extends State<EditCollectionSupplyDialog> {
+  late DateTime _collectionDate;
+  late String _paymentMode;
+  late TextEditingController _referenceController;
+  late TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _collectionDate =
+        DateTime.tryParse(widget.supply.supplyDate) ?? DateTime.now();
+    _paymentMode = widget.supply.payments.isNotEmpty
+        ? widget.supply.payments.first.paymentMethod.toLowerCase()
+        : 'cash';
+    if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft']
+        .contains(_paymentMode)) {
+      _paymentMode = 'cash';
+    }
+    _referenceController = TextEditingController(
+      text: widget.supply.payments.isNotEmpty
+          ? (widget.supply.payments.first.referenceNo ?? '')
+          : '',
+    );
+    _notesController = TextEditingController(text: widget.supply.notes ?? '');
+  }
+
+  @override
+  void dispose() {
+    _referenceController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: kcSurfaceWhite,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: kcPrimaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.edit_note_rounded,
+                            color: kcPrimaryDark, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Edit Collection Entry',
+                              style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: kcDeepNavy)),
+                          Text(widget.supply.supplyNo,
+                              style: GoogleFonts.inter(
+                                  fontSize: 12, color: kcTextSecondary)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: kcVeryLightGrey,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kcBorderColor),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_outline_rounded,
+                        size: 16, color: kcMediumGrey),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.supply.dealerName ?? '-'} (${widget.supply.dealerCode ?? '-'})',
+                      style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: kcDeepNavy),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Collection Date',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              InkWell(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _collectionDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+                  if (picked != null) {
+                    setState(() => _collectionDate = picked);
+                  }
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: kcBorderColor),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded,
+                          size: 18, color: kcPrimaryDark),
+                      const SizedBox(width: 10),
+                      Text(
+                        DateFormat('dd MMM yyyy').format(_collectionDate),
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: kcDeepNavy),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_drop_down_rounded,
+                          color: kcMediumGrey),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('Payment Mode',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                initialValue: _paymentMode,
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                  DropdownMenuItem(
+                      value: 'upi', child: Text('UPI / GPay / PhonePe')),
+                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                  DropdownMenuItem(
+                      value: 'bank_transfer', child: Text('Bank Transfer')),
+                  DropdownMenuItem(value: 'neft', child: Text('NEFT / RTGS')),
+                ],
+                onChanged: (val) {
+                  if (val != null) setState(() => _paymentMode = val);
+                },
+              ),
+              const SizedBox(height: 14),
+              Text('Reference / Transaction ID',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _referenceController,
+                decoration: InputDecoration(
+                  hintText: 'e.g. UPI Ref / UTR / Cheque No',
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('Remarks / Notes',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _notesController,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  hintText: 'Enter notes or remarks...',
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kcPrimaryDark,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                    ),
+                    onPressed: () {
+                      final payload = <String, dynamic>{
+                        'supply_date':
+                            DateFormat('yyyy-MM-dd').format(_collectionDate),
+                        'payment_method': _paymentMode,
+                        'payment_reference':
+                            _referenceController.text.trim().isNotEmpty
+                                ? _referenceController.text.trim()
+                                : null,
+                        'payment_notes': _notesController.text.trim().isNotEmpty
+                            ? _notesController.text.trim()
+                            : null,
+                        'notes': _notesController.text.trim().isNotEmpty
+                            ? _notesController.text.trim()
+                            : null,
+                      };
+                      widget.onSave(payload);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Save Changes',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EditPaymentEntryDialog extends StatefulWidget {
+  final DealerPaymentModel payment;
+  final Function(Map<String, dynamic> payload) onSave;
+
+  const EditPaymentEntryDialog({
+    super.key,
+    required this.payment,
+    required this.onSave,
+  });
+
+  @override
+  State<EditPaymentEntryDialog> createState() => _EditPaymentEntryDialogState();
+}
+
+class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
+  late DateTime _paymentDate;
+  late String _paymentMode;
+  late TextEditingController _referenceController;
+  late TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _paymentDate =
+        DateTime.tryParse(widget.payment.paymentDate) ?? DateTime.now();
+    _paymentMode = widget.payment.paymentMethod.toLowerCase();
+    if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft']
+        .contains(_paymentMode)) {
+      _paymentMode = 'cash';
+    }
+    _referenceController =
+        TextEditingController(text: widget.payment.referenceNo ?? '');
+    _notesController = TextEditingController(text: widget.payment.notes ?? '');
+  }
+
+  @override
+  void dispose() {
+    _referenceController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: kcSurfaceWhite,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: kcSuccessColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.edit_note_rounded,
+                            color: kcSuccessColor, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Edit Payment',
+                              style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: kcDeepNavy)),
+                          Text(widget.payment.paymentNo,
+                              style: GoogleFonts.inter(
+                                  fontSize: 12, color: kcTextSecondary)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: kcVeryLightGrey,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kcBorderColor),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_outline_rounded,
+                        size: 16, color: kcMediumGrey),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.payment.dealerName ?? '-'} (${widget.payment.dealerCode ?? '-'})  •  ${widget.payment.amountFormatted}',
+                      style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: kcDeepNavy),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Payment Date',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              InkWell(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _paymentDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+                  if (picked != null) {
+                    setState(() => _paymentDate = picked);
+                  }
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: kcBorderColor),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded,
+                          size: 18, color: kcPrimaryDark),
+                      const SizedBox(width: 10),
+                      Text(
+                        DateFormat('dd MMM yyyy').format(_paymentDate),
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: kcDeepNavy),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_drop_down_rounded,
+                          color: kcMediumGrey),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('Payment Mode',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                initialValue: _paymentMode,
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                  DropdownMenuItem(
+                      value: 'upi', child: Text('UPI / GPay / PhonePe')),
+                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                  DropdownMenuItem(
+                      value: 'bank_transfer', child: Text('Bank Transfer')),
+                  DropdownMenuItem(value: 'neft', child: Text('NEFT / RTGS')),
+                ],
+                onChanged: (val) {
+                  if (val != null) setState(() => _paymentMode = val);
+                },
+              ),
+              const SizedBox(height: 14),
+              Text('Reference / Transaction ID',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _referenceController,
+                decoration: InputDecoration(
+                  hintText: 'e.g. UPI Ref / UTR / Cheque No',
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('Remarks / Notes',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: kcDeepNavy)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _notesController,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  hintText: 'Enter notes or remarks...',
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: kcBorderColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kcSuccessColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                    ),
+                    onPressed: () {
+                      final payload = <String, dynamic>{
+                        'payment_date':
+                            DateFormat('yyyy-MM-dd').format(_paymentDate),
+                        'payment_method': _paymentMode,
+                        'reference_no':
+                            _referenceController.text.trim().isNotEmpty
+                                ? _referenceController.text.trim()
+                                : null,
+                        'notes': _notesController.text.trim().isNotEmpty
+                            ? _notesController.text.trim()
+                            : null,
+                      };
+                      widget.onSave(payload);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Save Changes',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -102,9 +102,11 @@ class ProductModel {
       costPrice: _parseDouble(json['cost_price']),
       taxRate: _parseDouble(json['tax_rate']),
       currentStock: isRefillType ? 0.0 : _parseDouble(json['current_stock']),
-      trackStock: !isRefillType && (json['track_stock'] == true || json['track_stock'] == 1),
+      trackStock: !isRefillType &&
+          (json['track_stock'] == true || json['track_stock'] == 1),
       minStockLevel: isRefillType ? 0.0 : _parseDouble(json['min_stock_level']),
-      isLowStock: !isRefillType && (json['is_low_stock'] == true || json['is_low_stock'] == 1),
+      isLowStock: !isRefillType &&
+          (json['is_low_stock'] == true || json['is_low_stock'] == 1),
       isActive: json['is_active'] == true || json['is_active'] == 1,
       isReferenced: json['is_referenced'] == true || json['is_referenced'] == 1,
       category: json['category'] is Map<String, dynamic>

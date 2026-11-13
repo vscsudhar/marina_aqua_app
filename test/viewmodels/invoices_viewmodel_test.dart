@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
@@ -123,6 +122,7 @@ void main() {
         dealerId: anyNamed('dealerId'),
         status: anyNamed('status'),
         paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
         search: anyNamed('search'),
@@ -161,6 +161,7 @@ void main() {
         dealerId: anyNamed('dealerId'),
         status: anyNamed('status'),
         paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
         search: anyNamed('search'),
@@ -186,6 +187,7 @@ void main() {
         dealerId: anyNamed('dealerId'),
         status: anyNamed('status'),
         paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
         search: anyNamed('search'),
@@ -211,6 +213,7 @@ void main() {
         dealerId: anyNamed('dealerId'),
         status: anyNamed('status'),
         paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
         search: anyNamed('search'),
@@ -243,6 +246,7 @@ void main() {
         dealerId: anyNamed('dealerId'),
         status: anyNamed('status'),
         paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
         startDate: anyNamed('startDate'),
         endDate: anyNamed('endDate'),
         search: anyNamed('search'),
@@ -259,11 +263,142 @@ void main() {
       expect(viewModel.successMessage, 'Payment recorded successfully!');
     });
 
-    test('downloadInvoicePdf generates invoice pdf and sets success message', () async {
+    test('downloadInvoicePdf generates invoice pdf and sets success message',
+        () async {
       final viewModel = InvoicesViewModel(billingService: billingService);
       await viewModel.downloadInvoicePdf(testInvoices.first);
 
       expect(viewModel.successMessage, contains('downloaded'));
+    });
+
+    test(
+        'downloadInvoicePdf supports GST copy types (Original, Duplicate, Triplicate, All)',
+        () async {
+      final viewModel = InvoicesViewModel(billingService: billingService);
+      final gstInvoice = testInvoices.first;
+
+      // 1. Original Copy
+      await viewModel.downloadInvoicePdf(
+        gstInvoice,
+        copyTitles: ['ORIGINAL FOR RECIPIENT'],
+        copyLabelName: 'Original_Copy',
+      );
+      expect(viewModel.successMessage, contains('Original_Copy'));
+
+      // 2. Duplicate Copy
+      await viewModel.downloadInvoicePdf(
+        gstInvoice,
+        copyTitles: ['DUPLICATE FOR TRANSPORTER'],
+        copyLabelName: 'Duplicate_Copy',
+      );
+      expect(viewModel.successMessage, contains('Duplicate_Copy'));
+
+      // 3. Triplicate Copy
+      await viewModel.downloadInvoicePdf(
+        gstInvoice,
+        copyTitles: ['TRIPLICATE FOR SUPPLIER'],
+        copyLabelName: 'Triplicate_Copy',
+      );
+      expect(viewModel.successMessage, contains('Triplicate_Copy'));
+
+      // 4. All Copies
+      await viewModel.downloadInvoicePdf(
+        gstInvoice,
+        copyTitles: [
+          'ORIGINAL FOR RECIPIENT',
+          'DUPLICATE FOR TRANSPORTER',
+          'TRIPLICATE FOR SUPPLIER'
+        ],
+        copyLabelName: 'All_Copies',
+      );
+      expect(viewModel.successMessage, contains('All_Copies'));
+    });
+
+    test('printInvoice supports GST and Without GST copy types', () async {
+      final viewModel = InvoicesViewModel(billingService: billingService);
+      final gstInvoice = testInvoices.first;
+
+      await viewModel.printInvoice(
+        gstInvoice,
+        copyTitles: ['ORIGINAL FOR RECIPIENT'],
+        copyLabelName: 'Original_Copy',
+      );
+      expect(viewModel.successMessage, contains('Print preview launched'));
+
+      const withoutGstInvoice = InvoiceModel(
+        id: 103,
+        invoiceNo: 'INV-20261029-0003',
+        invoiceDate: '2026-10-29',
+        customerName: 'Direct Cash Customer',
+        invoiceType: 'without_gst',
+        subtotal: 500.0,
+        taxableAmount: 500.0,
+        taxTotal: 0.0,
+        grandTotal: 500.0,
+        paidAmount: 500.0,
+        balanceDue: 0.0,
+        status: 'finalized',
+        paymentStatus: 'paid',
+        items: [
+          InvoiceItemModel(
+            id: 2,
+            invoiceId: 103,
+            itemDescription: 'Refill 20L Water Can',
+            quantity: 20,
+            unit: 'Can',
+            unitPrice: 25.0,
+            taxableAmount: 500.0,
+            taxRate: 0.0,
+            lineTotal: 500.0,
+          ),
+        ],
+      );
+
+      // Download Without GST All Copies
+      await viewModel.downloadInvoicePdf(
+        withoutGstInvoice,
+        copyTitles: ['ORIGINAL FOR CUSTOMER', 'DUPLICATE FOR OFFICE'],
+        copyLabelName: 'All_Copies',
+      );
+      expect(viewModel.successMessage, contains('All_Copies'));
+      expect(withoutGstInvoice.grandTotal, 500.0);
+      expect(withoutGstInvoice.isWithoutGst, true);
+    });
+
+    test('setActiveInvoiceType toggles between with_gst and without_gst tabs',
+        () async {
+      when(billingService.getInvoices(
+        page: anyNamed('page'),
+        perPage: anyNamed('perPage'),
+        dealerId: anyNamed('dealerId'),
+        status: anyNamed('status'),
+        paymentStatus: anyNamed('paymentStatus'),
+        invoiceType: anyNamed('invoiceType'),
+        startDate: anyNamed('startDate'),
+        endDate: anyNamed('endDate'),
+        search: anyNamed('search'),
+      )).thenAnswer((_) async => PaginatedList(
+            items: testInvoices,
+            meta: const PaginationMeta(
+                currentPage: 1, lastPage: 1, perPage: 15, total: 2),
+          ));
+
+      final viewModel = InvoicesViewModel(billingService: billingService);
+      expect(viewModel.activeInvoiceType, 'with_gst');
+      expect(viewModel.isWithGstTab, true);
+      expect(viewModel.isWithoutGstTab, false);
+
+      viewModel.setActiveInvoiceType('without_gst');
+      expect(viewModel.activeInvoiceType, 'without_gst');
+      expect(viewModel.isWithGstTab, false);
+      expect(viewModel.isWithoutGstTab, true);
+
+      verify(billingService.getInvoices(
+        page: 1,
+        perPage: 15,
+        invoiceType: 'without_gst',
+        search: anyNamed('search'),
+      )).called(1);
     });
   });
 }

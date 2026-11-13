@@ -16,6 +16,7 @@ import 'package:marina_aqua/ui/views/invoices/widgets/credit_note_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/invoice_form_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/invoice_payment_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/invoice_preview_dialog.dart';
+import 'package:marina_aqua/ui/views/invoices/widgets/invoice_copy_options_dialog.dart';
 import 'package:marina_aqua/ui/widgets/report_export_actions_bar.dart';
 
 class InvoicesView extends StackedView<InvoicesViewModel> {
@@ -64,8 +65,12 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
           ElevatedButton.icon(
             onPressed: () => _openCreateInvoice(context, viewModel),
             icon: const Icon(Icons.add, size: 18, color: Colors.white),
-            label: const Text('New Tax Invoice',
-                style: TextStyle(color: Colors.white)),
+            label: Text(
+              viewModel.isWithoutGstTab
+                  ? 'New Invoice (Non-GST)'
+                  : 'New Tax Invoice',
+              style: const TextStyle(color: Colors.white),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: kcPrimaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -134,6 +139,11 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                         ],
                       ),
                     ),
+
+                  // Invoice Type Tabs: With GST | Without GST
+                  _buildInvoiceTypeTabs(context, viewModel),
+
+                  const SizedBox(height: 16),
 
                   // KPI Summary Cards
                   _buildKpiMetrics(viewModel, currencyFormat, isDesktop),
@@ -511,26 +521,27 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
               headingRowColor: WidgetStateProperty.all(kcVeryLightGrey),
               dataRowMinHeight: 56,
               dataRowMaxHeight: 64,
-              columns: const [
-                DataColumn(
+              columns: [
+                const DataColumn(
                     label: Text('Invoice # / Date',
                         style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
+                const DataColumn(
                     label: Text('Customer / Dealer',
                         style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
+                const DataColumn(
                     label: Text('Status',
                         style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
+                const DataColumn(
                     label: Text('Payment',
                         style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
-                    label: Text('Taxable / GST',
-                        style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
+                if (!viewModel.isWithoutGstTab)
+                  const DataColumn(
+                      label: Text('Taxable / GST',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                const DataColumn(
                     label: Text('Grand Total / Due',
                         style: TextStyle(fontWeight: FontWeight.w700))),
-                DataColumn(
+                const DataColumn(
                     label: Text('Actions',
                         style: TextStyle(fontWeight: FontWeight.w700))),
               ],
@@ -588,38 +599,39 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                     DataCell(_buildStatusBadge(inv.status)),
                     // Col 3: Payment
                     DataCell(_buildPaymentBadge(inv.paymentStatus)),
-                    // Col 4: Taxable / GST
-                    DataCell(
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            formatAmount(inv.taxableAmount),
-                            style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600, fontSize: 13),
-                          ),
-                          if (inv.taxTotal > 0 && !inv.isInterstate)
+                    // Col 4: Taxable / GST (Only for With GST invoices)
+                    if (!viewModel.isWithoutGstTab)
+                      DataCell(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Text(
-                              'CGST ${formatAmount(inv.cgstAmount)} | SGST ${formatAmount(inv.sgstAmount)}',
+                              formatAmount(inv.taxableAmount),
                               style: GoogleFonts.inter(
-                                  fontSize: 10, color: kcMediumGrey),
-                            )
-                          else if (inv.taxTotal > 0 && inv.isInterstate)
-                            Text(
-                              'IGST: ${formatAmount(inv.igstAmount)}',
-                              style: GoogleFonts.inter(
-                                  fontSize: 10, color: kcMediumGrey),
-                            )
-                          else
-                            Text(
-                              'GST: ${formatAmount(inv.taxTotal)}',
-                              style: GoogleFonts.inter(
-                                  fontSize: 11, color: kcMediumGrey),
+                                  fontWeight: FontWeight.w600, fontSize: 13),
                             ),
-                        ],
+                            if (inv.taxTotal > 0 && !inv.isInterstate)
+                              Text(
+                                'CGST ${formatAmount(inv.cgstAmount)} | SGST ${formatAmount(inv.sgstAmount)}',
+                                style: GoogleFonts.inter(
+                                    fontSize: 10, color: kcMediumGrey),
+                              )
+                            else if (inv.taxTotal > 0 && inv.isInterstate)
+                              Text(
+                                'IGST: ${formatAmount(inv.igstAmount)}',
+                                style: GoogleFonts.inter(
+                                    fontSize: 10, color: kcMediumGrey),
+                              )
+                            else
+                              Text(
+                                'GST: ${formatAmount(inv.taxTotal)}',
+                                style: GoogleFonts.inter(
+                                    fontSize: 11, color: kcMediumGrey),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
                     // Col 5: Grand Total / Due
                     DataCell(
                       Column(
@@ -670,14 +682,16 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
                             icon: const Icon(Icons.print_outlined,
                                 size: 20, color: kcDeepNavy),
                             tooltip: 'Print Invoice',
-                            onPressed: () => viewModel.printInvoice(inv),
+                            onPressed: () =>
+                                _handlePrintInvoice(context, viewModel, inv),
                           ),
                           // Download PDF
                           IconButton(
                             icon: const Icon(Icons.picture_as_pdf_outlined,
                                 size: 20, color: kcTextSecondary),
                             tooltip: 'Download PDF',
-                            onPressed: () => viewModel.downloadInvoicePdf(inv),
+                            onPressed: () =>
+                                _handleDownloadInvoice(context, viewModel, inv),
                           ),
                           // More Actions Menu
                           PopupMenuButton<String>(
@@ -932,6 +946,94 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     );
   }
 
+  Widget _buildInvoiceTypeTabs(
+      BuildContext context, InvoicesViewModel viewModel) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: kcBorderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _invoiceTabButton(
+            context: context,
+            label: 'With GST (Tax Invoices)',
+            icon: Icons.receipt_long,
+            isSelected: viewModel.isWithGstTab,
+            onTap: () => viewModel.setActiveInvoiceType('with_gst'),
+          ),
+          const SizedBox(width: 6),
+          _invoiceTabButton(
+            context: context,
+            label: 'Without GST (Bill of Supply)',
+            icon: Icons.description_outlined,
+            isSelected: viewModel.isWithoutGstTab,
+            onTap: () => viewModel.setActiveInvoiceType('without_gst'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _invoiceTabButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? kcPrimaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: kcPrimaryColor.withValues(alpha: 0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : kcMediumGrey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                color: isSelected ? Colors.white : kcDeepNavy,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Dialog Handlers
 
   void _openCreateInvoice(
@@ -943,12 +1045,51 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
         dealers: viewModel.dealers,
         products: viewModel.products,
         companySettings: viewModel.companySettings,
+        defaultInvoiceType: viewModel.activeInvoiceType,
         onSave: (payload, isFinal) => viewModel.createInvoice(payload, isFinal),
       ),
     );
 
     if (result is InvoiceModel) {
       viewModel.openInvoiceInBrowser(result.id);
+    }
+  }
+
+  Future<void> _handlePrintInvoice(
+    BuildContext context,
+    InvoicesViewModel viewModel,
+    InvoiceModel invoice,
+  ) async {
+    final option = await InvoiceCopyOptionsDialog.show(
+      context,
+      invoice: invoice,
+      isPrint: true,
+    );
+    if (option != null) {
+      await viewModel.printInvoice(
+        invoice,
+        copyTitles: option.copyTitles,
+        copyLabelName: option.fileSuffix,
+      );
+    }
+  }
+
+  Future<void> _handleDownloadInvoice(
+    BuildContext context,
+    InvoicesViewModel viewModel,
+    InvoiceModel invoice,
+  ) async {
+    final option = await InvoiceCopyOptionsDialog.show(
+      context,
+      invoice: invoice,
+      isPrint: false,
+    );
+    if (option != null) {
+      await viewModel.downloadInvoicePdf(
+        invoice,
+        copyTitles: option.copyTitles,
+        copyLabelName: option.fileSuffix,
+      );
     }
   }
 
@@ -959,8 +1100,9 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       builder: (ctx) => InvoicePreviewDialog(
         invoice: invoice,
         companySettings: viewModel.companySettings,
-        onDownloadPdf: () => viewModel.downloadInvoicePdf(invoice),
-        onPrint: () => viewModel.printInvoice(invoice),
+        onDownloadPdf: () =>
+            _handleDownloadInvoice(context, viewModel, invoice),
+        onPrint: () => _handlePrintInvoice(context, viewModel, invoice),
         onOpenBrowser: () => viewModel.openInvoiceInBrowser(invoice.id),
         onFinalize: invoice.isDraft
             ? () {

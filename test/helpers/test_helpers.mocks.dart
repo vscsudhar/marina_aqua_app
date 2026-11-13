@@ -2012,11 +2012,11 @@ class MockProductMasterService extends _i1.Mock
     int? page,
     int? perPage,
     String? search,
+    String? productType,
     int? categoryId,
     int? unitId,
     bool? isActive,
     bool? lowStock,
-    String? productType,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2026,11 +2026,11 @@ class MockProductMasterService extends _i1.Mock
             #page: page,
             #perPage: perPage,
             #search: search,
+            #productType: productType,
             #categoryId: categoryId,
             #unitId: unitId,
             #isActive: isActive,
             #lowStock: lowStock,
-            #productType: productType,
           },
         ),
         returnValue: _i21.Future<_i7.PaginatedList<_i10.ProductModel>>.value(
@@ -2043,6 +2043,7 @@ class MockProductMasterService extends _i1.Mock
               #page: page,
               #perPage: perPage,
               #search: search,
+              #productType: productType,
               #categoryId: categoryId,
               #unitId: unitId,
               #isActive: isActive,
@@ -2061,6 +2062,7 @@ class MockProductMasterService extends _i1.Mock
               #page: page,
               #perPage: perPage,
               #search: search,
+              #productType: productType,
               #categoryId: categoryId,
               #unitId: unitId,
               #isActive: isActive,
@@ -2527,6 +2529,27 @@ class MockDealerService extends _i1.Mock implements _i28.DealerService {
         returnValueForMissingStub:
             _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i21.Future<Map<String, dynamic>>);
+
+  @override
+  _i21.Future<Map<String, dynamic>> getDealerStatement(
+    int? dealerId, {
+    String? startDate,
+    String? endDate,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDealerStatement,
+          [dealerId],
+          {
+            #startDate: startDate,
+            #endDate: endDate,
+          },
+        ),
+        returnValue:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i21.Future<Map<String, dynamic>>);
 }
 
 /// A class which mocks [DailyCollectionService].
@@ -2742,6 +2765,16 @@ class MockDailyCollectionService extends _i1.Mock
       ) as _i21.Future<_i13.DealerSupplyModel>);
 
   @override
+  _i21.Future<void> deleteSupply(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteSupply,
+          [id],
+        ),
+        returnValue: _i21.Future<void>.value(),
+        returnValueForMissingStub: _i21.Future<void>.value(),
+      ) as _i21.Future<void>);
+
+  @override
   _i21.Future<_i13.DealerPaymentModel> recordPayment(
           Map<String, dynamic>? payload) =>
       (super.noSuchMethod(
@@ -2766,6 +2799,78 @@ class MockDailyCollectionService extends _i1.Mock
           ),
         )),
       ) as _i21.Future<_i13.DealerPaymentModel>);
+
+  @override
+  _i21.Future<_i13.DealerPaymentModel> getPayment(int? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getPayment,
+          [id],
+        ),
+        returnValue: _i21.Future<_i13.DealerPaymentModel>.value(
+            _FakeDealerPaymentModel_13(
+          this,
+          Invocation.method(
+            #getPayment,
+            [id],
+          ),
+        )),
+        returnValueForMissingStub: _i21.Future<_i13.DealerPaymentModel>.value(
+            _FakeDealerPaymentModel_13(
+          this,
+          Invocation.method(
+            #getPayment,
+            [id],
+          ),
+        )),
+      ) as _i21.Future<_i13.DealerPaymentModel>);
+
+  @override
+  _i21.Future<_i13.DealerPaymentModel> updatePayment(
+    int? id,
+    Map<String, dynamic>? payload,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updatePayment,
+          [
+            id,
+            payload,
+          ],
+        ),
+        returnValue: _i21.Future<_i13.DealerPaymentModel>.value(
+            _FakeDealerPaymentModel_13(
+          this,
+          Invocation.method(
+            #updatePayment,
+            [
+              id,
+              payload,
+            ],
+          ),
+        )),
+        returnValueForMissingStub: _i21.Future<_i13.DealerPaymentModel>.value(
+            _FakeDealerPaymentModel_13(
+          this,
+          Invocation.method(
+            #updatePayment,
+            [
+              id,
+              payload,
+            ],
+          ),
+        )),
+      ) as _i21.Future<_i13.DealerPaymentModel>);
+
+  @override
+  _i21.Future<void> deletePayment(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deletePayment,
+          [id],
+        ),
+        returnValue: _i21.Future<void>.value(),
+        returnValueForMissingStub: _i21.Future<void>.value(),
+      ) as _i21.Future<void>);
 
   @override
   _i21.Future<_i7.PaginatedList<_i13.DealerPaymentModel>> getPayments({
@@ -2923,6 +3028,26 @@ class MockDealerLedgerReportService extends _i1.Mock
           ),
         )),
       ) as _i21.Future<_i14.DailyOtherTransactionModel>);
+
+  @override
+  _i21.Future<Map<String, dynamic>> getCellTransactions({
+    required int? dealerId,
+    required String? date,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCellTransactions,
+          [],
+          {
+            #dealerId: dealerId,
+            #date: date,
+          },
+        ),
+        returnValue:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i21.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i21.Future<Map<String, dynamic>>);
 
   @override
   String getExportPdfUrl({
@@ -3636,6 +3761,7 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
     int? dealerId,
     String? status,
     String? paymentStatus,
+    String? invoiceType,
     String? startDate,
     String? endDate,
     String? search,
@@ -3650,6 +3776,7 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
             #dealerId: dealerId,
             #status: status,
             #paymentStatus: paymentStatus,
+            #invoiceType: invoiceType,
             #startDate: startDate,
             #endDate: endDate,
             #search: search,
@@ -3667,6 +3794,7 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
               #dealerId: dealerId,
               #status: status,
               #paymentStatus: paymentStatus,
+              #invoiceType: invoiceType,
               #startDate: startDate,
               #endDate: endDate,
               #search: search,
@@ -3686,6 +3814,7 @@ class MockBillingService extends _i1.Mock implements _i32.BillingService {
               #dealerId: dealerId,
               #status: status,
               #paymentStatus: paymentStatus,
+              #invoiceType: invoiceType,
               #startDate: startDate,
               #endDate: endDate,
               #search: search,

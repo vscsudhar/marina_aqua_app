@@ -37,6 +37,7 @@ class BillingService {
     int? dealerId,
     String? status,
     String? paymentStatus,
+    String? invoiceType,
     String? startDate,
     String? endDate,
     String? search,
@@ -49,6 +50,9 @@ class BillingService {
     if (status != null && status.isNotEmpty) queryParams['status'] = status;
     if (paymentStatus != null && paymentStatus.isNotEmpty) {
       queryParams['payment_status'] = paymentStatus;
+    }
+    if (invoiceType != null && invoiceType.isNotEmpty) {
+      queryParams['invoice_type'] = invoiceType;
     }
     if (startDate != null && endDate != null) {
       queryParams['start_date'] = startDate;

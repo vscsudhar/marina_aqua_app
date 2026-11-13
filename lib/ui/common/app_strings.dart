@@ -1,5 +1,5 @@
 class AppStrings {
-  static const String appName = 'Marina Aqua';
+  static const String appName = 'SS AquaFlow';
   static const String companyTagline =
       'Packaged Drinking Water & Mineral Supplies';
   static const String portalTitle = 'Dealer Management System';
@@ -24,5 +24,5 @@ class AppStrings {
   static const String supportContact =
       'Need assistance? Contact IT Operations at support@marinaaqua.com';
   static const String copyrightNotice =
-      '© 2026 Marina Aqua Pvt Ltd. All rights reserved. Registered under FSSAI & BIS.';
+      '© 2026 SS AquaFlow. All rights reserved. Registered under FSSAI & BIS.';
 }

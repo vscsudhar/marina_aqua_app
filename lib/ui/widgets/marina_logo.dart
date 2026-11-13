@@ -41,7 +41,7 @@ class MarinaLogo extends StatelessWidget {
           ? companyName!.trim()
           : ((effectiveName != null && effectiveName.trim().isNotEmpty)
               ? effectiveName.trim()
-              : 'MARINA AQUA');
+              : 'SS AQUAFLOW');
 
       final Widget emblem;
       if (finalLogo != null && finalLogo.isNotEmpty) {
@@ -114,8 +114,8 @@ class MarinaLogo extends StatelessWidget {
       if (!showText) return emblem;
 
       final words = rawName.split(RegExp(r'\s+'));
-      final firstPart = words.isNotEmpty ? words[0] : 'MARINA';
-      final secondPart = words.length > 1 ? words[1] : '';
+      final firstPart = words.isNotEmpty ? words[0] : 'SS';
+      final secondPart = words.length > 1 ? words[1] : 'AQUAFLOW';
       final defaultSubtitle = words.length > 2
           ? (subtitle ?? words.sublist(2).join(' ').toUpperCase())
           : (subtitle ?? 'DEALER MANAGEMENT SYSTEM');

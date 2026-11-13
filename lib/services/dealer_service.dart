@@ -173,4 +173,21 @@ class DealerService {
     final data = response.data as Map<String, dynamic>;
     return data['data'] as Map<String, dynamic>;
   }
+
+  Future<Map<String, dynamic>> getDealerStatement(
+    int dealerId, {
+    String? startDate,
+    String? endDate,
+  }) async {
+    final queryParams = <String, dynamic>{};
+    if (startDate != null) queryParams['start_date'] = startDate;
+    if (endDate != null) queryParams['end_date'] = endDate;
+
+    final response = await _apiService.client.get(
+      '/dealers/$dealerId/statement',
+      queryParameters: queryParams,
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 }
