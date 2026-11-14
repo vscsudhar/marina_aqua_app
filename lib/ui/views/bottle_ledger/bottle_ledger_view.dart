@@ -249,8 +249,13 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                 rows: viewModel.report!.supplierTable.rows,
                                 monthlyTotals: viewModel
                                     .report!.supplierTable.monthlyTotals,
+                                monthlyQtyTotals: viewModel
+                                    .report!.supplierTable.monthlyQtyTotals,
                                 grandTotal:
                                     viewModel.report!.supplierTable.grandTotal,
+                                grandQtyTotal:
+                                    viewModel.report!.supplierTable.grandQtyTotal,
+                                showCountColumn: true,
                                 onCellTap: (date, productKey) => _onCellTap(
                                   context,
                                   viewModel,
@@ -295,8 +300,13 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                           rows: viewModel.report!.supplierTable.rows,
                           monthlyTotals:
                               viewModel.report!.supplierTable.monthlyTotals,
+                          monthlyQtyTotals:
+                              viewModel.report!.supplierTable.monthlyQtyTotals,
                           grandTotal:
                               viewModel.report!.supplierTable.grandTotal,
+                          grandQtyTotal:
+                              viewModel.report!.supplierTable.grandQtyTotal,
+                          showCountColumn: true,
                           onCellTap: (date, productKey) => _onCellTap(
                             context,
                             viewModel,
