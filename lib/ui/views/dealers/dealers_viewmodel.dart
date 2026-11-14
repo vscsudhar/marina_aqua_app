@@ -10,6 +10,7 @@ import 'package:marina_aqua/services/api_service.dart';
 import 'package:marina_aqua/services/company_service.dart';
 import 'package:marina_aqua/services/dealer_service.dart';
 import 'package:marina_aqua/services/product_master_service.dart';
+import 'package:marina_aqua/services/storage_service.dart';
 
 class DealersViewModel extends BaseViewModel {
   final _dealerService = locator<DealerService>();
@@ -209,6 +210,19 @@ class DealersViewModel extends BaseViewModel {
         description: e.message,
       );
     }
+  }
+
+  Future<void> switchActiveCompany(CompanyModel company) async {
+    final storageService = locator<StorageService>();
+    await storageService.saveActiveCompanyId(company.id);
+    await fetchCatalogProducts();
+    await fetchDealers(page: 1);
+    await _dialogService.showDialog(
+      title: 'Active Company Switched',
+      description:
+          'Active company set to "${company.name}". All product and ledger modules will now operate under this company context.',
+    );
+    notifyListeners();
   }
 
   Future<void> confirmDeleteDealer(

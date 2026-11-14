@@ -225,7 +225,7 @@ class ProductsViewModel extends BaseViewModel {
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(product.isReferenced ? 'Deactivate' : 'Delete'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -238,7 +238,7 @@ class ProductsViewModel extends BaseViewModel {
         await fetchCategories();
         await fetchUnits();
         await _dialogService.showDialog(
-          title: 'Product Action',
+          title: 'Product Deleted',
           description: message,
         );
       } on ApiException catch (e) {

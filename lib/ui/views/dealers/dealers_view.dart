@@ -1302,12 +1302,23 @@ class DealersView extends StackedView<DealersViewModel> {
                       ),
                     ),
                     DataCell(
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 18),
-                        tooltip: 'Edit Corporate Client',
-                        onPressed: () => _openCompanyFormDialog(
-                            context, viewModel,
-                            company: c),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.swap_horiz_rounded,
+                                size: 20, color: kcPrimaryColor),
+                            tooltip: 'Switch to this Company Context',
+                            onPressed: () => viewModel.switchActiveCompany(c),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            tooltip: 'Edit Corporate Client',
+                            onPressed: () => _openCompanyFormDialog(
+                                context, viewModel,
+                                company: c),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -1342,11 +1353,22 @@ class DealersView extends StackedView<DealersViewModel> {
                       fontSize: 15, fontWeight: FontWeight.bold),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 20),
-                tooltip: 'Edit Company',
-                onPressed: () => _openCompanyFormDialog(context, viewModel,
-                    company: company),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.swap_horiz_rounded,
+                        size: 20, color: kcPrimaryColor),
+                    tooltip: 'Switch to this Company Context',
+                    onPressed: () => viewModel.switchActiveCompany(company),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    tooltip: 'Edit Company',
+                    onPressed: () => _openCompanyFormDialog(context, viewModel,
+                        company: company),
+                  ),
+                ],
               ),
             ],
           ),

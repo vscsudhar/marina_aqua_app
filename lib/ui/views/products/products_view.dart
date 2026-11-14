@@ -857,18 +857,12 @@ class ProductsView extends StackedView<ProductsViewModel> {
                               product: product),
                         ),
                         IconButton(
-                          icon: Icon(
-                            product.isReferenced
-                                ? Icons.archive_outlined
-                                : Icons.delete_outline,
+                          icon: const Icon(
+                            Icons.delete_outline,
                             size: 18,
-                            color: product.isReferenced
-                                ? kcWarningColor
-                                : kcErrorColor,
+                            color: kcErrorColor,
                           ),
-                          tooltip: product.isReferenced
-                              ? 'Deactivate (Referenced)'
-                              : 'Delete Product',
+                          tooltip: 'Delete Product',
                           onPressed: () =>
                               viewModel.confirmDeleteProduct(context, product),
                         ),
@@ -1075,18 +1069,14 @@ class ProductsView extends StackedView<ProductsViewModel> {
               ),
               const SizedBox(width: 8),
               TextButton.icon(
-                icon: Icon(
-                  product.isReferenced
-                      ? Icons.archive_outlined
-                      : Icons.delete_outline,
+                icon: const Icon(
+                  Icons.delete_outline,
                   size: 16,
-                  color: product.isReferenced ? kcWarningColor : kcErrorColor,
+                  color: kcErrorColor,
                 ),
-                label: Text(
-                  product.isReferenced ? 'Deactivate' : 'Delete',
-                  style: TextStyle(
-                      color:
-                          product.isReferenced ? kcWarningColor : kcErrorColor),
+                label: const Text(
+                  'Delete',
+                  style: TextStyle(color: kcErrorColor),
                 ),
                 onPressed: () =>
                     viewModel.confirmDeleteProduct(context, product),
