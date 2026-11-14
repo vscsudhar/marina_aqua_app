@@ -42,6 +42,13 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   double _closingBalance = 0;
   double _totalDebit = 0;
   double _totalCredit = 0;
+  int _refillCount = 0;
+  double _refillAmount = 0;
+  int _bottleCount = 0;
+  double _bottleAmount = 0;
+  double _othersPayments = 0;
+  double _p1RefillAmount = 0;
+  double _p2RefillAmount = 0;
   List<Map<String, dynamic>> _entries = [];
 
   final _currency =
@@ -116,6 +123,16 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
             (summary['closing_balance'] as num?)?.toDouble() ?? 0.0;
         _totalDebit = (summary['total_debit'] as num?)?.toDouble() ?? 0.0;
         _totalCredit = (summary['total_credit'] as num?)?.toDouble() ?? 0.0;
+        _refillCount = (summary['refill_count'] as num?)?.toInt() ?? 0;
+        _refillAmount = (summary['refill_amount'] as num?)?.toDouble() ?? 0.0;
+        _bottleCount = (summary['bottle_count'] as num?)?.toInt() ?? 0;
+        _bottleAmount = (summary['bottle_amount'] as num?)?.toDouble() ?? 0.0;
+        _othersPayments =
+            (summary['others_payments'] as num?)?.toDouble() ?? 0.0;
+        _p1RefillAmount =
+            (summary['p1_refill_amount'] as num?)?.toDouble() ?? 0.0;
+        _p2RefillAmount =
+            (summary['p2_refill_amount'] as num?)?.toDouble() ?? 0.0;
       } else {
         _openingBalance = (data['opening_balance'] is num)
             ? (data['opening_balance'] as num).toDouble()
@@ -200,12 +217,24 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       'Statement Period': periodStr,
       'Opening Balance': _currency.format(_openingBalance),
       'Closing Outstanding': _currency.format(_closingBalance),
+      'Refill Count': '$_refillCount Cans',
+      'Refill Amount': _currency.format(_refillAmount),
+      'Bottle Count': '$_bottleCount Units',
+      'Bottle Amount': _currency.format(_bottleAmount),
+      'Others Payments': _currency.format(_othersPayments),
+      'P1 Refill (1-15)': _currency.format(_p1RefillAmount),
+      'P2 Refill (16-End)': _currency.format(_p2RefillAmount),
     };
 
     final kpis = {
       'Opening Balance': _currency.format(_openingBalance),
-      'Total Debits': _currency.format(_totalDebit),
-      'Total Credits': _currency.format(_totalCredit),
+      'Refill Count': '$_refillCount Cans',
+      'Refill Amount': _currency.format(_refillAmount),
+      'Bottle Count': '$_bottleCount Units',
+      'Bottle Amount': _currency.format(_bottleAmount),
+      'Others Payments': _currency.format(_othersPayments),
+      'Total Charges': _currency.format(_totalDebit),
+      'Total Payments': _currency.format(_totalCredit),
       'Closing Balance': _currency.format(_closingBalance),
     };
 
@@ -570,7 +599,120 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           );
                         },
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 12),
+
+                      // PRODUCT & PERIOD BREAKDOWN
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Wrap(
+                          spacing: 16,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.water_drop_outlined,
+                                    size: 16, color: Color(0xFF0284C7)),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Refill: ',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF334155)),
+                                ),
+                                Text(
+                                  '$_refillCount Cans',
+                                  style: GoogleFonts.outfit(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF0F172A)),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '(${_currency.format(_refillAmount)})',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF0284C7)),
+                                ),
+                                if (_p1RefillAmount > 0 ||
+                                    _p2RefillAmount > 0) ...[
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '[P1: ${_currency.format(_p1RefillAmount)} | P2: ${_currency.format(_p2RefillAmount)}]',
+                                    style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: const Color(0xFF64748B)),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.local_drink_outlined,
+                                    size: 16, color: Color(0xFF059669)),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Bottles: ',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF334155)),
+                                ),
+                                Text(
+                                  '$_bottleCount Units',
+                                  style: GoogleFonts.outfit(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF0F172A)),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '(${_currency.format(_bottleAmount)})',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF059669)),
+                                ),
+                              ],
+                            ),
+                            if (_othersPayments > 0)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.payments_outlined,
+                                      size: 16, color: Color(0xFFD97706)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Others Payments: ',
+                                    style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF334155)),
+                                  ),
+                                  Text(
+                                    _currency.format(_othersPayments),
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFD97706)),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
 
                       // LEDGER TRANSACTION ENTRIES TABLE
                       if (_isLoading)

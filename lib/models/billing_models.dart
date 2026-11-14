@@ -401,6 +401,8 @@ class InvoiceModel {
   final String invoiceDate;
   final String? dueDate;
   final int? dealerId;
+  final String? customerType;
+  final int? customerCompanyId;
   final String customerName;
   final String? customerPhone;
   final String? customerEmail;
@@ -437,6 +439,7 @@ class InvoiceModel {
   final List<InvoicePaymentModel> payments;
   final List<CreditNoteModel> creditNotes;
   final Map<String, dynamic>? dealer;
+  final Map<String, dynamic>? customerCompany;
   final String? createdBy;
   final String? createdAt;
 
@@ -446,6 +449,8 @@ class InvoiceModel {
     required this.invoiceDate,
     this.dueDate,
     this.dealerId,
+    this.customerType,
+    this.customerCompanyId,
     required this.customerName,
     this.customerPhone,
     this.customerEmail,
@@ -482,6 +487,7 @@ class InvoiceModel {
     this.payments = const [],
     this.creditNotes = const [],
     this.dealer,
+    this.customerCompany,
     this.createdBy,
     this.createdAt,
   });
@@ -503,6 +509,10 @@ class InvoiceModel {
       dealerId: json['dealer_id'] is int
           ? json['dealer_id']
           : int.tryParse(json['dealer_id']?.toString() ?? ''),
+      customerType: json['customer_type'] as String?,
+      customerCompanyId: json['customer_company_id'] is int
+          ? json['customer_company_id']
+          : int.tryParse(json['customer_company_id']?.toString() ?? ''),
       customerName: json['customer_name'] as String? ?? 'Valued Customer',
       customerPhone: json['customer_phone'] as String?,
       customerEmail: json['customer_email'] as String?,
@@ -581,6 +591,7 @@ class InvoiceModel {
               .toList() ??
           const [],
       dealer: json['dealer'] as Map<String, dynamic>?,
+      customerCompany: json['customer_company'] as Map<String, dynamic>?,
       createdBy: json['created_by'] as String?,
       createdAt: json['created_at'] as String?,
     );

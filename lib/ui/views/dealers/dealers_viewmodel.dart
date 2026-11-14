@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:marina_aqua/app/app.locator.dart';
+import 'package:marina_aqua/models/company_model.dart';
 import 'package:marina_aqua/models/dealer_model.dart';
 import 'package:marina_aqua/models/paginated_response.dart';
 import 'package:marina_aqua/models/product_model.dart';
 import 'package:marina_aqua/services/api_service.dart';
+import 'package:marina_aqua/services/company_service.dart';
 import 'package:marina_aqua/services/dealer_service.dart';
 import 'package:marina_aqua/services/product_master_service.dart';
 
 class DealersViewModel extends BaseViewModel {
   final _dealerService = locator<DealerService>();
+  final _companyService = locator<CompanyService>();
   final _productMasterService = locator<ProductMasterService>();
   final _dialogService = locator<DialogService>();
   final _navigationService = locator<NavigationService>();
@@ -19,6 +22,12 @@ class DealersViewModel extends BaseViewModel {
 
   List<DealerModel> _dealers = [];
   List<DealerModel> get dealers => _dealers;
+
+  List<CompanyModel> _companies = [];
+  List<CompanyModel> get companies => _companies;
+
+  int _selectedTab = 0; // 0 = Dealers, 1 = Companies
+  int get selectedTab => _selectedTab;
 
   List<ProductModel> _catalogProducts = [];
   List<ProductModel> get catalogProducts => _catalogProducts;
@@ -52,9 +61,22 @@ class DealersViewModel extends BaseViewModel {
   double get totalOutstandingBalance =>
       _dealers.fold(0.0, (acc, d) => acc + d.currentOutstanding);
 
+  void setSelectedTab(int index) {
+    if (_selectedTab == index) return;
+    _selectedTab = index;
+    _searchQuery = '';
+    if (_selectedTab == 1) {
+      fetchCompanies();
+    } else {
+      fetchDealers(page: 1);
+    }
+    notifyListeners();
+  }
+
   Future<void> init() async {
     await Future.wait([
       fetchDealers(),
+      fetchCompanies(),
       fetchCatalogProducts(),
     ]);
   }
@@ -103,9 +125,30 @@ class DealersViewModel extends BaseViewModel {
     }
   }
 
+  Future<void> fetchCompanies() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _companies = await _companyService.getCompanies(search: _searchQuery);
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+    } catch (e) {
+      _errorMessage = 'Failed to load companies: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void setSearch(String query) {
     _searchQuery = query;
-    fetchDealers(page: 1);
+    if (_selectedTab == 1) {
+      fetchCompanies();
+    } else {
+      fetchDealers(page: 1);
+    }
   }
 
   void setStatusFilter(bool? status) {
@@ -122,7 +165,28 @@ class DealersViewModel extends BaseViewModel {
     _searchQuery = '';
     _selectedStatusFilter = null;
     _hasOutstandingOnly = false;
-    fetchDealers(page: 1);
+    if (_selectedTab == 1) {
+      fetchCompanies();
+    } else {
+      fetchDealers(page: 1);
+    }
+  }
+
+  Future<void> saveCompany(Map<String, dynamic> data, {int? companyId}) async {
+    if (companyId != null) {
+      await _companyService.updateCompany(companyId, data);
+      await _dialogService.showDialog(
+        title: 'Company Updated',
+        description: 'Corporate client "${data['name']}" details updated successfully.',
+      );
+    } else {
+      await _companyService.createCompany(data);
+      await _dialogService.showDialog(
+        title: 'Company Onboarded',
+        description: 'Corporate client "${data['name']}" has been onboarded successfully and is now ready for invoicing.',
+      );
+    }
+    await fetchCompanies();
   }
 
   Future<void> saveDealer(Map<String, dynamic> data, {int? dealerId}) async {

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:marina_aqua/models/dealer_ledger_report_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/widgets/dual_horizontal_scrollable.dart';
 
 class DealerLedgerTable extends StatelessWidget {
   final MonthlyLedgerReportModel report;
@@ -36,8 +37,7 @@ class DealerLedgerTable extends StatelessWidget {
     const othersColWidth = 100.0;
     const totalColWidth = 120.0;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return DualHorizontalScrollable(
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,

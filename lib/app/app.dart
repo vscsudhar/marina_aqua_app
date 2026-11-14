@@ -1,3 +1,4 @@
+import '../services/company_service.dart';
 import '../services/user_management_service.dart';
 import 'package:marina_aqua/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:marina_aqua/ui/dialogs/info_alert/info_alert_dialog.dart';
@@ -60,6 +61,7 @@ import 'package:stacked_services/stacked_services.dart';
     LazySingleton(classType: UserManagementService),
     LazySingleton(classType: ExportPrintService),
     LazySingleton(classType: DamagedProductService),
+    LazySingleton(classType: CompanyService),
     // @stacked-service
   ],
   bottomsheets: [

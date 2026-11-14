@@ -582,7 +582,7 @@ class ExportPrintService {
           pw.Text(
             label,
             style: const pw.TextStyle(
-              fontSize: 7.5,
+              fontSize: 8.5,
               color: PdfColors.grey700,
             ),
           ),
@@ -590,7 +590,7 @@ class ExportPrintService {
           pw.Text(
             value,
             style: pw.TextStyle(
-              fontSize: 7.5,
+              fontSize: 8.5,
               fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
             ),
           ),
@@ -600,7 +600,7 @@ class ExportPrintService {
   }
 
   pw.Widget _pdfSummaryRow(String label, String value,
-      {bool isBold = false, double fontSize = 7.5}) {
+      {bool isBold = false, double fontSize = 8.5}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
       child: pw.Row(
@@ -845,18 +845,18 @@ class ExportPrintService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        // Company Logo (little big)
+                        // Company Logo (increased size)
                         if (logoImage != null)
                           pw.Container(
-                            width: 80,
-                            height: 52,
+                            width: 100,
+                            height: 68,
                             alignment: pw.Alignment.topLeft,
                             child: pw.Image(logoImage, fit: pw.BoxFit.contain),
                           )
                         else
                           pw.Container(
-                            width: 54,
-                            height: 50,
+                            width: 64,
+                            height: 60,
                             decoration: pw.BoxDecoration(
                               color: neutralLight,
                               border:
@@ -872,7 +872,7 @@ class ExportPrintService {
                                     'MARINA',
                                     style: pw.TextStyle(
                                       color: brandDarkNavy,
-                                      fontSize: 8.5,
+                                      fontSize: 9.5,
                                       fontWeight: pw.FontWeight.bold,
                                     ),
                                   ),
@@ -881,7 +881,7 @@ class ExportPrintService {
                                     'AQUA',
                                     style: pw.TextStyle(
                                       color: brandAccent,
-                                      fontSize: 7.5,
+                                      fontSize: 8.5,
                                       fontWeight: pw.FontWeight.bold,
                                     ),
                                   ),
@@ -894,8 +894,9 @@ class ExportPrintService {
                           pw.Text(
                             'GSTIN: ${settings.gstin}',
                             style: pw.TextStyle(
-                              fontSize: 7.5,
+                              fontSize: 9.5,
                               fontWeight: pw.FontWeight.bold,
+                              color: brandDarkNavy,
                             ),
                           ),
                         if (settings.pan.isNotEmpty)
@@ -907,8 +908,9 @@ class ExportPrintService {
                             ),
                           ),
                         if (settings.fssaiNo != null &&
-                            settings.fssaiNo!.isNotEmpty) ...[
-                          pw.SizedBox(height: 1),
+                            settings.fssaiNo!.trim().isNotEmpty &&
+                            settings.fssaiNo!.trim().toLowerCase() != 'null') ...[
+                          pw.SizedBox(height: 1.5),
                           pw.Text(
                             'FSSAI Lic. No: ${settings.fssaiNo}',
                             style: pw.TextStyle(
@@ -918,23 +920,6 @@ class ExportPrintService {
                             ),
                           ),
                         ],
-                        pw.SizedBox(height: 1.5),
-                        if (settings.phone.isNotEmpty)
-                          pw.Text(
-                            'Phone: ${settings.phone}',
-                            style: const pw.TextStyle(
-                              fontSize: 7.5,
-                              color: PdfColors.grey700,
-                            ),
-                          ),
-                        if (settings.email.isNotEmpty)
-                          pw.Text(
-                            'Email: ${settings.email}',
-                            style: const pw.TextStyle(
-                              fontSize: 7.5,
-                              color: PdfColors.grey700,
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -1036,6 +1021,10 @@ class ExportPrintService {
                         _pdfMetaRow('Invoice No:', invoice.invoiceNo,
                             isBold: true),
                         _pdfMetaRow('Date:', invoice.invoiceDate),
+                        if (settings.phone.isNotEmpty)
+                          _pdfMetaRow('Phone:', settings.phone),
+                        if (settings.email.isNotEmpty)
+                          _pdfMetaRow('Email:', settings.email),
                         if (invoice.dueDate != null &&
                             invoice.dueDate!.isNotEmpty)
                           _pdfMetaRow('Due Date:', invoice.dueDate!),
@@ -1074,16 +1063,16 @@ class ExportPrintService {
                         pw.Text(
                           'BILLED TO:',
                           style: pw.TextStyle(
-                            fontSize: 7.5,
+                            fontSize: 8.5,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColors.grey700,
                           ),
                         ),
                         pw.SizedBox(height: 2),
                         pw.Text(
-                          invoice.customerName,
+                          invoice.customerName.replaceAll(RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)', caseSensitive: false), ''),
                           style: pw.TextStyle(
-                            fontSize: 10,
+                            fontSize: 11.5,
                             fontWeight: pw.FontWeight.bold,
                             color: brandDarkNavy,
                           ),
@@ -1094,7 +1083,7 @@ class ExportPrintService {
                           pw.Text(
                             invoice.customerAddress!,
                             style: const pw.TextStyle(
-                                fontSize: 8, color: PdfColors.grey800),
+                                fontSize: 9, color: PdfColors.grey800),
                           ),
                         ],
                         if (invoice.customerPhone != null &&
@@ -1103,7 +1092,7 @@ class ExportPrintService {
                           pw.Text(
                             'Phone: ${invoice.customerPhone}',
                             style: const pw.TextStyle(
-                                fontSize: 8, color: PdfColors.grey800),
+                                fontSize: 9, color: PdfColors.grey800),
                           ),
                         ],
                       ],
@@ -1116,13 +1105,13 @@ class ExportPrintService {
                           pw.Text(
                             'Customer GSTIN: ${invoice.customerGstin}',
                             style: pw.TextStyle(
-                                fontSize: 8.5, fontWeight: pw.FontWeight.bold),
+                                fontSize: 9.5, fontWeight: pw.FontWeight.bold),
                           )
                         else
                           pw.Text(
                             'Unregistered Customer (B2C)',
                             style: const pw.TextStyle(
-                                fontSize: 8, color: PdfColors.grey600),
+                                fontSize: 8.5, color: PdfColors.grey600),
                           ),
                       ],
                     ),
@@ -1301,12 +1290,19 @@ class ExportPrintService {
                           pw.Divider(thickness: 0.8, color: brandDarkNavy),
                           _pdfSummaryRow('Grand Total:',
                               'Rs. ${_formatAmount(invoice.grandTotal)}',
-                              isBold: true, fontSize: 10),
+                              isBold: true, fontSize: 11.5),
                           _pdfSummaryRow('Amount Paid:',
                               'Rs. ${_formatAmount(invoice.paidAmount)}'),
                           _pdfSummaryRow('Balance Due:',
                               'Rs. ${_formatAmount(invoice.balanceDue)}',
                               isBold: true),
+                          pw.SizedBox(height: 3),
+                          () {
+                            final bool isFullyPaid = invoice.paidAmount >= invoice.grandTotal && invoice.grandTotal > 0;
+                            final bool isPartiallyPaid = invoice.paidAmount > 0 && invoice.paidAmount < invoice.grandTotal;
+                            final String statusText = isFullyPaid ? 'FULLY PAID' : (isPartiallyPaid ? 'PARTIALLY PAID' : 'UNPAID');
+                            return _pdfSummaryRow('Payment Status:', statusText, isBold: true);
+                          }(),
                         ],
                       ),
                     ),

@@ -5,9 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import 'package:marina_aqua/models/billing_models.dart';
+import 'package:marina_aqua/models/company_model.dart';
 import 'package:marina_aqua/models/dealer_model.dart';
 import 'package:marina_aqua/models/dealer_product_price_model.dart';
 import 'package:marina_aqua/models/product_model.dart';
+import 'package:marina_aqua/services/company_service.dart';
 import 'package:marina_aqua/services/dealer_service.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'package:marina_aqua/ui/common/ui_helpers.dart';
@@ -118,6 +120,7 @@ class InvoiceItemRow {
 
 class InvoiceFormDialog extends StatefulWidget {
   final List<DealerModel> dealers;
+  final List<CompanyModel>? companies;
   final List<ProductModel> products;
   final CompanySettingModel companySettings;
   final InvoiceModel? existingInvoice;
@@ -128,6 +131,7 @@ class InvoiceFormDialog extends StatefulWidget {
   const InvoiceFormDialog({
     super.key,
     required this.dealers,
+    this.companies,
     required this.products,
     required this.companySettings,
     this.existingInvoice,
@@ -145,14 +149,18 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   final DealerService _dealerService = locator<DealerService>();
+  final CompanyService _companyService = locator<CompanyService>();
   Map<int, double> _dealerPriceMap = {};
+  List<CompanyModel> _companies = [];
 
   late DateTime _invoiceDate;
   DateTime? _dueDate;
   late String _invoiceType;
   bool get _isWithoutGst => _invoiceType == 'without_gst';
-  bool _isDealerCustomer = true;
+  String _customerType = 'dealer'; // 'dealer' | 'company' | 'direct'
+  bool get _isDealerCustomer => _customerType == 'dealer';
   DealerModel? _selectedDealer;
+  CompanyModel? _selectedCompany;
 
   final TextEditingController _invoiceNoController = TextEditingController();
   bool _isLoadingInvoiceNo = false;
@@ -211,6 +219,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   @override
   void initState() {
     super.initState();
+    _companies = List.from(widget.companies ?? []);
     final inv = widget.existingInvoice;
     _invoiceType = inv?.invoiceType ?? widget.defaultInvoiceType ?? 'with_gst';
 
@@ -218,9 +227,19 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _invoiceNoController.text = inv.invoiceNo;
       _invoiceDate = DateTime.tryParse(inv.invoiceDate) ?? DateTime.now();
       _dueDate = inv.dueDate != null ? DateTime.tryParse(inv.dueDate!) : null;
-      _isDealerCustomer = inv.dealerId != null;
 
-      if (_isDealerCustomer) {
+      final isComp = inv.customerType == 'company' ||
+          (inv.customerCompanyId != null && inv.customerCompanyId! > 0);
+      final isDlr = inv.dealerId != null && inv.dealerId! > 0;
+
+      if (isComp) {
+        _customerType = 'company';
+        _selectedCompany = _companies.cast<CompanyModel?>().firstWhere(
+              (c) => c?.id == inv.customerCompanyId,
+              orElse: () => null,
+            );
+      } else if (isDlr) {
+        _customerType = 'dealer';
         _selectedDealer = widget.dealers.cast<DealerModel?>().firstWhere(
               (d) => d?.id == inv.dealerId,
               orElse: () => null,
@@ -228,6 +247,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         if (_selectedDealer != null) {
           _loadDealerPrices(_selectedDealer!.id);
         }
+      } else {
+        _customerType = 'direct';
       }
 
       _customerNameController.text = inv.customerName;
@@ -269,16 +290,20 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _loadNextInvoiceNo();
 
       if (widget.dealers.isNotEmpty) {
+        _customerType = 'dealer';
         _selectedDealer = widget.dealers.first;
         _populateFromDealer(_selectedDealer!);
         _loadDealerPrices(_selectedDealer!.id);
       } else {
+        _customerType = 'direct';
         _customerNameController.text = 'Direct Customer';
       }
 
       _rows = [];
       _addRow();
     }
+
+    _loadCompanies();
   }
 
   Timer? _debounceTimer;
@@ -383,6 +408,38 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     _customerAddressController.text = dealer.address ?? '';
     _customerGstinController.text = dealer.gstin ?? '';
     _placeOfSupplyController.text = '33-Tamil Nadu';
+  }
+
+  void _populateFromCompany(CompanyModel company) {
+    _customerNameController.text = company.name;
+    _customerPhoneController.text = company.phone ?? '';
+    _customerEmailController.text = company.email ?? '';
+    _customerAddressController.text = company.address ?? '';
+    _customerGstinController.text = company.gstin ?? '';
+    _placeOfSupplyController.text = '33-Tamil Nadu';
+  }
+
+  Future<void> _loadCompanies() async {
+    try {
+      final list = await _companyService.getCompanies(status: 'active');
+      if (mounted) {
+        setState(() {
+          _companies = list;
+          if (_customerType == 'company') {
+            final cid = widget.existingInvoice?.customerCompanyId;
+            if (cid != null) {
+              _selectedCompany = _companies.cast<CompanyModel?>().firstWhere(
+                    (c) => c?.id == cid,
+                    orElse: () => _companies.isNotEmpty ? _companies.first : null,
+                  );
+            } else if (_selectedCompany == null && _companies.isNotEmpty) {
+              _selectedCompany = _companies.first;
+              _populateFromCompany(_selectedCompany!);
+            }
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   void _setInvoiceType(String type) {
@@ -530,6 +587,18 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   double get _balanceDue =>
       (_grandTotal - _paidAmount).clamp(0.0, double.infinity);
 
+  String get _paymentStatusText {
+    if (_paidAmount <= 0) return 'Unpaid';
+    if (_paidAmount < _grandTotal) return 'Partially Paid';
+    return 'Fully Paid';
+  }
+
+  Color get _paymentStatusColor {
+    if (_paidAmount <= 0) return kcErrorColor;
+    if (_paidAmount < _grandTotal) return const Color(0xFFD97706);
+    return kcSuccessColor;
+  }
+
   Future<void> _submit(bool isFinal) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -587,11 +656,14 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       final payload = <String, dynamic>{
         'invoice_no': invoiceNo,
         'invoice_type': _invoiceType,
+        'customer_type': _customerType,
         'invoice_date': DateFormat('yyyy-MM-dd').format(_invoiceDate),
         'due_date': _dueDate != null
             ? DateFormat('yyyy-MM-dd').format(_dueDate!)
             : null,
-        'dealer_id': _isDealerCustomer ? _selectedDealer?.id : null,
+        'dealer_id': _customerType == 'dealer' ? _selectedDealer?.id : null,
+        'customer_company_id':
+            _customerType == 'company' ? _selectedCompany?.id : null,
         'customer_name': _customerNameController.text.trim(),
         'customer_phone': _customerPhoneController.text.trim(),
         'customer_email': _customerEmailController.text.trim(),
@@ -608,14 +680,13 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         'status': isFinal ? 'finalized' : 'draft',
         'is_final': isFinal,
         'items': itemsPayload,
+        'paid_amount': _paidAmount,
+        'payment_amount': _paidAmount,
+        'payment_method': _paymentMethod,
+        'payment_reference': _paymentRefController.text.trim().isNotEmpty
+            ? _paymentRefController.text.trim()
+            : null,
       };
-
-      if (_paidAmount > 0) {
-        payload['paid_amount'] = _paidAmount;
-        payload['payment_amount'] = _paidAmount;
-        payload['payment_method'] = _paymentMethod;
-        payload['payment_reference'] = _paymentRefController.text.trim();
-      }
 
       final result = await widget.onSave(payload, isFinal);
       if (mounted) {
@@ -886,24 +957,57 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                       visualDensity: VisualDensity.compact,
                     ),
                   ),
-                  // Toggle: Dealer vs Walk-in
-                  SegmentedButton<bool>(
+                  // Toggle: Dealer vs Company vs Walk-in
+                  SegmentedButton<String>(
                     segments: const [
                       ButtonSegment(
-                          value: true, label: Text('Dealer Customer')),
+                        value: 'dealer',
+                        label: Text('Dealer Customer'),
+                        icon: Icon(Icons.store_mall_directory_outlined, size: 16),
+                      ),
                       ButtonSegment(
-                          value: false, label: Text('Walk-in / Direct')),
+                        value: 'company',
+                        label: Text('Company Customer'),
+                        icon: Icon(Icons.business_outlined, size: 16),
+                      ),
+                      ButtonSegment(
+                        value: 'direct',
+                        label: Text('Walk-in / Direct'),
+                        icon: Icon(Icons.person_outline, size: 16),
+                      ),
                     ],
-                    selected: {_isDealerCustomer},
+                    selected: {_customerType},
                     onSelectionChanged: (val) {
+                      final selected = val.first;
                       setState(() {
-                        _isDealerCustomer = val.first;
-                        if (_isDealerCustomer && widget.dealers.isNotEmpty) {
-                          _selectedDealer = widget.dealers.first;
-                          _populateFromDealer(_selectedDealer!);
-                          _loadDealerPrices(_selectedDealer!.id);
-                        } else if (!_isDealerCustomer) {
+                        _customerType = selected;
+                        if (selected == 'dealer') {
+                          _selectedCompany = null;
+                          if (_selectedDealer == null && widget.dealers.isNotEmpty) {
+                            _selectedDealer = widget.dealers.first;
+                          }
+                          if (_selectedDealer != null) {
+                            _populateFromDealer(_selectedDealer!);
+                            _loadDealerPrices(_selectedDealer!.id);
+                          }
+                        } else if (selected == 'company') {
                           _dealerPriceMap.clear();
+                          _selectedDealer = null;
+                          if (_selectedCompany == null && _companies.isNotEmpty) {
+                            _selectedCompany = _companies.first;
+                          }
+                          if (_selectedCompany != null) {
+                            _populateFromCompany(_selectedCompany!);
+                          }
+                        } else {
+                          _dealerPriceMap.clear();
+                          _selectedDealer = null;
+                          _selectedCompany = null;
+                          _customerNameController.text = 'Direct Customer';
+                          _customerPhoneController.clear();
+                          _customerEmailController.clear();
+                          _customerAddressController.clear();
+                          _customerGstinController.clear();
                         }
                       });
                     },
@@ -1035,7 +1139,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
           const SizedBox(height: 16),
           Row(
             children: [
-              if (_isDealerCustomer)
+              if (_customerType == 'dealer')
                 Expanded(
                   child: DropdownButtonFormField<DealerModel>(
                     initialValue: _selectedDealer,
@@ -1056,6 +1160,31 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     },
                     decoration: const InputDecoration(
                       labelText: 'Select Registered Dealer *',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                )
+              else if (_customerType == 'company')
+                Expanded(
+                  child: DropdownButtonFormField<CompanyModel>(
+                    initialValue: _selectedCompany,
+                    items: _companies.map((c) {
+                      return DropdownMenuItem(
+                        value: c,
+                        child: Text(c.name),
+                      );
+                    }).toList(),
+                    onChanged: (comp) {
+                      if (comp != null) {
+                        setState(() {
+                          _selectedCompany = comp;
+                          _populateFromCompany(comp);
+                        });
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Select Registered Company *',
                       isDense: true,
                       border: OutlineInputBorder(),
                     ),
@@ -1645,6 +1774,13 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 formatAmount(_balanceDue),
                 isBold: true,
                 color: _balanceDue > 0 ? kcErrorColor : kcSuccessColor,
+              ),
+              const SizedBox(height: 6),
+              _summaryRow(
+                'Payment Status:',
+                _paymentStatusText,
+                isBold: true,
+                color: _paymentStatusColor,
               ),
             ],
           ),

@@ -5,9 +5,11 @@ import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../models/billing_models.dart';
+import '../../../models/company_model.dart';
 import '../../../models/dealer_model.dart';
 import '../../../models/product_model.dart';
 import '../../../services/billing_service.dart';
+import '../../../services/company_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/dealer_service.dart';
@@ -19,6 +21,7 @@ import '../../widgets/report_print_preview_dialog.dart';
 class InvoicesViewModel extends ReactiveViewModel {
   final SettingsService _settingsService;
   final BillingService _billingService;
+  final CompanyService _companyService;
   final DealerService _dealerService;
   final ProductMasterService _productService;
   final NavigationService _navigationService;
@@ -28,6 +31,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   InvoicesViewModel({
     SettingsService? settingsService,
     BillingService? billingService,
+    CompanyService? companyService,
     DealerService? dealerService,
     ProductMasterService? productService,
     NavigationService? navigationService,
@@ -35,6 +39,7 @@ class InvoicesViewModel extends ReactiveViewModel {
     AuthService? authService,
   })  : _settingsService = settingsService ?? locator<SettingsService>(),
         _billingService = billingService ?? locator<BillingService>(),
+        _companyService = companyService ?? locator<CompanyService>(),
         _dealerService = dealerService ?? locator<DealerService>(),
         _productService = productService ?? locator<ProductMasterService>(),
         _navigationService = navigationService ?? locator<NavigationService>(),
@@ -57,6 +62,9 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   List<DealerModel> _dealers = [];
   List<DealerModel> get dealers => _dealers;
+
+  List<CompanyModel> _companies = [];
+  List<CompanyModel> get companies => _companies;
 
   List<ProductModel> _products = [];
   List<ProductModel> get products => _products;
@@ -135,6 +143,13 @@ class InvoicesViewModel extends ReactiveViewModel {
         _dealers = await _dealerService.getAllDealers(activeOnly: true);
       } catch (e) {
         debugPrint('Failed to load dealers: $e');
+      }
+
+      // 2b. Load Companies Dropdown
+      try {
+        _companies = await _companyService.getCompanies(status: 'active');
+      } catch (e) {
+        debugPrint('Failed to load companies: $e');
       }
 
       // 3. Load Products Dropdown

@@ -170,10 +170,10 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8),
                                       child: Container(
                                         constraints: const BoxConstraints(
-                                          minWidth: 55,
-                                          maxWidth: 145,
-                                          minHeight: 50,
-                                          maxHeight: 70,
+                                          minWidth: 65,
+                                          maxWidth: 165,
+                                          minHeight: 55,
+                                          maxHeight: 85,
                                         ),
                                         padding: const EdgeInsets.all(4),
                                         decoration: BoxDecoration(
@@ -257,16 +257,27 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     fontSize: 13.5, color: kcTextSecondary),
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                'GSTIN: ${companySettings.gstin} | PAN: ${companySettings.pan}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: kcTextPrimary,
+                              if (companySettings.gstin.isNotEmpty)
+                                Text(
+                                  'GSTIN: ${companySettings.gstin}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: kcDeepNavy,
+                                  ),
                                 ),
-                              ),
+                              if (companySettings.pan.isNotEmpty)
+                                Text(
+                                  'PAN: ${companySettings.pan}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: kcTextPrimary,
+                                  ),
+                                ),
                               if (companySettings.fssaiNo != null &&
-                                  companySettings.fssaiNo!.isNotEmpty)
+                                  companySettings.fssaiNo!.trim().isNotEmpty &&
+                                  companySettings.fssaiNo!.trim().toLowerCase() != 'null')
                                 Text(
                                   'FSSAI Lic. No: ${companySettings.fssaiNo}',
                                   style: GoogleFonts.inter(
@@ -275,11 +286,6 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     color: kcPrimaryColor,
                                   ),
                                 ),
-                              Text(
-                                'Phone: ${companySettings.phone} | Email: ${companySettings.email}',
-                                style: GoogleFonts.inter(
-                                    fontSize: 12, color: kcTextSecondary),
-                              ),
                             ],
                           );
 
@@ -333,14 +339,13 @@ class InvoicePreviewDialog extends StatelessWidget {
                               _metaRow('Invoice No:', invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              _metaRow('Phone:', companySettings.phone),
+                              if (companySettings.phone.isNotEmpty)
+                                _metaRow('Phone:', companySettings.phone),
                               if (companySettings.email.isNotEmpty)
                                 _metaRow('Email:', companySettings.email),
-                              if (companySettings.fssaiNo != null &&
-                                  companySettings.fssaiNo!.isNotEmpty)
-                                _metaRow('FSSAI NO:', companySettings.fssaiNo!),
-                              if (companySettings.gstin.isNotEmpty)
-                                _metaRow('GSTIN:', companySettings.gstin),
+                              if (invoice.dueDate != null &&
+                                  invoice.dueDate!.isNotEmpty)
+                                _metaRow('Due Date:', invoice.dueDate!),
                               if (invoice.dealerSupplyNo != null)
                                 _metaRow(
                                     'Supply Ref:', invoice.dealerSupplyNo!),
@@ -395,7 +400,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  invoice.customerName,
+                                  invoice.customerName.replaceAll(RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)', caseSensitive: false), ''),
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
@@ -744,6 +749,19 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     ? kcErrorColor
                                     : kcSuccessColor,
                               ),
+                              const SizedBox(height: 6),
+                              () {
+                                final isPaid = invoice.paidAmount >= invoice.grandTotal && invoice.grandTotal > 0;
+                                final isPart = invoice.paidAmount > 0 && invoice.paidAmount < invoice.grandTotal;
+                                final statusLabel = isPaid ? 'FULLY PAID' : (isPart ? 'PARTIALLY PAID' : 'UNPAID');
+                                final statusColor = isPaid ? kcSuccessColor : (isPart ? const Color(0xFFD97706) : kcErrorColor);
+                                return _sumRow(
+                                  'Payment Status:',
+                                  statusLabel,
+                                  isBold: true,
+                                  color: statusColor,
+                                );
+                              }(),
                             ],
                           );
 

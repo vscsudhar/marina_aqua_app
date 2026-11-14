@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:marina_aqua/models/company_model.dart';
 import 'package:marina_aqua/models/dealer_model.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'dealers_viewmodel.dart';
+import 'widgets/company_form_dialog.dart';
 import 'widgets/dealer_form_dialog.dart';
 import 'widgets/dealer_pricing_dialog.dart';
 import 'widgets/dealer_statement_dialog.dart';
@@ -38,6 +40,7 @@ class DealersView extends StackedView<DealersViewModel> {
       body: Column(
         children: [
           _buildMetricsStrip(viewModel, isDesktop, isTablet),
+          _buildTabBar(viewModel),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -50,14 +53,25 @@ class DealersView extends StackedView<DealersViewModel> {
                     child: viewModel.isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : viewModel.errorMessage != null
-                            ? _buildErrorView(viewModel.errorMessage!,
-                                onRetry: viewModel.fetchDealers)
-                            : viewModel.dealers.isEmpty
-                                ? _buildEmptyView(context, viewModel)
-                                : _buildDealersListOrTable(
-                                    context, viewModel, isDesktop),
+                            ? _buildErrorView(
+                                viewModel.errorMessage!,
+                                onRetry: viewModel.selectedTab == 1
+                                    ? viewModel.fetchCompanies
+                                    : viewModel.fetchDealers,
+                              )
+                            : viewModel.selectedTab == 1
+                                ? (viewModel.companies.isEmpty
+                                    ? _buildEmptyCompaniesView(
+                                        context, viewModel)
+                                    : _buildCompaniesListOrTable(
+                                        context, viewModel, isDesktop))
+                                : (viewModel.dealers.isEmpty
+                                    ? _buildEmptyView(context, viewModel)
+                                    : _buildDealersListOrTable(
+                                        context, viewModel, isDesktop)),
                   ),
-                  if (viewModel.dealers.isNotEmpty)
+                  if (viewModel.selectedTab == 0 &&
+                      viewModel.dealers.isNotEmpty)
                     _buildPaginationBar(viewModel),
                 ],
               ),
@@ -129,6 +143,44 @@ class DealersView extends StackedView<DealersViewModel> {
 
   Widget _buildMetricsStrip(
       DealersViewModel viewModel, bool isDesktop, bool isTablet) {
+    if (viewModel.selectedTab == 1) {
+      final activeCount = viewModel.companies.where((c) => c.isActive).length;
+      return Container(
+        color: kcSurfaceWhite,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildMetricTile(
+                label: 'Total Registered Companies',
+                value: viewModel.companies.length.toString(),
+                icon: Icons.business,
+                color: kcPrimaryColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildMetricTile(
+                label: 'Active Corporate Clients',
+                value: activeCount.toString(),
+                icon: Icons.check_circle_outline,
+                color: kcSuccessColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildMetricTile(
+                label: 'Corporate Invoicing Status',
+                value: 'Ready',
+                icon: Icons.receipt_long_outlined,
+                color: const Color(0xFF0284C7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (!isDesktop && !isTablet) {
       // Mobile View: Horizontally scrollable strip to prevent pixel overflows on small screens
       return Container(
@@ -273,7 +325,124 @@ class DealersView extends StackedView<DealersViewModel> {
     );
   }
 
+  Widget _buildTabBar(DealersViewModel viewModel) {
+    return Container(
+      color: kcSurfaceWhite,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: [
+          _buildTabItem(
+            title: 'Registered Dealers (${viewModel.totalDealersCount})',
+            icon: Icons.storefront_rounded,
+            isSelected: viewModel.selectedTab == 0,
+            onTap: () => viewModel.setSelectedTab(0),
+          ),
+          const SizedBox(width: 12),
+          _buildTabItem(
+            title: 'Corporate Companies (${viewModel.companies.length})',
+            icon: Icons.business_rounded,
+            isSelected: viewModel.selectedTab == 1,
+            onTap: () => viewModel.setSelectedTab(1),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabItem({
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? kcPrimaryColor : kcVeryLightGrey,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? kcPrimaryColor : kcBorderColor,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : kcTextSecondary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.white : kcTextPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFilterToolbar(BuildContext context, DealersViewModel viewModel) {
+    if (viewModel.selectedTab == 1) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: kcSurfaceWhite,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: kcBorderColor),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 40,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search company name, code, contact, phone...',
+                    hintStyle: const TextStyle(fontSize: 12),
+                    prefixIcon: const Icon(Icons.search, size: 18),
+                    suffixIcon: viewModel.searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 16),
+                            onPressed: () => viewModel.setSearch(''),
+                          )
+                        : null,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onChanged: viewModel.setSearch,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kcPrimaryColor,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+              ),
+              icon: const Icon(Icons.domain_add, size: 18),
+              label: const Text('Onboard Company',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              onPressed: () => _openCompanyFormDialog(context, viewModel),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -367,6 +536,20 @@ class DealersView extends StackedView<DealersViewModel> {
             backgroundColor: kcVeryLightGrey,
             side: const BorderSide(color: kcBorderColor),
             onSelected: (_) => viewModel.toggleOutstandingFilter(),
+          ),
+          // Onboard Company Button
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kcPrimaryColor,
+              side: const BorderSide(color: kcPrimaryColor, width: 1.5),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            icon: const Icon(Icons.domain_add, size: 18),
+            label: const Text('Onboard Company',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () => _openCompanyFormDialog(context, viewModel),
           ),
           // Add Dealer Button
           ElevatedButton.icon(
@@ -917,6 +1100,284 @@ class DealersView extends StackedView<DealersViewModel> {
             onPressed: onRetry,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyCompaniesView(
+      BuildContext context, DealersViewModel viewModel) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.business_outlined, size: 56, color: kcMediumGrey),
+          const SizedBox(height: 16),
+          const Text(
+            'No corporate companies found',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Onboard corporate companies to enable direct B2B invoicing and contracts.',
+            style: TextStyle(fontSize: 13, color: kcTextSecondary),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kcPrimaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            icon: const Icon(Icons.domain_add, size: 18),
+            label: const Text('Onboard First Company',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () => _openCompanyFormDialog(context, viewModel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompaniesListOrTable(
+      BuildContext context, DealersViewModel viewModel, bool isDesktop) {
+    if (!isDesktop) {
+      return ListView.separated(
+        itemCount: viewModel.companies.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (ctx, index) {
+          final comp = viewModel.companies[index];
+          return _buildCompanyCard(context, viewModel, comp);
+        },
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: kcSurfaceWhite,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kcBorderColor),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowColor: const WidgetStatePropertyAll(kcVeryLightGrey),
+              dataRowMinHeight: 60,
+              dataRowMaxHeight: 76,
+              horizontalMargin: 16,
+              columnSpacing: 18,
+              columns: const [
+                DataColumn(
+                    label: Text('Company Legal Name & Code',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Contact Person & Phone',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Email & GSTIN',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Address',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Status',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+                DataColumn(
+                    label: Text('Actions',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12))),
+              ],
+              rows: viewModel.companies.map((c) {
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            c.name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: kcPrimaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              c.companyCode,
+                              style: const TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: kcPrimaryDark),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    DataCell(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              (c.contactPerson != null &&
+                                      c.contactPerson!.isNotEmpty)
+                                  ? c.contactPerson!
+                                  : '-',
+                              style: const TextStyle(fontSize: 12)),
+                          Text(
+                              (c.phone != null && c.phone!.isNotEmpty)
+                                  ? c.phone!
+                                  : '-',
+                              style: const TextStyle(
+                                  fontSize: 11, color: kcTextSecondary)),
+                        ],
+                      ),
+                    ),
+                    DataCell(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              (c.email != null && c.email!.isNotEmpty)
+                                  ? c.email!
+                                  : '-',
+                              style: const TextStyle(fontSize: 12)),
+                          Text(
+                              (c.gstin != null && c.gstin!.isNotEmpty)
+                                  ? 'GSTIN: ${c.gstin!}'
+                                  : '-',
+                              style: const TextStyle(
+                                  fontSize: 11, color: kcTextSecondary)),
+                        ],
+                      ),
+                    ),
+                    DataCell(
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 240),
+                        child: Text(
+                          (c.address != null && c.address!.isNotEmpty)
+                              ? c.address!
+                              : '-',
+                          style: const TextStyle(fontSize: 11.5),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: c.isActive
+                              ? kcSuccessColor.withValues(alpha: 0.1)
+                              : kcErrorColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          c.isActive ? 'Active' : 'Inactive',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: c.isActive ? kcSuccessColor : kcErrorColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        tooltip: 'Edit Corporate Client',
+                        onPressed: () => _openCompanyFormDialog(
+                            context, viewModel,
+                            company: c),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompanyCard(
+      BuildContext context, DealersViewModel viewModel, CompanyModel company) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: kcSurfaceWhite,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kcBorderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  company.name,
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20),
+                tooltip: 'Edit Company',
+                onPressed: () => _openCompanyFormDialog(context, viewModel,
+                    company: company),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('Code: ${company.companyCode}',
+              style: const TextStyle(fontSize: 12, color: kcTextSecondary)),
+          if (company.contactPerson != null &&
+              company.contactPerson!.isNotEmpty)
+            Text('Contact: ${company.contactPerson!}',
+                style: const TextStyle(fontSize: 12)),
+          if (company.phone != null && company.phone!.isNotEmpty)
+            Text('Phone: ${company.phone!}',
+                style: const TextStyle(fontSize: 12)),
+          if (company.gstin != null && company.gstin!.isNotEmpty)
+            Text('GSTIN: ${company.gstin!}',
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
+  void _openCompanyFormDialog(BuildContext context, DealersViewModel viewModel,
+      {CompanyModel? company}) {
+    showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => CompanyFormDialog(
+        company: company,
+        onSave: (data) =>
+            viewModel.saveCompany(data, companyId: company?.id),
       ),
     );
   }

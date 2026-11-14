@@ -1043,6 +1043,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       barrierDismissible: false,
       builder: (context) => InvoiceFormDialog(
         dealers: viewModel.dealers,
+        companies: viewModel.companies,
         products: viewModel.products,
         companySettings: viewModel.companySettings,
         defaultInvoiceType: viewModel.activeInvoiceType,
@@ -1153,6 +1154,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       barrierDismissible: false,
       builder: (context) => InvoiceFormDialog(
         dealers: viewModel.dealers,
+        companies: viewModel.companies,
         products: viewModel.products,
         companySettings: viewModel.companySettings,
         existingInvoice: invoice,

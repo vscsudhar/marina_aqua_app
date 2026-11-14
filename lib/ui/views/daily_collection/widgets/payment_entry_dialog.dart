@@ -72,6 +72,14 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
 
   final List<CollectionProductItem> _items = [];
   bool _userEditedAmount = false;
+  bool _userManuallySetAllocation = false;
+
+  String _paymentAllocation = 'refill'; // 'refill' | 'bottle' | 'others'
+  ProductModel? _selectedBottleProduct;
+  final TextEditingController _bottleQtyController =
+      TextEditingController(text: '1');
+  double _bottlePrice = 0.0;
+  bool _isResolvingBottlePrice = false;
 
   @override
   void initState() {
@@ -169,12 +177,70 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
   double get _balanceAddedToLedger =>
       _totalActualSupplyAmount - _collectedAmount;
 
+  List<ProductModel> get _bottleProducts {
+    final list = widget.products.where((p) {
+      if (p.productType.toLowerCase() == 'bottle') return true;
+      final name = p.name.toLowerCase();
+      final sku = p.sku.toLowerCase();
+      if (name.contains('refill') || sku.contains('refill')) return false;
+      return name.contains('bottle') ||
+          name.contains('1l') ||
+          name.contains('2l') ||
+          name.contains('5l') ||
+          name.contains('500ml') ||
+          name.contains('300ml') ||
+          name.contains('200ml') ||
+          name.contains('100ml') ||
+          name.contains('nbt') ||
+          name.contains('bot');
+    }).toList();
+
+    if (list.isEmpty) {
+      return widget.products
+          .where((p) =>
+              !p.name.toLowerCase().contains('refill') &&
+              !p.sku.toLowerCase().contains('refill'))
+          .toList();
+    }
+    return list;
+  }
+
+  double get _bottleQty =>
+      double.tryParse(_bottleQtyController.text.trim()) ?? 1.0;
+
+  double get _bottleLineTotal => _bottleQty * _bottlePrice;
+
+  Future<void> _resolveBottlePrice(ProductModel p) async {
+    setState(() => _isResolvingBottlePrice = true);
+    try {
+      final res = await _dealerService.resolveEffectivePrice(
+        widget.dealer.id,
+        p.id,
+        date: DateFormat('yyyy-MM-dd').format(_paymentDate),
+      );
+      if (mounted) {
+        setState(() {
+          _bottlePrice = (res['price'] as num?)?.toDouble() ?? p.defaultPrice;
+          _isResolvingBottlePrice = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _bottlePrice = p.defaultPrice;
+          _isResolvingBottlePrice = false;
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     for (final it in _items) {
       it.dispose();
     }
     _amountController.dispose();
+    _bottleQtyController.dispose();
     _referenceController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -228,6 +294,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                       _buildLedgerBalanceSummaryCard(),
                       const SizedBox(height: 22),
                       _buildAmountField(),
+                      const SizedBox(height: 18),
+                      _buildPaymentAllocationSelector(),
                       const SizedBox(height: 18),
                       _buildMethodSelector(),
                       const SizedBox(height: 16),
@@ -1129,6 +1197,230 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     );
   }
 
+  Widget _buildPaymentAllocationSelector() {
+    final remaining = _collectedAmount - _totalActualSupplyAmount;
+    final hasRemaining = remaining > 0;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: kcSurfaceWhite,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: hasRemaining
+              ? const Color(0xFFD97706).withValues(alpha: 0.5)
+              : kcBorderColor,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.account_tree_outlined,
+                size: 18,
+                color: hasRemaining ? const Color(0xFFD97706) : kcPrimaryDark,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  hasRemaining
+                      ? 'Payment Allocation (Remaining: ${currencyFormat.format(remaining)})'
+                      : 'Payment Allocation',
+                  style: GoogleFonts.outfit(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: kcTextPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            hasRemaining
+                ? 'Specify how the remaining payment of ${currencyFormat.format(remaining)} is allocated:'
+                : 'Select how this collection payment is accounted in dealer ledger:',
+            style: GoogleFonts.inter(fontSize: 11, color: kcTextMuted),
+          ),
+          const SizedBox(height: 12),
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(
+                value: 'refill',
+                label: Text('Refill'),
+                icon: Icon(Icons.water_drop_outlined, size: 16),
+              ),
+              ButtonSegment(
+                value: 'bottle',
+                label: Text('Bottle'),
+                icon: Icon(Icons.local_drink_outlined, size: 16),
+              ),
+              ButtonSegment(
+                value: 'others',
+                label: Text('Others'),
+                icon: Icon(Icons.more_horiz, size: 16),
+              ),
+            ],
+            selected: {_paymentAllocation},
+            onSelectionChanged: (val) {
+              setState(() {
+                _userManuallySetAllocation = true;
+                _paymentAllocation = val.first;
+                if (_paymentAllocation == 'bottle' && _selectedBottleProduct == null) {
+                  final bottles = _bottleProducts;
+                  if (bottles.isNotEmpty) {
+                    _selectedBottleProduct = bottles.first;
+                    _resolveBottlePrice(_selectedBottleProduct!);
+                  }
+                }
+              });
+            },
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: kcPrimaryColor,
+              selectedForegroundColor: Colors.white,
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (_paymentAllocation == 'refill')
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: kcPrimaryColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, size: 16, color: kcPrimaryDark),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Payment will be allocated to Dealer Ledger P1/P2 filling payments and reduces dealer outstanding.',
+                      style: GoogleFonts.inter(fontSize: 11, color: kcPrimaryDark, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else if (_paymentAllocation == 'bottle')
+            _buildBottleAllocationDetails()
+          else if (_paymentAllocation == 'others')
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, size: 16, color: Color(0xFF92400E)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Direct dealer balance reduction. Payment will reduce outstanding balance directly without altering Refill or Bottle Ledgers.',
+                      style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: const Color(0xFF92400E),
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottleAllocationDetails() {
+    final bottles = _bottleProducts;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: kcVeryLightGrey,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: kcBorderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: DropdownButtonFormField<ProductModel>(
+                  initialValue: _selectedBottleProduct,
+                  items: bottles.map((p) {
+                    return DropdownMenuItem(
+                      value: p,
+                      child: Text('${p.name} (${p.unitName})'),
+                    );
+                  }).toList(),
+                  onChanged: (p) {
+                    if (p != null) {
+                      setState(() {
+                        _selectedBottleProduct = p;
+                      });
+                      _resolveBottlePrice(p);
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select Bottle Product *',
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 1,
+                child: TextFormField(
+                  controller: _bottleQtyController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Bottle Qty *',
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _isResolvingBottlePrice
+                    ? 'Resolving rate...'
+                    : 'Rate: ₹${_bottlePrice.toStringAsFixed(2)} / unit',
+                style: GoogleFonts.inter(fontSize: 11, color: kcTextSecondary),
+              ),
+              Text(
+                'Bottle Total: ${currencyFormat.format(_bottleLineTotal)}',
+                style: GoogleFonts.outfit(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: kcPrimaryDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'This bottle product and count will be recorded in the Bottle Ledger.',
+            style: GoogleFonts.inter(fontSize: 10.5, color: kcSuccessColor, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMethodSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1249,6 +1541,227 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
     );
   }
 
+  Future<String?> _promptRemainingAllocation(double remainingAmount) async {
+    String tempAllocation = _paymentAllocation;
+    ProductModel? tempBottle = _selectedBottleProduct ??
+        (_bottleProducts.isNotEmpty ? _bottleProducts.first : null);
+    final tempQtyController =
+        TextEditingController(text: _bottleQtyController.text);
+    double tempBottlePrice = _bottlePrice;
+
+    if (tempBottle != null && tempBottlePrice <= 0) {
+      tempBottlePrice = tempBottle.defaultPrice;
+    }
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (dialogCtx, setDialogState) {
+            final double qty =
+                double.tryParse(tempQtyController.text.trim()) ?? 1.0;
+            final double bottleTotal = qty * tempBottlePrice;
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD97706).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.help_outline_rounded,
+                      color: Color(0xFFD97706),
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Payment Allocation',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'How did the dealer pay the remaining ${currencyFormat.format(remainingAmount)}?',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: kcTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Options: Refill, Bottle, Others
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ChoiceChip(
+                          label: const Text('Refill'),
+                          avatar: const Icon(Icons.water_drop_outlined, size: 16),
+                          selected: tempAllocation == 'refill',
+                          selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
+                          onSelected: (val) {
+                            if (val) setDialogState(() => tempAllocation = 'refill');
+                          },
+                        ),
+                        ChoiceChip(
+                          label: const Text('Bottle'),
+                          avatar: const Icon(Icons.local_drink_outlined, size: 16),
+                          selected: tempAllocation == 'bottle',
+                          selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
+                          onSelected: (val) {
+                            if (val) setDialogState(() => tempAllocation = 'bottle');
+                          },
+                        ),
+                        ChoiceChip(
+                          label: const Text('Others'),
+                          avatar: const Icon(Icons.more_horiz, size: 16),
+                          selected: tempAllocation == 'others',
+                          selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
+                          onSelected: (val) {
+                            if (val) setDialogState(() => tempAllocation = 'others');
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Contextual explanation based on choice
+                    if (tempAllocation == 'refill')
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: kcPrimaryColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: kcPrimaryColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Text(
+                          'Record ${currencyFormat.format(remainingAmount)} as refill payment in Dealer Ledger P1/P2 filling payments allocation. Updates dealer outstanding.',
+                          style: GoogleFonts.inter(
+                              fontSize: 11.5,
+                              color: kcPrimaryDark,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    else if (tempAllocation == 'others')
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: Colors.amber.withValues(alpha: 0.3)),
+                        ),
+                        child: Text(
+                          'Directly reduce dealer outstanding by ${currencyFormat.format(remainingAmount)}. No refill or bottle ledger entries will be created.',
+                          style: GoogleFonts.inter(
+                              fontSize: 11.5,
+                              color: const Color(0xFF92400E),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    else if (tempAllocation == 'bottle') ...[
+                      // Bottle Product selection & quantity
+                      DropdownButtonFormField<ProductModel>(
+                        initialValue: tempBottle,
+                        items: _bottleProducts.map((p) {
+                          return DropdownMenuItem(
+                            value: p,
+                            child: Text('${p.name} (${p.unitName})'),
+                          );
+                        }).toList(),
+                        onChanged: (p) {
+                          if (p != null) {
+                            setDialogState(() {
+                              tempBottle = p;
+                              tempBottlePrice = p.defaultPrice;
+                            });
+                          }
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Select Bottle Product *',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: tempQtyController,
+                        keyboardType:
+                            const TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          labelText: 'Bottle Quantity *',
+                          isDense: true,
+                          border: const OutlineInputBorder(),
+                          helperText:
+                              'Rate: ₹${tempBottlePrice.toStringAsFixed(2)}  •  Total: ${currencyFormat.format(bottleTotal)}',
+                        ),
+                        onChanged: (_) => setDialogState(() {}),
+                      ),
+                      if (bottleTotal != remainingAmount && bottleTotal > 0) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          'Note: Bottle total (${currencyFormat.format(bottleTotal)}) will be recorded into Bottle Ledger.',
+                          style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: const Color(0xFFD97706),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogCtx).pop(null),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kcPrimaryDark,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    if (tempAllocation == 'bottle') {
+                      _selectedBottleProduct = tempBottle;
+                      _bottleQtyController.text = tempQtyController.text;
+                      _bottlePrice = tempBottlePrice;
+                    }
+                    Navigator.of(dialogCtx).pop(tempAllocation);
+                  },
+                  child: const Text('Confirm Allocation',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -1327,53 +1840,42 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
       }
     }
 
-    bool includeInLedger = true;
-    if (amount > 0) {
-      final promptResult = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              const Icon(Icons.help_outline_rounded,
-                  color: kcPrimaryDark, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Include in Ledger?',
-                style: GoogleFonts.outfit(
-                    fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ],
-          ),
-          content: Text(
-            '₹${amount.toStringAsFixed(0)} collected successfully. Do you want to include this payment in the Dealer Ledger Amount section?',
-            style: GoogleFonts.inter(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('No',
-                  style: TextStyle(
-                      color: kcMediumGrey, fontWeight: FontWeight.bold)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kcPrimaryDark,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-              ),
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Yes',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      );
-      if (promptResult != null) {
-        includeInLedger = promptResult;
+    // Prompt user for remaining payment allocation if payment > 0 and user hasn't explicitly chosen
+    final remainingPayment = _items.isNotEmpty ? (amount - todayBill) : amount;
+    if (remainingPayment > 0 && !_userManuallySetAllocation) {
+      final alloc = await _promptRemainingAllocation(remainingPayment);
+      if (alloc == null) {
+        return; // User cancelled
+      }
+      _paymentAllocation = alloc;
+    }
+
+    final bool includeInLedger = _paymentAllocation != 'others';
+
+    // If bottle allocation selected, ensure bottle product is added to supply items
+    if (_paymentAllocation == 'bottle') {
+      if (_selectedBottleProduct == null) {
+        final bottles = _bottleProducts;
+        if (bottles.isNotEmpty) {
+          _selectedBottleProduct = bottles.first;
+        }
+      }
+      if (_selectedBottleProduct != null && _bottleQty > 0) {
+        final existingIndex =
+            _items.indexWhere((it) => it.product?.id == _selectedBottleProduct!.id);
+        if (existingIndex >= 0) {
+          _items[existingIndex].quantity += _bottleQty;
+        } else {
+          final qtyCtrl = TextEditingController(text: _bottleQty.toString());
+          _items.add(CollectionProductItem(
+            product: _selectedBottleProduct,
+            quantity: _bottleQty,
+            appliedPrice: _bottlePrice > 0
+                ? _bottlePrice
+                : _selectedBottleProduct!.defaultPrice,
+            quantityController: qtyCtrl,
+          ));
+        }
       }
     }
 

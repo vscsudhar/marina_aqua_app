@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../models/bottle_ledger_models.dart';
+import 'package:marina_aqua/ui/widgets/dual_horizontal_scrollable.dart';
 
 class BottleLedgerTable extends StatelessWidget {
   final String title;
@@ -104,9 +105,8 @@ class BottleLedgerTable extends StatelessWidget {
               ),
             ),
 
-            // Scrollable Table Content
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+            // Dual Horizontal Scrollable Table Content
+            DualHorizontalScrollable(
               child: ConstrainedBox(
                 constraints:
                     BoxConstraints(minWidth: showCountColumn ? 920 : 540),

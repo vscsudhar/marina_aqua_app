@@ -15,6 +15,7 @@ import 'package:stacked_shared/stacked_shared.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/billing_service.dart';
+import '../services/company_service.dart';
 import '../services/daily_collection_service.dart';
 import '../services/damaged_product_service.dart';
 import '../services/dashboard_service.dart';
@@ -53,4 +54,5 @@ Future<void> setupLocator(
   locator.registerLazySingleton(() => UserManagementService());
   locator.registerLazySingleton(() => ExportPrintService());
   locator.registerLazySingleton(() => DamagedProductService());
+  locator.registerLazySingleton(() => CompanyService());
 }
