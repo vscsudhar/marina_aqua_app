@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
-import '../../common/app_colors.dart';
-import '../../widgets/marina_logo.dart';
 import 'startup_viewmodel.dart';
 
 class StartupView extends StackedView<StartupViewModel> {
@@ -16,24 +14,32 @@ class StartupView extends StackedView<StartupViewModel> {
     Widget? child,
   ) {
     return Scaffold(
-      backgroundColor: kcDeepNavy,
+      backgroundColor: const Color(0xFFFDFAF4),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const MarinaLogo(
-              size: 76,
-              isDark: true,
-              isVertical: true,
-              useCompanyLogo: false,
-              subtitle: 'Dealer Management System',
+            Image.asset(
+              'assets/images/startup_logo.png',
+              width: 280,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'DEALER MANAGEMENT SYSTEM',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 2.0,
+                color: const Color(0xFF64748B),
+              ),
             ),
             const SizedBox(height: 36),
             const SizedBox(
-              width: 24,
-              height: 24,
+              width: 26,
+              height: 26,
               child: CircularProgressIndicator(
-                color: kcAquaCyan,
+                color: Color(0xFFE07A2E),
                 strokeWidth: 2.5,
               ),
             ),
@@ -41,8 +47,9 @@ class StartupView extends StackedView<StartupViewModel> {
             Text(
               'Initializing secure session...',
               style: GoogleFonts.inter(
-                color: kcLightGrey,
+                color: const Color(0xFF94A3B8),
                 fontSize: 13,
+                fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
             ),
