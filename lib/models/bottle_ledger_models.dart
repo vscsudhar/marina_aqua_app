@@ -40,7 +40,7 @@ class BottleLedgerMetaModel {
 
   factory BottleLedgerMetaModel.fromJson(Map<String, dynamic> json) {
     return BottleLedgerMetaModel(
-      companyName: json['company_name'] ?? 'Marina Aqua',
+      companyName: json['company_name'] ?? 'SS AquaFlow',
       companyLogo: json['company_logo'],
       year: _toInt(json['year'], DateTime.now().year),
       month: _toInt(json['month'], DateTime.now().month),

@@ -14,12 +14,14 @@ class MarinaLogo extends StatelessWidget {
   final String? logoUrl;
   final String? companyName;
   final bool useCompanyLogo;
+  final bool isVertical;
 
   const MarinaLogo({
     super.key,
     this.size = 56,
     this.isDark = false,
     this.showText = true,
+    this.isVertical = false,
     this.subtitle,
     this.logoUrl,
     this.companyName,
@@ -120,6 +122,55 @@ class MarinaLogo extends StatelessWidget {
           ? (subtitle ?? words.sublist(2).join(' ').toUpperCase())
           : (subtitle ?? 'DEALER MANAGEMENT SYSTEM');
 
+      if (isVertical) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            emblem,
+            SizedBox(height: size * 0.28),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  firstPart.toUpperCase(),
+                  style: GoogleFonts.outfit(
+                    fontSize: size * 0.42,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: isDark ? Colors.white : kcDeepNavy,
+                  ),
+                ),
+                if (secondPart.isNotEmpty) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    secondPart.toUpperCase(),
+                    style: GoogleFonts.outfit(
+                      fontSize: size * 0.42,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                      color: kcAquaCyan,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              defaultSubtitle,
+              style: GoogleFonts.inter(
+                fontSize: (size * 0.19).clamp(11.0, 14.0),
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.4,
+                color: isDark ? kcPrimaryLight : kcMediumGrey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        );
+      }
+
       return Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -181,9 +232,9 @@ class MarinaLogo extends StatelessWidget {
     }
 
     // If company logo is explicitly disabled (e.g. on application login screen),
-    // strictly use the Marina Aqua application brand emblem without listening to settings.
+    // strictly use the SS AquaFlow application brand emblem without listening to settings.
     if (!useCompanyLogo) {
-      return buildContent(null, 'MARINA AQUA');
+      return buildContent(null, 'SS AQUAFLOW');
     }
 
     // If explicit companyName and logoUrl are provided by parent (e.g. sidebar or home view),
@@ -229,7 +280,7 @@ class MarinaLogo extends StatelessWidget {
                   settings!.companyName.trim().isNotEmpty &&
                   settings.companyName != 'Marina Aqua Pure Water Co.')
               ? settings.companyName
-              : (user?.companyName ?? settings?.companyName ?? 'MARINA AQUA'));
+              : (user?.companyName ?? settings?.companyName ?? 'SS AQUAFLOW'));
 
       return buildContent(effectiveLogo, effectiveName);
     }

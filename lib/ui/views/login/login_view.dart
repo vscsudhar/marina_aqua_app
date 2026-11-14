@@ -85,7 +85,7 @@ class LoginView extends StackedView<LoginViewModel> {
                           size: 52,
                           isDark: true,
                           useCompanyLogo: false,
-                          subtitle: 'ENTERPRISE DISTRIBUTION',
+                          subtitle: 'Dealer Management System',
                         ),
                         const SizedBox(height: 32),
                         Column(
@@ -233,7 +233,7 @@ class LoginView extends StackedView<LoginViewModel> {
                   size: 48,
                   isDark: false,
                   useCompanyLogo: false,
-                  subtitle: 'DEALER MANAGEMENT PORTAL',
+                  subtitle: 'Dealer Management System',
                 ),
               ),
               const SizedBox(height: 28),

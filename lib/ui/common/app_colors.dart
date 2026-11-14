@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Marina Aqua Theme Colors - Ocean & Crystal Water Identity
+// SS AquaFlow Theme Colors - Ocean & Crystal Water Identity
 const Color kcPrimaryColor = Color(0xFF0284C7); // Vivid Sky Blue
 const Color kcPrimaryDark = Color(0xFF0369A1); // Deep Ocean Blue
 const Color kcPrimaryLight = Color(0xFF38BDF8); // Crystal Aqua Blue

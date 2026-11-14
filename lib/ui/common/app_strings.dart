@@ -1,7 +1,6 @@
 class AppStrings {
   static const String appName = 'SS AquaFlow';
-  static const String companyTagline =
-      'Packaged Drinking Water & Mineral Supplies';
+  static const String companyTagline = 'Dealer Management System';
   static const String portalTitle = 'Dealer Management System';
   static const String loginTitle = 'Sign in to your account';
   static const String loginSubtitle =
@@ -9,7 +8,7 @@ class AppStrings {
 
   static const String labelEmailOrUsername = 'Email or Username';
   static const String hintEmailOrUsername =
-      'e.g., admin@marinaaqua.com or admin';
+      'e.g., admin@ssaquaflow.com or admin';
   static const String labelPassword = 'Password';
   static const String hintPassword = '••••••••';
   static const String labelRememberMe = 'Remember session on this device';
@@ -22,7 +21,7 @@ class AppStrings {
       'Password must be at least 6 characters';
 
   static const String supportContact =
-      'Need assistance? Contact IT Operations at support@marinaaqua.com';
+      'Need assistance? Contact IT Operations at support@ssaquaflow.com';
   static const String copyrightNotice =
       '© 2026 SS AquaFlow. All rights reserved. Registered under FSSAI & BIS.';
 }

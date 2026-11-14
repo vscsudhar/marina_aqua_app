@@ -190,7 +190,7 @@ class SettingsViewModel extends ReactiveViewModel {
         await _authService.refreshProfile();
       } catch (_) {}
       _successMessage =
-          'Company logo removed. Standard Marina Aqua emblem restored.';
+          'Company logo removed. Standard SS AquaFlow emblem restored.';
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {

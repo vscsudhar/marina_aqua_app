@@ -149,14 +149,20 @@ class InvoicePreviewDialog extends StatelessWidget {
                           final effectiveCompanyName =
                               (companySettings.companyName.isNotEmpty &&
                                       companySettings.companyName !=
-                                          'Marina Aqua Pure Water Co.')
+                                          'Marina Aqua Pure Water Co.' &&
+                                      companySettings.companyName !=
+                                          'SS AquaFlow')
                                   ? companySettings.companyName
                                   : (locator.isRegistered<AuthService>()
                                       ? (locator<AuthService>()
                                               .currentUser
                                               ?.companyName ??
-                                          companySettings.companyName)
-                                      : companySettings.companyName);
+                                          (companySettings.companyName.isNotEmpty
+                                              ? companySettings.companyName
+                                              : 'SS AquaFlow'))
+                                      : (companySettings.companyName.isNotEmpty
+                                          ? companySettings.companyName
+                                          : 'SS AquaFlow'));
 
                           final companyWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

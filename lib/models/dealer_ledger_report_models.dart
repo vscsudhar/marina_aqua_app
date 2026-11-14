@@ -80,7 +80,7 @@ class LedgerCompanyModel {
 
   factory LedgerCompanyModel.fromJson(Map<String, dynamic> json) {
     return LedgerCompanyModel(
-      name: json['name'] ?? 'Marina Aqua Private Limited',
+      name: json['name'] ?? 'SS AquaFlow',
       tagline: json['tagline'] ?? '',
       address: json['address'] ?? '',
       gstin: json['gstin'] ?? '',

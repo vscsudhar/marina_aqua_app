@@ -26,10 +26,14 @@ class HomeViewModel extends ReactiveViewModel {
   String? get companyName {
     if (_settingsService.isInitialized &&
         _settingsService.settings.companyName.trim().isNotEmpty &&
-        _settingsService.settings.companyName != 'Marina Aqua Pure Water Co.') {
+        _settingsService.settings.companyName != 'Marina Aqua Pure Water Co.' &&
+        _settingsService.settings.companyName != 'SS AquaFlow') {
       return _settingsService.settings.companyName;
     }
-    return currentUser?.companyName ?? _settingsService.settings.companyName;
+    return currentUser?.companyName ??
+        (_settingsService.settings.companyName.isNotEmpty
+            ? _settingsService.settings.companyName
+            : 'SS AquaFlow');
   }
 
   String? get companyLogo {

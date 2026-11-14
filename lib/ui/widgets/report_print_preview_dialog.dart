@@ -207,7 +207,7 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
       }
     } catch (_) {}
     final settings = settingsService?.settings;
-    final companyName = settings?.companyName ?? 'Marina Aqua Private Limited';
+    final companyName = settings?.companyName ?? 'SS AquaFlow';
     final address = settings?.address ??
         'No. 42 Water Works Road, Guindy, Chennai - 600032';
     final gstin = settings?.gstin ?? '33AABCM9876C1Z8';

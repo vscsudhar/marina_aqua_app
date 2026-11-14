@@ -22,10 +22,11 @@ class StartupView extends StackedView<StartupViewModel> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const MarinaLogo(
-              size: 64,
+              size: 76,
               isDark: true,
+              isVertical: true,
               useCompanyLogo: false,
-              subtitle: 'DEALER MANAGEMENT SYSTEM',
+              subtitle: 'Dealer Management System',
             ),
             const SizedBox(height: 36),
             const SizedBox(

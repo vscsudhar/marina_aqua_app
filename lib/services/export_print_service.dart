@@ -87,7 +87,7 @@ class ExportPrintService {
   Future<void> printFromApi({
     required String endpoint,
     Map<String, dynamic>? queryParams,
-    String title = 'Marina Aqua Document',
+    String title = 'SS AquaFlow Document',
   }) async {
     final response = await _apiService.client.get(
       endpoint,
@@ -894,7 +894,7 @@ class ExportPrintService {
                                 mainAxisAlignment: pw.MainAxisAlignment.center,
                                 children: [
                                   pw.Text(
-                                    'MARINA',
+                                    'SS',
                                     style: pw.TextStyle(
                                       color: brandDarkNavy,
                                       fontSize: 9.5,
@@ -903,10 +903,10 @@ class ExportPrintService {
                                   ),
                                   pw.SizedBox(height: 1),
                                   pw.Text(
-                                    'AQUA',
+                                    'AQUAFLOW',
                                     style: pw.TextStyle(
                                       color: brandAccent,
-                                      fontSize: 8.5,
+                                      fontSize: 8.0,
                                       fontWeight: pw.FontWeight.bold,
                                     ),
                                   ),

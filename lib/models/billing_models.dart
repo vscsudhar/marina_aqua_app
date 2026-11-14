@@ -28,7 +28,7 @@ class CompanySettingModel {
 
   const CompanySettingModel({
     required this.id,
-    this.companyName = 'Marina Aqua Pure Water Co.',
+    this.companyName = 'SS AquaFlow',
     this.tagline = 'Pure & Mineral Rich Packaged Drinking Water',
     this.phone = '+91 94441 23456',
     this.email = 'billing@marinaaqua.com',
@@ -63,7 +63,7 @@ class CompanySettingModel {
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 1,
       companyName:
-          json['company_name'] as String? ?? 'Marina Aqua Pure Water Co.',
+          json['company_name'] as String? ?? 'SS AquaFlow',
       tagline: json['tagline'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String? ?? '',
