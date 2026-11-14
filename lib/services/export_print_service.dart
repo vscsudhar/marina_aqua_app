@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:dio/dio.dart';
 import 'package:excel/excel.dart';
 import 'package:pdf/pdf.dart';
@@ -29,6 +30,28 @@ class ExportPrintService {
   // In-memory logo cache for PDF generation
   Uint8List? _cachedLogoBytes;
   String? _cachedLogoUrl;
+
+  static pw.ThemeData? _pdfTheme;
+
+  /// Loads bundled Unicode NotoSans fonts (Regular and Bold) supporting Indian Rupee symbol (₹ / U+20B9)
+  static Future<pw.ThemeData> getPdfTheme() async {
+    if (_pdfTheme != null) return _pdfTheme!;
+    try {
+      final regularData =
+          await rootBundle.load('assets/fonts/NotoSans-Regular.ttf');
+      final boldData = await rootBundle.load('assets/fonts/NotoSans-Bold.ttf');
+      final regularFont = pw.Font.ttf(regularData);
+      final boldFont = pw.Font.ttf(boldData);
+      _pdfTheme = pw.ThemeData.withFont(
+        base: regularFont,
+        bold: boldFont,
+      );
+      return _pdfTheme!;
+    } catch (e) {
+      debugPrint('ExportPrintService: Error loading bundled NotoSans font: $e');
+      return pw.ThemeData();
+    }
+  }
 
   static const String mimePdf = 'application/pdf';
   static const String mimeExcel =
@@ -329,7 +352,8 @@ class ExportPrintService {
     Map<String, String>? kpis,
     bool isLandscape = false,
   }) async {
-    final pdf = pw.Document();
+    final theme = await getPdfTheme();
+    final pdf = pw.Document(theme: theme);
     final pageFormat =
         isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4;
 
@@ -570,7 +594,7 @@ class ExportPrintService {
     final absVal = val.abs();
     final str =
         absVal % 1 == 0 ? absVal.toInt().toString() : absVal.toStringAsFixed(2);
-    return '$sign Rs. $str';
+    return '$sign ₹$str';
   }
 
   pw.Widget _pdfMetaRow(String label, String value, {bool isBold = false}) {
@@ -657,7 +681,8 @@ class ExportPrintService {
     Uint8List? customLogoBytes,
   ]) async {
     final settings = customSettings ?? _companySettings;
-    final pdf = pw.Document();
+    final theme = await getPdfTheme();
+    final pdf = pw.Document(theme: theme);
 
     // Resolve and fetch company logo for PDF header
     Uint8List? effectiveLogoBytes = customLogoBytes;
@@ -715,20 +740,20 @@ class ExportPrintService {
             'Item Description',
             'HSN/SAC',
             'Qty & Unit',
-            'Rate (Rs.)',
-            'Disc (Rs.)',
-            'Total (Rs.)',
+            'Rate (₹)',
+            'Disc (₹)',
+            'Total (₹)',
           ]
         : [
             '#',
             'Item Description',
             'HSN/SAC',
             'Qty & Unit',
-            'Rate (Rs.)',
-            'Disc (Rs.)',
-            'Taxable (Rs.)',
-            !invoice.isInterstate ? 'GST Split (CGST+SGST)' : 'IGST (Rs.)',
-            'Total (Rs.)',
+            'Rate (₹)',
+            'Disc (₹)',
+            'Taxable (₹)',
+            !invoice.isInterstate ? 'GST Split (CGST+SGST)' : 'IGST (₹)',
+            'Total (₹)',
           ];
 
     // Prepare table rows with actual decimals
@@ -1266,22 +1291,22 @@ class ExportPrintService {
                       child: pw.Column(
                         children: [
                           _pdfSummaryRow('Subtotal:',
-                              'Rs. ${_formatAmount(invoice.subtotal)}'),
+                              '₹${_formatAmount(invoice.subtotal)}'),
                           if (invoice.discountTotal > 0)
                             _pdfSummaryRow('Discount:',
-                                '- Rs. ${_formatAmount(invoice.discountTotal)}'),
+                                '- ₹${_formatAmount(invoice.discountTotal)}'),
                           if (!isWithoutGst) ...[
                             _pdfSummaryRow('Taxable Amount:',
-                                'Rs. ${_formatAmount(invoice.taxableAmount)}',
+                                '₹${_formatAmount(invoice.taxableAmount)}',
                                 isBold: true),
                             if (!invoice.isInterstate) ...[
                               _pdfSummaryRow('CGST:',
-                                  'Rs. ${_formatAmount(invoice.cgstAmount)}'),
+                                  '₹${_formatAmount(invoice.cgstAmount)}'),
                               _pdfSummaryRow('SGST:',
-                                  'Rs. ${_formatAmount(invoice.sgstAmount)}'),
+                                  '₹${_formatAmount(invoice.sgstAmount)}'),
                             ] else ...[
                               _pdfSummaryRow('IGST:',
-                                  'Rs. ${_formatAmount(invoice.igstAmount)}'),
+                                  '₹${_formatAmount(invoice.igstAmount)}'),
                             ],
                           ],
                           _pdfSummaryRow(
@@ -1289,12 +1314,12 @@ class ExportPrintService {
                               isBold: true),
                           pw.Divider(thickness: 0.8, color: brandDarkNavy),
                           _pdfSummaryRow('Grand Total:',
-                              'Rs. ${_formatAmount(invoice.grandTotal)}',
+                              '₹${_formatAmount(invoice.grandTotal)}',
                               isBold: true, fontSize: 11.5),
                           _pdfSummaryRow('Amount Paid:',
-                              'Rs. ${_formatAmount(invoice.paidAmount)}'),
+                              '₹${_formatAmount(invoice.paidAmount)}'),
                           _pdfSummaryRow('Balance Due:',
-                              'Rs. ${_formatAmount(invoice.balanceDue)}',
+                              '₹${_formatAmount(invoice.balanceDue)}',
                               isBold: true),
                           pw.SizedBox(height: 3),
                           () {
