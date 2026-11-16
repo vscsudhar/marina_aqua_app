@@ -1850,7 +1850,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
       _paymentAllocation = alloc;
     }
 
-    final bool includeInLedger = _paymentAllocation != 'others';
+    // Only refill payments are included in Dealer Ledger (filling) amounts; bottle and others are excluded
+    final bool includeInLedger = _paymentAllocation == 'refill';
 
     // If bottle allocation selected, ensure bottle product is added to supply items
     if (_paymentAllocation == 'bottle') {
@@ -1900,9 +1901,13 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         'payment_reference': _referenceController.text.trim().isNotEmpty
             ? _referenceController.text.trim()
             : null,
-        'payment_notes': _notesController.text.trim().isNotEmpty
-            ? _notesController.text.trim()
-            : null,
+        'payment_notes': _paymentAllocation == 'bottle'
+            ? (_notesController.text.trim().isNotEmpty
+                ? '${_notesController.text.trim()} [Bottle allocation]'
+                : 'Bottle payment')
+            : (_notesController.text.trim().isNotEmpty
+                ? _notesController.text.trim()
+                : null),
         'include_in_ledger_amount': includeInLedger,
         'idempotency_key':
             'COL-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',
@@ -1920,9 +1925,13 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         'reference_no': _referenceController.text.trim().isNotEmpty
             ? _referenceController.text.trim()
             : null,
-        'notes': _notesController.text.trim().isNotEmpty
-            ? _notesController.text.trim()
-            : null,
+        'notes': _paymentAllocation == 'bottle'
+            ? (_notesController.text.trim().isNotEmpty
+                ? '${_notesController.text.trim()} [Bottle allocation]'
+                : 'Bottle payment')
+            : (_notesController.text.trim().isNotEmpty
+                ? _notesController.text.trim()
+                : null),
         'include_in_ledger_amount': includeInLedger,
         'idempotency_key':
             'PAY-${widget.dealer.id}-${DateTime.now().microsecondsSinceEpoch}',

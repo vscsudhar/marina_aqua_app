@@ -47,6 +47,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   late List<UnitModel> _units;
   late bool _trackStock;
   late bool _isActive;
+  late bool _forInvoice;
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -194,6 +195,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _productType = p?.productType ?? 'normal';
     _trackStock = p?.trackStock ?? true;
     _isActive = p?.isActive ?? true;
+    _forInvoice = p?.forInvoice ?? false;
   }
 
   @override
@@ -286,6 +288,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           ? null
           : _descriptionController.text.trim(),
       'is_active': _isActive,
+      'for_invoice': _forInvoice,
     };
 
     if (_isRefill) {
@@ -659,6 +662,21 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                         onChanged: (val) => setState(() => _isActive = val),
                       );
 
+                      final forInvoiceTile = CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('For Invoice',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 14)),
+                        subtitle: const Text(
+                            'Invoice product (excluded from Bottle Ledger)',
+                            style: TextStyle(fontSize: 12)),
+                        value: _forInvoice,
+                        activeColor: kcPrimaryColor,
+                        onChanged: (val) =>
+                            setState(() => _forInvoice = val ?? false),
+                        controlAffinity: ListTileControlAffinity.leading,
+                      );
+
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1025,14 +1043,18 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          // Switches: Stock Tracking & Active Status
+                          // Switches: Stock Tracking, Active Status & For Invoice
                           if (_isRefill) ...[
                             activeTile,
+                            const SizedBox(height: 8),
+                            forInvoiceTile,
                           ] else ...[
                             if (isNarrow) ...[
                               trackStockTile,
                               const SizedBox(height: 8),
                               activeTile,
+                              const SizedBox(height: 8),
+                              forInvoiceTile,
                             ] else ...[
                               Row(
                                 children: [
@@ -1041,6 +1063,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                   Expanded(child: activeTile),
                                 ],
                               ),
+                              const SizedBox(height: 8),
+                              forInvoiceTile,
                             ],
                           ],
                         ],

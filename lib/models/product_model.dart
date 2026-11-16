@@ -21,6 +21,7 @@ class ProductModel {
   final double minStockLevel;
   final bool isLowStock;
   final bool isActive;
+  final bool forInvoice;
   final bool isReferenced;
   final CategoryModel? category;
   final UnitModel? unit;
@@ -47,6 +48,7 @@ class ProductModel {
     this.minStockLevel = 0.0,
     this.isLowStock = false,
     this.isActive = true,
+    this.forInvoice = false,
     this.isReferenced = false,
     this.category,
     this.unit,
@@ -108,6 +110,7 @@ class ProductModel {
       isLowStock: !isRefillType &&
           (json['is_low_stock'] == true || json['is_low_stock'] == 1),
       isActive: json['is_active'] == true || json['is_active'] == 1,
+      forInvoice: json['for_invoice'] == true || json['for_invoice'] == 1,
       isReferenced: json['is_referenced'] == true || json['is_referenced'] == 1,
       category: json['category'] is Map<String, dynamic>
           ? CategoryModel.fromJson(json['category'] as Map<String, dynamic>)
@@ -143,6 +146,7 @@ class ProductModel {
       'track_stock': isRefill ? false : trackStock,
       'min_stock_level': isRefill ? null : minStockLevel,
       'is_active': isActive,
+      'for_invoice': forInvoice,
     };
   }
 
@@ -166,6 +170,7 @@ class ProductModel {
     double? minStockLevel,
     bool? isLowStock,
     bool? isActive,
+    bool? forInvoice,
     bool? isReferenced,
     CategoryModel? category,
     UnitModel? unit,
@@ -192,6 +197,7 @@ class ProductModel {
       minStockLevel: minStockLevel ?? this.minStockLevel,
       isLowStock: isLowStock ?? this.isLowStock,
       isActive: isActive ?? this.isActive,
+      forInvoice: forInvoice ?? this.forInvoice,
       isReferenced: isReferenced ?? this.isReferenced,
       category: category ?? this.category,
       unit: unit ?? this.unit,
