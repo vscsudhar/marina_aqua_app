@@ -118,6 +118,26 @@ class InvoiceItemRow {
   double get lineTotal => taxableAmount + (taxRate > 0 ? taxAmount : 0.0);
 }
 
+class AdditionalTaxEntry {
+  final TextEditingController nameController;
+  final TextEditingController rateController;
+
+  AdditionalTaxEntry({String name = '', double rate = 0.0})
+      : nameController = TextEditingController(text: name),
+        rateController = TextEditingController(
+            text: rate > 0
+                ? (rate % 1 == 0 ? rate.toInt().toString() : rate.toString())
+                : '');
+
+  String get name => nameController.text.trim();
+  double get rate => double.tryParse(rateController.text.trim()) ?? 0.0;
+
+  void dispose() {
+    nameController.dispose();
+    rateController.dispose();
+  }
+}
+
 class InvoiceFormDialog extends StatefulWidget {
   final List<DealerModel> dealers;
   final List<CompanyModel>? companies;
@@ -154,7 +174,23 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   List<CompanyModel> _companies = [];
 
   late DateTime _invoiceDate;
+  bool _enableDueDate = false;
   DateTime? _dueDate;
+
+  bool _enablePaymentMode = false;
+  String _invoicePaymentMode = 'Cash';
+  static const List<String> kInvoicePaymentModes = [
+    'Cash',
+    'UPI',
+    'Bank Transfer',
+    'Card',
+    'Cheque',
+    'Other',
+  ];
+
+  bool _enableAdditionalTax = false;
+  List<AdditionalTaxEntry> _additionalTaxes = [];
+
   late String _gstMode; // 'cgst_sgst' | 'igst' | 'without_gst'
   late String _invoiceType;
   final TextEditingController _igstRateController =
@@ -224,7 +260,39 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
 
       _invoiceNoController.text = inv.invoiceNo;
       _invoiceDate = DateTime.tryParse(inv.invoiceDate) ?? DateTime.now();
-      _dueDate = inv.dueDate != null ? DateTime.tryParse(inv.dueDate!) : null;
+      if (inv.dueDate != null && inv.dueDate!.isNotEmpty) {
+        _enableDueDate = true;
+        _dueDate = DateTime.tryParse(inv.dueDate!);
+      } else {
+        _enableDueDate = false;
+        _dueDate = null;
+      }
+
+      if (inv.paymentMode != null && inv.paymentMode!.trim().isNotEmpty) {
+        _enablePaymentMode = true;
+        _invoicePaymentMode = inv.paymentMode!.trim();
+        if (!kInvoicePaymentModes.contains(_invoicePaymentMode)) {
+          _invoicePaymentMode = 'Other';
+        }
+      } else {
+        _enablePaymentMode = false;
+        _invoicePaymentMode = 'Cash';
+      }
+
+      if (inv.additionalTaxes != null && inv.additionalTaxes!.isNotEmpty) {
+        _enableAdditionalTax = true;
+        _additionalTaxes = inv.additionalTaxes!.map((t) {
+          return AdditionalTaxEntry(
+            name: t['name']?.toString() ?? '',
+            rate: (t['rate'] is num)
+                ? (t['rate'] as num).toDouble()
+                : (double.tryParse(t['rate']?.toString() ?? '0') ?? 0.0),
+          );
+        }).toList();
+      } else {
+        _enableAdditionalTax = false;
+        _additionalTaxes = [];
+      }
 
       final isComp = inv.customerType == 'company' ||
           (inv.customerCompanyId != null && inv.customerCompanyId! > 0);
@@ -290,7 +358,12 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         _invoiceType = 'with_gst';
       }
       _invoiceDate = DateTime.now();
-      _dueDate = DateTime.now().add(const Duration(days: 15));
+      _enableDueDate = false;
+      _dueDate = null;
+      _enablePaymentMode = false;
+      _invoicePaymentMode = 'Cash';
+      _enableAdditionalTax = false;
+      _additionalTaxes = [];
       _termsController.text = widget.companySettings.invoiceFooterNotes;
       _loadNextInvoiceNo();
 
@@ -328,6 +401,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     _paymentRefController.dispose();
     _notesController.dispose();
     _termsController.dispose();
+    for (final t in _additionalTaxes) {
+      t.dispose();
+    }
     for (final r in _rows) {
       r.dispose();
     }
@@ -613,12 +689,30 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _isCgstSgst ? _rows.fold(0.0, (acc, r) => acc + r.sgstAmount) : 0.0;
   double get _igstTotal =>
       _isIgst ? _rows.fold(0.0, (acc, r) => acc + r.igstAmount) : 0.0;
+  double get _additionalTaxTotal {
+    if (!_isIgst || !_enableAdditionalTax) return 0.0;
+    double total = 0.0;
+    for (final t in _additionalTaxes) {
+      final rate = t.rate;
+      if (rate > 0) {
+        total += ((_taxableTotal * (rate / 100)) * 100).round() / 100;
+      }
+    }
+    return total;
+  }
   double get _taxTotal => _isWithoutGst
       ? 0.0
-      : (_isIgst ? _igstTotal : (_cgstTotal + _sgstTotal));
-  double get _rawGrandTotal => _taxableTotal + _taxTotal;
-  double get _roundOff => (_rawGrandTotal.roundToDouble() - _rawGrandTotal);
-  double get _grandTotal => _rawGrandTotal.roundToDouble();
+      : (_isIgst
+          ? (_igstTotal + _additionalTaxTotal)
+          : (_cgstTotal + _sgstTotal));
+  double get _rawGrandTotal =>
+      double.parse((_taxableTotal + _taxTotal).toStringAsFixed(2));
+  double get _grandTotal => _rawGrandTotal.ceilToDouble();
+  double get _roundOff {
+    final diff = _grandTotal - _rawGrandTotal;
+    final roundedDiff = double.parse(diff.toStringAsFixed(2));
+    return roundedDiff < 0.00001 ? 0.0 : roundedDiff;
+  }
 
   double get _paidAmount =>
       double.tryParse(_paidAmountController.text.trim()) ?? 0.0;
@@ -648,6 +742,18 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     if (!_isInvoiceNoValid && _invoiceNoValidationMessage != null) {
       setState(() => _errorMessage = _invoiceNoValidationMessage);
       return;
+    }
+
+    if (_enableDueDate && _dueDate != null) {
+      final invDateOnly =
+          DateTime(_invoiceDate.year, _invoiceDate.month, _invoiceDate.day);
+      final dueDateOnly =
+          DateTime(_dueDate!.year, _dueDate!.month, _dueDate!.day);
+      if (dueDateOnly.isBefore(invDateOnly)) {
+        setState(() =>
+            _errorMessage = 'Due date cannot be earlier than invoice date');
+        return;
+      }
     }
 
     if (_rows.isEmpty) {
@@ -696,8 +802,11 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         'invoice_type': _invoiceType,
         'customer_type': _customerType,
         'invoice_date': DateFormat('yyyy-MM-dd').format(_invoiceDate),
-        'due_date': _dueDate != null
+        'due_date': (_enableDueDate && _dueDate != null)
             ? DateFormat('yyyy-MM-dd').format(_dueDate!)
+            : null,
+        'payment_mode': (_enablePaymentMode && _invoicePaymentMode.isNotEmpty)
+            ? _invoicePaymentMode
             : null,
         'dealer_id': _customerType == 'dealer' ? _selectedDealer?.id : null,
         'customer_company_id':
@@ -709,6 +818,20 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         'customer_gstin': _customerGstinController.text.trim().toUpperCase(),
         'place_of_supply': _placeOfSupplyController.text.trim(),
         'is_interstate': _isInterstate,
+        'additional_taxes': (_isIgst && _enableAdditionalTax)
+            ? _additionalTaxes
+                .where((t) => t.name.isNotEmpty && t.rate > 0)
+                .map((t) => {
+                      'name': t.name,
+                      'rate': t.rate,
+                      'amount':
+                          ((_taxableTotal * (t.rate / 100)) * 100).round() /
+                              100,
+                    })
+                .toList()
+            : null,
+        'additional_tax_total':
+            (_isIgst && _enableAdditionalTax) ? _additionalTaxTotal : 0.0,
         'notes': _notesController.text.trim(),
         'terms': _termsController.text.trim().isNotEmpty
             ? _termsController.text.trim()
@@ -1231,6 +1354,294 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               ),
             ],
           ),
+          const SizedBox(height: 14),
+          // Optional Due Date and Optional Payment Mode Row
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: kcVeryLightGrey,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: kcBorderColor),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Due Date Toggle & Picker
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _enableDueDate,
+                        onChanged: (val) {
+                          setState(() {
+                            _enableDueDate = val ?? false;
+                            if (_enableDueDate && _dueDate == null) {
+                              _dueDate = _invoiceDate.add(const Duration(days: 15));
+                            }
+                          });
+                        },
+                        activeColor: kcPrimaryColor,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _enableDueDate = !_enableDueDate;
+                            if (_enableDueDate && _dueDate == null) {
+                              _dueDate = _invoiceDate.add(const Duration(days: 15));
+                            }
+                          });
+                        },
+                        child: Text(
+                          'Add Due Date',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: kcDeepNavy,
+                          ),
+                        ),
+                      ),
+                      if (_enableDueDate) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              final d = await showDatePicker(
+                                context: context,
+                                initialDate: _dueDate ?? _invoiceDate,
+                                firstDate: _invoiceDate,
+                                lastDate: DateTime(2035),
+                              );
+                              if (d != null) setState(() => _dueDate = d);
+                            },
+                            child: InputDecorator(
+                              decoration: const InputDecoration(
+                                labelText: 'Due Date',
+                                isDense: true,
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                                suffixIcon: Icon(Icons.event, size: 18),
+                              ),
+                              child: Text(
+                                _dueDate != null
+                                    ? DateFormat('dd-MM-yyyy').format(_dueDate!)
+                                    : 'Select Due Date',
+                                style: GoogleFonts.inter(fontSize: 13),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                // Payment Mode Toggle & Dropdown
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _enablePaymentMode,
+                        onChanged: (val) {
+                          setState(() {
+                            _enablePaymentMode = val ?? false;
+                          });
+                        },
+                        activeColor: kcPrimaryColor,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _enablePaymentMode = !_enablePaymentMode;
+                          });
+                        },
+                        child: Text(
+                          'Add Payment Mode',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: kcDeepNavy,
+                          ),
+                        ),
+                      ),
+                      if (_enablePaymentMode) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _invoicePaymentMode,
+                            items: kInvoicePaymentModes.map((m) {
+                              return DropdownMenuItem(
+                                value: m,
+                                child: Text(m,
+                                    style: GoogleFonts.inter(fontSize: 13)),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() => _invoicePaymentMode = val);
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Payment Mode',
+                              isDense: true,
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_isIgst) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kcPrimaryColor.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: kcPrimaryColor.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _enableAdditionalTax,
+                        onChanged: (val) {
+                          setState(() {
+                            _enableAdditionalTax = val ?? false;
+                            if (_enableAdditionalTax && _additionalTaxes.isEmpty) {
+                              _additionalTaxes.add(AdditionalTaxEntry(name: 'Cess', rate: 0.0));
+                            }
+                          });
+                        },
+                        activeColor: kcPrimaryColor,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _enableAdditionalTax = !_enableAdditionalTax;
+                            if (_enableAdditionalTax && _additionalTaxes.isEmpty) {
+                              _additionalTaxes.add(AdditionalTaxEntry(name: 'Cess', rate: 0.0));
+                            }
+                          });
+                        },
+                        child: Text(
+                          'Add Additional GST / Tax (IGST)',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: kcPrimaryDark,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (_enableAdditionalTax)
+                        TextButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _additionalTaxes.add(AdditionalTaxEntry());
+                            });
+                          },
+                          icon: const Icon(Icons.add, size: 16),
+                          label: const Text('Add Tax Row'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: kcPrimaryColor,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (_enableAdditionalTax) ...[
+                    const SizedBox(height: 8),
+                    ..._additionalTaxes.asMap().entries.map((entry) {
+                      final idx = entry.key;
+                      final tax = entry.value;
+                      final calculatedAmount =
+                          ((_taxableTotal * (tax.rate / 100)) * 100).round() / 100;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: TextFormField(
+                                controller: tax.nameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Tax Name (e.g. Cess, Additional GST)',
+                                  isDense: true,
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                controller: tax.rateController,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                    decimal: true),
+                                decoration: const InputDecoration(
+                                  labelText: 'Tax Rate (%)',
+                                  isDense: true,
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: kcBorderColor),
+                              ),
+                              child: Text(
+                                'Amount: ${formatAmount(calculatedAmount)}',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: kcDeepNavy,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline,
+                                  color: kcErrorColor, size: 20),
+                              tooltip: 'Remove Tax Line',
+                              onPressed: () {
+                                setState(() {
+                                  final removed = _additionalTaxes.removeAt(idx);
+                                  removed.dispose();
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           Row(
             children: [
@@ -1884,15 +2295,29 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     final rateStr = _igstRate % 1 == 0
                         ? _igstRate.toInt().toString()
                         : _igstRate.toStringAsFixed(1);
-                    return _summaryRow('IGST ($rateStr%):',
-                        formatAmount(_igstTotal),
-                        color: kcPrimaryDark);
+                    return Column(
+                      children: [
+                        _summaryRow('IGST ($rateStr%):',
+                            formatAmount(_igstTotal),
+                            color: kcPrimaryDark),
+                        if (_enableAdditionalTax)
+                          for (final t in _additionalTaxes)
+                            if (t.name.isNotEmpty && t.rate > 0)
+                              _summaryRow(
+                                '${t.name} (${t.rate % 1 == 0 ? t.rate.toInt().toString() : t.rate.toString()}%):',
+                                formatAmount(
+                                    ((_taxableTotal * (t.rate / 100)) * 100)
+                                            .round() /
+                                        100),
+                                color: kcPrimaryDark),
+                      ],
+                    );
                   }(),
                 ],
                 _summaryRow('Total GST Tax:', formatAmount(_taxTotal)),
               ],
               _summaryRow('Round Off:',
-                  '${_roundOff >= 0 ? '+' : '-'}₹${_roundOff.abs().toStringAsFixed(2)}',
+                  '${_roundOff > 0 ? '+' : ''}₹${_roundOff.toStringAsFixed(2)}',
                   color: kcPrimaryDark, isBold: true),
               const Divider(height: 20),
               _summaryRow(

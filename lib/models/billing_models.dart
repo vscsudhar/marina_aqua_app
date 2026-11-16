@@ -427,6 +427,9 @@ class InvoiceModel {
   final double balanceDue;
   final String status;
   final String paymentStatus;
+  final String? paymentMode;
+  final List<Map<String, dynamic>>? additionalTaxes;
+  final double additionalTaxTotal;
   final String? cancellationReason;
   final String? cancelledAt;
   final String? cancelledBy;
@@ -475,6 +478,9 @@ class InvoiceModel {
     this.balanceDue = 0.0,
     this.status = 'draft',
     this.paymentStatus = 'unpaid',
+    this.paymentMode,
+    this.additionalTaxes,
+    this.additionalTaxTotal = 0.0,
     this.cancellationReason,
     this.cancelledAt,
     this.cancelledBy,
@@ -567,6 +573,13 @@ class InvoiceModel {
           : 0.0,
       status: json['status'] as String? ?? 'draft',
       paymentStatus: json['payment_status'] as String? ?? 'unpaid',
+      paymentMode: json['payment_mode'] as String?,
+      additionalTaxes: (json['additional_taxes'] as List?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
+      additionalTaxTotal: (json['additional_tax_total'] != null)
+          ? double.tryParse(json['additional_tax_total'].toString()) ?? 0.0
+          : 0.0,
       cancellationReason: json['cancellation_reason'] as String?,
       cancelledAt: json['cancelled_at'] as String?,
       cancelledBy: json['cancelled_by'] as String?,

@@ -590,11 +590,13 @@ class ExportPrintService {
   }
 
   String _formatRoundOff(double val) {
-    final sign = val >= 0 ? '+' : '-';
+    if (val.abs() < 0.00001) {
+      return '₹0.00';
+    }
+    final sign = val > 0 ? '+' : '-';
     final absVal = val.abs();
-    final str =
-        absVal % 1 == 0 ? absVal.toInt().toString() : absVal.toStringAsFixed(2);
-    return '$sign ₹$str';
+    final str = absVal.toStringAsFixed(2);
+    return '$sign₹$str';
   }
 
   pw.Widget _pdfMetaRow(String label, String value, {bool isBold = false}) {

@@ -237,7 +237,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         Text(
                                           effectiveCompanyName,
                                           style: GoogleFonts.inter(
-                                            fontSize: 22,
+                                            fontSize: 24,
                                             fontWeight: FontWeight.w800,
                                             color: kcDeepNavy,
                                           ),
@@ -247,7 +247,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                           Text(
                                             companySettings.tagline,
                                             style: GoogleFonts.inter(
-                                                fontSize: 12,
+                                                fontSize: 14,
                                                 color: kcMediumGrey),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -260,7 +260,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                               Text(
                                 companySettings.address,
                                 style: GoogleFonts.inter(
-                                    fontSize: 13.5, color: kcTextSecondary),
+                                    fontSize: 15.5, color: kcTextSecondary),
                               ),
                               const SizedBox(height: 4),
                               if (!invoice.isWithoutGst &&
@@ -268,7 +268,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   'GSTIN: ${companySettings.gstin}',
                                   style: GoogleFonts.inter(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: kcDeepNavy,
                                   ),
@@ -278,7 +278,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   'PAN: ${companySettings.pan}',
                                   style: GoogleFonts.inter(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: kcTextPrimary,
                                   ),
@@ -289,7 +289,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   'FSSAI Lic. No: ${companySettings.fssaiNo}',
                                   style: GoogleFonts.inter(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: kcPrimaryColor,
                                   ),
@@ -358,6 +358,10 @@ class InvoicePreviewDialog extends StatelessWidget {
                               if (invoice.dueDate != null &&
                                   invoice.dueDate!.isNotEmpty)
                                 _metaRow('Due Date:', invoice.dueDate!),
+                              if (invoice.paymentMode != null &&
+                                  invoice.paymentMode!.trim().isNotEmpty)
+                                _metaRow('Payment Mode:',
+                                    invoice.paymentMode!.trim().toUpperCase()),
                               if (invoice.dealerSupplyNo != null)
                                 _metaRow(
                                     'Supply Ref:', invoice.dealerSupplyNo!),
@@ -404,7 +408,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   'BILLED TO:',
                                   style: GoogleFonts.inter(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w800,
                                     color: kcMediumGrey,
                                     letterSpacing: 0.5,
@@ -414,7 +418,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   invoice.customerName.replaceAll(RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)', caseSensitive: false), ''),
                                   style: GoogleFonts.inter(
-                                    fontSize: 15,
+                                    fontSize: 17,
                                     fontWeight: FontWeight.w700,
                                     color: kcDeepNavy,
                                   ),
@@ -425,7 +429,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   Text(
                                     invoice.customerAddress!,
                                     style: GoogleFonts.inter(
-                                        fontSize: 12, color: kcTextSecondary),
+                                        fontSize: 14, color: kcTextSecondary),
                                   ),
                                 ],
                                 if (invoice.customerPhone != null &&
@@ -433,7 +437,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   Text(
                                     'Phone: ${invoice.customerPhone}',
                                     style: GoogleFonts.inter(
-                                        fontSize: 12, color: kcTextSecondary),
+                                        fontSize: 14, color: kcTextSecondary),
                                   ),
                               ],
                             );
@@ -449,7 +453,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     Text(
                                       'Customer GSTIN: ${invoice.customerGstin}',
                                       style: GoogleFonts.inter(
-                                        fontSize: 13,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w700,
                                         color: kcTextPrimary,
                                       ),
@@ -458,7 +462,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     Text(
                                       'Unregistered Customer (B2C)',
                                       style: GoogleFonts.inter(
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontStyle: FontStyle.italic,
                                         color: kcMediumGrey,
                                       ),
@@ -664,7 +668,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     Text(
                                       'Bank & Remittance Details:',
                                       style: GoogleFonts.inter(
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         color: kcDeepNavy,
                                       ),
@@ -673,17 +677,17 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     Text(
                                         'Bank: ${companySettings.bankName} (${companySettings.bankBranch})',
                                         style: GoogleFonts.inter(
-                                            fontSize: 11,
+                                            fontSize: 13,
                                             color: kcTextSecondary)),
                                     Text(
                                         'A/C No: ${companySettings.accountNumber}',
                                         style: GoogleFonts.inter(
-                                            fontSize: 11,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w600)),
                                     Text(
                                         'IFSC: ${companySettings.ifscCode}${companySettings.upiId.trim().isNotEmpty ? " | UPI: ${companySettings.upiId.trim()}" : ""}',
                                         style: GoogleFonts.inter(
-                                            fontSize: 11,
+                                            fontSize: 13,
                                             color: kcTextSecondary)),
                                   ],
                                 ),
@@ -694,7 +698,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 Text(
                                   'Notes: ${invoice.notes!.trim()}',
                                   style: GoogleFonts.inter(
-                                      fontSize: 11,
+                                      fontSize: 13,
                                       fontStyle: FontStyle.italic,
                                       color: kcTextSecondary),
                                 ),
@@ -725,7 +729,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       Text(
                                         'Declaration / Disclaimer:',
                                         style: GoogleFonts.inter(
-                                          fontSize: 10.5,
+                                          fontSize: 12.5,
                                           fontWeight: FontWeight.w700,
                                           color: kcDeepNavy,
                                         ),
@@ -734,7 +738,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       Text(
                                         effectiveDisclaimer,
                                         style: GoogleFonts.inter(
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           color: kcTextPrimary,
                                           height: 1.35,
                                         ),
@@ -783,14 +787,31 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         ? (invoice.igstAmount / invoice.taxableAmount * 100)
                                         : 0.0;
                                     final igstStr = igstPct % 1 == 0 ? igstPct.toInt().toString() : igstPct.toStringAsFixed(1);
-                                    return _sumRow('IGST ($igstStr%):',
-                                        formatAmount(invoice.igstAmount));
+                                    return Column(
+                                      children: [
+                                        _sumRow('IGST ($igstStr%):',
+                                            formatAmount(invoice.igstAmount)),
+                                        if (invoice.additionalTaxes != null &&
+                                            invoice.additionalTaxes!.isNotEmpty)
+                                          ...invoice.additionalTaxes!.map((t) {
+                                            final name = t['name']?.toString() ?? 'Additional Tax';
+                                            final rate = t['rate'] != null
+                                                ? double.tryParse(t['rate'].toString()) ?? 0.0
+                                                : 0.0;
+                                            final amt = t['amount'] != null
+                                                ? double.tryParse(t['amount'].toString()) ?? 0.0
+                                                : ((invoice.taxableAmount * (rate / 100)) * 100).round() / 100;
+                                            final rStr = rate % 1 == 0 ? rate.toInt().toString() : rate.toStringAsFixed(1);
+                                            return _sumRow('$name ($rStr%):', formatAmount(amt));
+                                          }),
+                                      ],
+                                    );
                                   }(),
                                 ],
                               ],
                               _sumRow(
                                 'Round Off:',
-                                '${invoice.roundOff >= 0 ? '+' : '-'}₹${invoice.roundOff.abs().toStringAsFixed(2)}',
+                                '${invoice.roundOff > 0 ? '+' : (invoice.roundOff < 0 ? '-' : '')}₹${invoice.roundOff.abs().toStringAsFixed(2)}',
                                 color: kcPrimaryDark,
                                 isBold: true,
                               ),
@@ -801,7 +822,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     : 'Grand Total:',
                                 formatAmount(invoice.grandTotal),
                                 isBold: true,
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: kcDeepNavy,
                               ),
                               _sumRow('Amount Paid:',
@@ -1028,17 +1049,17 @@ class InvoicePreviewDialog extends StatelessWidget {
 
   static Widget _metaRow(String label, String value, {bool isBold = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 2.5),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(label,
-              style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey)),
+              style: GoogleFonts.inter(fontSize: 14, color: kcMediumGrey)),
           const SizedBox(width: 6),
           Text(
             value,
             style: GoogleFonts.inter(
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
               color: kcDeepNavy,
             ),
@@ -1052,7 +1073,7 @@ class InvoicePreviewDialog extends StatelessWidget {
     String label,
     String value, {
     bool isBold = false,
-    double fontSize = 12,
+    double fontSize = 14,
     Color? color,
   }) {
     return Padding(
