@@ -10,6 +10,7 @@ import 'package:marina_aqua/services/auth_service.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/services/dashboard_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 import 'package:marina_aqua/ui/widgets/date_filter_selector.dart';
 
 class HomeViewModel extends ReactiveViewModel {
@@ -79,7 +80,8 @@ class HomeViewModel extends ReactiveViewModel {
 
   Future<void> init() async {
     // Initially call profile and settings APIs to populate sidebar company name and logo immediately
-    _loadInitialProfileAndSettings();
+    await _loadInitialProfileAndSettings();
+    SubscriptionGuard.checkAndShowNearExpiryOnce();
     await fetchDashboardData();
   }
 

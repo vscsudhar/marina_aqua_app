@@ -686,42 +686,32 @@ class ExportPrintService {
     final theme = await getPdfTheme();
     final pdf = pw.Document(theme: theme);
 
-    // Resolve and fetch company logo for PDF header
-    Uint8List? effectiveLogoBytes = customLogoBytes;
-    if (effectiveLogoBytes == null &&
-        settings.logoData != null &&
-        settings.logoData!.startsWith('data:image')) {
-      try {
-        final b64 = settings.logoData!.split(',').last;
-        effectiveLogoBytes = Uint8List.fromList(base64Decode(b64));
-      } catch (_) {}
-    }
-    if (effectiveLogoBytes == null) {
-      final rawLogo = settings.logoUrl ?? settings.logoPath ?? settings.logoData;
-      if (rawLogo != null && rawLogo.isNotEmpty) {
-        final resolvedUrl = ApiService.resolveLogoUrl(rawLogo);
-        if (resolvedUrl != null && resolvedUrl.isNotEmpty) {
-          if (_cachedLogoBytes != null && _cachedLogoUrl == resolvedUrl) {
-            effectiveLogoBytes = _cachedLogoBytes;
-          } else {
-            try {
-              final response = await _apiService.client.get(
-                resolvedUrl,
-                options: Options(
-                  responseType: ResponseType.bytes,
-                  receiveTimeout: const Duration(seconds: 3),
-                  sendTimeout: const Duration(seconds: 3),
-                ),
-              );
-              if (response.data != null) {
-                effectiveLogoBytes =
-                    Uint8List.fromList(response.data as List<int>);
-                _cachedLogoBytes = effectiveLogoBytes;
-                _cachedLogoUrl = resolvedUrl;
-              }
-            } catch (_) {
-              // Fallback to emblem if logo cannot be downloaded
+    // Resolve and fetch company logo strictly from URL for PDF header
+    Uint8List? effectiveLogoBytes;
+    final rawLogo = settings.logoUrl ?? settings.logoPath;
+    if (rawLogo != null && rawLogo.isNotEmpty) {
+      final resolvedUrl = ApiService.resolveLogoUrl(rawLogo);
+      if (resolvedUrl != null && resolvedUrl.isNotEmpty) {
+        if (_cachedLogoBytes != null && _cachedLogoUrl == resolvedUrl) {
+          effectiveLogoBytes = _cachedLogoBytes;
+        } else {
+          try {
+            final response = await _apiService.client.get(
+              resolvedUrl,
+              options: Options(
+                responseType: ResponseType.bytes,
+                receiveTimeout: const Duration(seconds: 3),
+                sendTimeout: const Duration(seconds: 3),
+              ),
+            );
+            if (response.data != null) {
+              effectiveLogoBytes =
+                  Uint8List.fromList(response.data as List<int>);
+              _cachedLogoBytes = effectiveLogoBytes;
+              _cachedLogoUrl = resolvedUrl;
             }
+          } catch (_) {
+            // Fallback to emblem if logo cannot be downloaded
           }
         }
       }
@@ -1193,6 +1183,27 @@ class ExportPrintService {
                 cellPadding:
                     const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 4.5),
                 border: pw.TableBorder.all(color: borderGrey, width: 0.5),
+                columnWidths: isWithoutGst
+                    ? const {
+                        0: pw.FixedColumnWidth(22), // #
+                        1: pw.FlexColumnWidth(3.3), // Item Description
+                        2: pw.FlexColumnWidth(1.3), // HSN/SAC
+                        3: pw.FlexColumnWidth(1.3), // Qty & Unit
+                        4: pw.FlexColumnWidth(1.2), // Rate
+                        5: pw.FlexColumnWidth(1.0), // Disc
+                        6: pw.FlexColumnWidth(1.5), // Total
+                      }
+                    : const {
+                        0: pw.FixedColumnWidth(20), // #
+                        1: pw.FlexColumnWidth(2.4), // Item Description
+                        2: pw.FlexColumnWidth(1.4), // HSN/SAC
+                        3: pw.FlexColumnWidth(1.3), // Qty & Unit
+                        4: pw.FlexColumnWidth(1.1), // Rate
+                        5: pw.FlexColumnWidth(0.9), // Disc
+                        6: pw.FlexColumnWidth(1.2), // Taxable
+                        7: pw.FlexColumnWidth(2.2), // GST
+                        8: pw.FlexColumnWidth(1.3), // Total
+                      },
               ),
 
               pw.SizedBox(height: 10),
@@ -1208,40 +1219,45 @@ class ExportPrintService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Container(
-                          padding: const pw.EdgeInsets.all(6),
-                          decoration: pw.BoxDecoration(
-                            color: neutralLight,
-                            border:
-                                pw.Border.all(color: borderGrey, width: 0.5),
-                            borderRadius: const pw.BorderRadius.all(
-                                pw.Radius.circular(4)),
-                          ),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text(
-                                'Bank & Remittance Details:',
-                                style: pw.TextStyle(
-                                    fontSize: 8,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: brandDarkNavy),
-                              ),
-                              pw.SizedBox(height: 2),
-                              pw.Text(
-                                  'Bank: ${settings.bankName} (${settings.bankBranch})',
-                                  style: const pw.TextStyle(fontSize: 7.5)),
-                              pw.Text('A/C No: ${settings.accountNumber}',
+                        if ((!isWithoutGst || invoice.showBankDetails) &&
+                            (settings.bankName.trim().isNotEmpty ||
+                                settings.accountNumber.trim().isNotEmpty ||
+                                settings.ifscCode.trim().isNotEmpty)) ...[
+                          pw.Container(
+                            padding: const pw.EdgeInsets.all(6),
+                            decoration: pw.BoxDecoration(
+                              color: neutralLight,
+                              border:
+                                  pw.Border.all(color: borderGrey, width: 0.5),
+                              borderRadius: const pw.BorderRadius.all(
+                                  pw.Radius.circular(4)),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  'Bank & Remittance Details:',
                                   style: pw.TextStyle(
-                                      fontSize: 7.5,
-                                      fontWeight: pw.FontWeight.bold)),
-                              pw.Text(
-                                  'IFSC: ${settings.ifscCode}${settings.upiId.trim().isNotEmpty ? " | UPI: ${settings.upiId.trim()}" : ""}',
-                                  style: const pw.TextStyle(fontSize: 7.5)),
-                            ],
+                                      fontSize: 8,
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: brandDarkNavy),
+                                ),
+                                pw.SizedBox(height: 2),
+                                pw.Text(
+                                    'Bank: ${settings.bankName} (${settings.bankBranch})',
+                                    style: const pw.TextStyle(fontSize: 7.5)),
+                                pw.Text('A/C No: ${settings.accountNumber}',
+                                    style: pw.TextStyle(
+                                        fontSize: 7.5,
+                                        fontWeight: pw.FontWeight.bold)),
+                                pw.Text(
+                                    'IFSC: ${settings.ifscCode}${settings.upiId.trim().isNotEmpty ? " | UPI: ${settings.upiId.trim()}" : ""}',
+                                    style: const pw.TextStyle(fontSize: 7.5)),
+                              ],
+                            ),
                           ),
-                        ),
-                        pw.SizedBox(height: 6),
+                          pw.SizedBox(height: 6),
+                        ],
                         if (invoice.notes != null &&
                             invoice.notes!.trim().isNotEmpty) ...[
                           pw.Text('Notes: ${invoice.notes!.trim()}',

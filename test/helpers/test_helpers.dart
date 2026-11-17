@@ -14,6 +14,7 @@ import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/services/billing_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/services/export_print_service.dart';
+import 'package:marina_aqua/services/company_service.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import 'test_helpers.mocks.dart';
@@ -55,6 +56,14 @@ void registerServices() {
   getAndRegisterBillingService();
   getAndRegisterSettingsService();
   getAndRegisterExportPrintService();
+  getAndRegisterCompanyService();
+}
+
+CompanyService getAndRegisterCompanyService() {
+  _removeRegistrationIfExists<CompanyService>();
+  final service = CompanyService(locator<ApiService>());
+  locator.registerSingleton<CompanyService>(service);
+  return service;
 }
 
 MockNavigationService getAndRegisterNavigationService() {

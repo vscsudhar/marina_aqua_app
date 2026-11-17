@@ -8,6 +8,7 @@ import 'package:marina_aqua/models/product_model.dart';
 import 'package:marina_aqua/models/unit_model.dart';
 import 'package:marina_aqua/services/api_service.dart';
 import 'package:marina_aqua/services/product_master_service.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 
 class ProductsViewModel extends BaseViewModel {
   final _productMasterService = locator<ProductMasterService>();
@@ -178,6 +179,7 @@ class ProductsViewModel extends BaseViewModel {
   }
 
   Future<void> saveProduct(Map<String, dynamic> data, {int? productId}) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     if (productId != null) {
       await _productMasterService.updateProduct(productId, data);
     } else {
@@ -189,6 +191,7 @@ class ProductsViewModel extends BaseViewModel {
   }
 
   Future<void> toggleProductStatus(ProductModel product) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       final updated =
           await _productMasterService.toggleProductStatus(product.id);
@@ -205,6 +208,7 @@ class ProductsViewModel extends BaseViewModel {
 
   Future<void> confirmDeleteProduct(
       BuildContext context, ProductModel product) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -288,6 +292,7 @@ class ProductsViewModel extends BaseViewModel {
     String? description,
     required bool isActive,
   }) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     if (id != null) {
       await _productMasterService.updateCategory(
         id: id,
@@ -309,6 +314,7 @@ class ProductsViewModel extends BaseViewModel {
 
   Future<void> confirmDeleteCategory(
       BuildContext context, CategoryModel category) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

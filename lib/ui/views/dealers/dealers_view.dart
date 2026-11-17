@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:marina_aqua/models/company_model.dart';
 import 'package:marina_aqua/models/dealer_model.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'dealers_viewmodel.dart';
 import 'widgets/company_form_dialog.dart';
@@ -1393,6 +1394,7 @@ class DealersView extends StackedView<DealersViewModel> {
 
   void _openCompanyFormDialog(BuildContext context, DealersViewModel viewModel,
       {CompanyModel? company}) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1406,6 +1408,7 @@ class DealersView extends StackedView<DealersViewModel> {
 
   void _openDealerFormDialog(BuildContext context, DealersViewModel viewModel,
       {DealerModel? dealer}) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1418,6 +1421,7 @@ class DealersView extends StackedView<DealersViewModel> {
 
   void _openDealerPricingDialog(
       BuildContext context, DealersViewModel viewModel, DealerModel dealer) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<void>(
       context: context,
       builder: (ctx) => DealerPricingDialog(

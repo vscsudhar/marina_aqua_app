@@ -12,6 +12,7 @@ import 'widgets/payment_entry_dialog.dart';
 import 'widgets/split_payment_section.dart';
 import 'widgets/supply_details_dialog.dart';
 import 'widgets/supply_entry_dialog.dart';
+import '../../../services/subscription_guard.dart';
 
 class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
   final VoidCallback? onBack;
@@ -892,6 +893,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
+                  if (!SubscriptionGuard.checkAccess(context)) return;
                   showDialog(
                     context: context,
                     builder: (_) => SupplyEntryDialog(
@@ -919,6 +921,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
               ),
               OutlinedButton.icon(
                 onPressed: () {
+                  if (!SubscriptionGuard.checkAccess(context)) return;
                   final dealerSupplies =
                       viewModel.getSuppliesForDealer(dealer.id);
                   showDialog(
@@ -974,6 +977,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                         builder: (_) => SupplyDetailsDialog(
                           supply: details,
                           onEdit: () {
+                            if (!SubscriptionGuard.checkAccess(context)) return;
                             showDialog(
                               context: context,
                               builder: (_) => SupplyEntryDialog(
@@ -987,6 +991,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                             );
                           },
                           onRecordPayment: () {
+                            if (!SubscriptionGuard.checkAccess(context)) return;
                             showDialog(
                               context: context,
                               builder: (_) => PaymentEntryDialog(
@@ -1191,6 +1196,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                                   builder: (_) => SupplyDetailsDialog(
                                     supply: details,
                                     onEdit: () {
+                                      if (!SubscriptionGuard.checkAccess(context)) return;
                                       showDialog(
                                         context: context,
                                         builder: (_) => SupplyEntryDialog(
@@ -1678,6 +1684,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
 
   void _showEditSupplyDialog(BuildContext context,
       DailyCollectionViewModel viewModel, DealerSupplyModel supply) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (_) => EditCollectionSupplyDialog(
@@ -1689,6 +1696,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
 
   void _showDeleteSupplyConfirmation(BuildContext context,
       DailyCollectionViewModel viewModel, DealerSupplyModel supply) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1732,6 +1740,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
 
   void _showEditPaymentDialog(BuildContext context,
       DailyCollectionViewModel viewModel, DealerPaymentModel payment) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (_) => EditPaymentEntryDialog(
@@ -1743,6 +1752,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
 
   void _showDeletePaymentConfirmation(BuildContext context,
       DailyCollectionViewModel viewModel, DealerPaymentModel payment) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

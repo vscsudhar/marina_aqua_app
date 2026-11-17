@@ -15,6 +15,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/dealer_service.dart';
 import '../../../services/export_print_service.dart';
 import '../../../services/product_master_service.dart';
+import '../../../services/subscription_guard.dart';
 import '../../common/ui_helpers.dart';
 import '../../widgets/report_print_preview_dialog.dart';
 
@@ -290,6 +291,7 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   /// Open live HTML invoice rendered by backend URL in browser
   void openInvoiceInBrowser(int id) {
+    if (!SubscriptionGuard.checkAccess()) return;
     if (id <= 0) {
       _errorMessage = 'Invalid invoice ID for HTML view.';
       notifyListeners();
@@ -303,6 +305,7 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   Future<void> updateInvoiceNumber(int id, String newInvoiceNo,
       {String? reason}) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.updateInvoiceNumber(id, newInvoiceNo,
           reason: reason);
@@ -316,6 +319,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   Future<void> finalizeInvoice(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.finalizeInvoice(id);
       _successMessage = 'Invoice finalized successfully!';
@@ -327,6 +331,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   Future<void> cancelInvoice(int id, String reason) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.cancelInvoice(id, reason);
       _successMessage = 'Invoice cancelled successfully!';
@@ -338,6 +343,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   Future<void> createCreditNote(int id, Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.createCreditNote(id, payload);
       _successMessage = 'GST Credit Note issued successfully!';
@@ -349,6 +355,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   Future<void> recordPayment(int id, Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.recordPayment(id, payload);
       _successMessage = 'Payment recorded successfully!';
@@ -360,6 +367,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   }
 
   Future<void> deleteInvoice(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _billingService.deleteInvoice(id);
       _successMessage =
@@ -376,6 +384,7 @@ class InvoicesViewModel extends ReactiveViewModel {
   Future<void> deleteDraftInvoice(int id) => deleteInvoice(id);
 
   Future<void> updateCompanySettings(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _settingsService.updateCompanySettings(payload);
       _successMessage = 'Company billing profile updated successfully!';
@@ -391,6 +400,7 @@ class InvoicesViewModel extends ReactiveViewModel {
     List<String>? copyTitles,
     String? copyLabelName,
   }) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isDownloadingPdf = true;
     _errorMessage = null;
     notifyListeners();
@@ -447,6 +457,7 @@ class InvoicesViewModel extends ReactiveViewModel {
     List<String>? copyTitles,
     String? copyLabelName,
   }) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isDownloadingPdf = true;
     _errorMessage = null;
     notifyListeners();

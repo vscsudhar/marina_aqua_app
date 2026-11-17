@@ -511,23 +511,23 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 columnWidths: invoice.isWithoutGst
                                     ? const {
                                         0: FixedColumnWidth(36), // Sl
-                                        1: FlexColumnWidth(3.5), // Description
-                                        2: FlexColumnWidth(1.2), // HSN
-                                        3: FlexColumnWidth(1.2), // Qty
+                                        1: FlexColumnWidth(3.3), // Description
+                                        2: FlexColumnWidth(1.3), // HSN
+                                        3: FlexColumnWidth(1.3), // Qty & Unit
                                         4: FlexColumnWidth(1.4), // Rate
                                         5: FlexColumnWidth(1.2), // Disc
                                         6: FlexColumnWidth(1.6), // Total
                                       }
                                     : const {
                                         0: FixedColumnWidth(36), // Sl
-                                        1: FlexColumnWidth(2.6), // Description
-                                        2: FlexColumnWidth(1.0), // HSN
-                                        3: FlexColumnWidth(1.0), // Qty
+                                        1: FlexColumnWidth(2.4), // Description
+                                        2: FlexColumnWidth(1.45), // HSN
+                                        3: FlexColumnWidth(1.2), // Qty & Unit
                                         4: FlexColumnWidth(1.1), // Rate
                                         5: FlexColumnWidth(1.2), // Amount (Taxable)
-                                        6: FlexColumnWidth(1.4), // SGST (% / ₹)
-                                        7: FlexColumnWidth(1.4), // CGST (% / ₹)
-                                        8: FlexColumnWidth(1.4), // IGST (% / ₹)
+                                        6: FlexColumnWidth(1.25), // SGST (% / ₹)
+                                        7: FlexColumnWidth(1.25), // CGST (% / ₹)
+                                        8: FlexColumnWidth(1.25), // IGST (% / ₹)
                                         9: FlexColumnWidth(1.4), // Total
                                       },
                                 children: [
@@ -635,47 +635,56 @@ class InvoicePreviewDialog extends StatelessWidget {
                       LayoutBuilder(
                         builder: (context, totalsConstraints) {
                           final isNarrow = totalsConstraints.maxWidth < 620;
+                          final hasBankDetails =
+                              companySettings.bankName.trim().isNotEmpty ||
+                                  companySettings.accountNumber.trim().isNotEmpty ||
+                                  companySettings.ifscCode.trim().isNotEmpty;
+                          final shouldShowBank =
+                              (!invoice.isWithoutGst || invoice.showBankDetails) &&
+                                  hasBankDetails;
                           final bankWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: kcBorderColor),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Bank & Remittance Details:',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: kcDeepNavy,
+                              if (shouldShowBank) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: kcBorderColor),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Bank & Remittance Details:',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: kcDeepNavy,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                        'Bank: ${companySettings.bankName} (${companySettings.bankBranch})',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 13,
-                                            color: kcTextSecondary)),
-                                    Text(
-                                        'A/C No: ${companySettings.accountNumber}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600)),
-                                    Text(
-                                        'IFSC: ${companySettings.ifscCode}${companySettings.upiId.trim().isNotEmpty ? " | UPI: ${companySettings.upiId.trim()}" : ""}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 13,
-                                            color: kcTextSecondary)),
-                                  ],
+                                      const SizedBox(height: 4),
+                                      Text(
+                                          'Bank: ${companySettings.bankName} (${companySettings.bankBranch})',
+                                          style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              color: kcTextSecondary)),
+                                      Text(
+                                          'A/C No: ${companySettings.accountNumber}',
+                                          style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600)),
+                                      Text(
+                                          'IFSC: ${companySettings.ifscCode}${companySettings.upiId.trim().isNotEmpty ? " | UPI: ${companySettings.upiId.trim()}" : ""}',
+                                          style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              color: kcTextSecondary)),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
+                                const SizedBox(height: 12),
+                              ],
                               if (invoice.notes != null &&
                                   invoice.notes!.trim().isNotEmpty) ...[
                                 Text(

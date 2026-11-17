@@ -4,6 +4,7 @@ import '../../../app/app.locator.dart';
 import '../../../models/bottle_ledger_models.dart';
 import '../../../services/bottle_ledger_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../services/subscription_guard.dart';
 
 class BottleLedgerViewModel extends BaseViewModel {
   final BottleLedgerService _ledgerService;
@@ -124,6 +125,7 @@ class BottleLedgerViewModel extends BaseViewModel {
   }
 
   Future<void> downloadPdf() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _errorMessage = null;
     _successMessage = null;
@@ -144,6 +146,7 @@ class BottleLedgerViewModel extends BaseViewModel {
   }
 
   Future<void> printLedger() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _errorMessage = null;
     _successMessage = null;

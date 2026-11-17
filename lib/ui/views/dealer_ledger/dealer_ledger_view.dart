@@ -5,6 +5,7 @@ import 'package:stacked/stacked.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'package:marina_aqua/ui/widgets/marina_logo.dart';
 import 'package:marina_aqua/models/dealer_ledger_report_models.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 import 'dealer_ledger_viewmodel.dart';
 import 'widgets/dealer_ledger_table.dart';
 import 'widgets/ledger_cell_transactions_dialog.dart';
@@ -707,6 +708,7 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
     DateTime? initialDate,
     LedgerDayOthersEntry? existingOthers,
   }) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final now = DateTime.now();
     final date = initialDate ??
         DateTime(viewModel.selectedYear, viewModel.selectedMonth,

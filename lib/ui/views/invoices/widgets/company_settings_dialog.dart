@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:marina_aqua/services/file_picker_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -296,26 +295,16 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: _logoUrl != null && _logoUrl!.isNotEmpty
-                                    ? (() {
-                                        final res = ApiService.resolveLogoUrl(_logoUrl) ?? _logoUrl!;
-                                        if (res.startsWith('data:image')) {
-                                          try {
-                                            final b64 = res.split(',').last;
-                                            final u8 = base64Decode(b64);
-                                            return Image.memory(u8, fit: BoxFit.contain);
-                                          } catch (_) {}
-                                        }
-                                        return Image.network(
-                                          res,
-                                          key: ValueKey(_logoUrl),
-                                          fit: BoxFit.contain,
-                                          errorBuilder: (_, __, ___) =>
-                                              const Center(
-                                            child: Icon(Icons.water_drop,
-                                                color: kcPrimaryColor, size: 28),
-                                          ),
-                                        );
-                                      })()
+                                    ? Image.network(
+                                        ApiService.resolveLogoUrl(_logoUrl) ?? _logoUrl!,
+                                        key: ValueKey(_logoUrl),
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Center(
+                                          child: Icon(Icons.water_drop,
+                                              color: kcPrimaryColor, size: 28),
+                                        ),
+                                      )
                                     : const Center(
                                         child: Icon(Icons.water_drop,
                                             color: kcPrimaryColor, size: 28),

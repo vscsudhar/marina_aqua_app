@@ -10,6 +10,7 @@ import '../../../services/export_print_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/inventory_service.dart';
 import '../../../services/product_master_service.dart';
+import '../../../services/subscription_guard.dart';
 import '../../widgets/report_print_preview_dialog.dart';
 import 'widgets/purchase_detail_dialog.dart';
 import 'widgets/purchase_entry_dialog.dart';
@@ -207,6 +208,7 @@ class PurchasesViewModel extends BaseViewModel {
 
   // Dialog actions
   Future<void> openCreatePurchase(BuildContext context) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -226,6 +228,7 @@ class PurchasesViewModel extends BaseViewModel {
 
   Future<void> openEditPurchase(
       BuildContext context, PurchaseModel purchase) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -251,16 +254,21 @@ class PurchasesViewModel extends BaseViewModel {
       builder: (ctx) => PurchaseDetailDialog(
         purchase: purchase,
         onReverse: (reason) async {
+          if (!SubscriptionGuard.checkAccess(context)) return;
           await _inventoryService.reversePurchase(purchase.id, reason: reason);
           await refresh();
         },
-        onEdit: () => openEditPurchase(context, purchase),
+        onEdit: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
+          openEditPurchase(context, purchase);
+        },
       ),
     );
   }
 
   Future<void> openStockAdjustment(BuildContext context,
       [ProductModel? product]) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -279,6 +287,7 @@ class PurchasesViewModel extends BaseViewModel {
   }
 
   Future<void> openCreateSupplier(BuildContext context) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -296,6 +305,7 @@ class PurchasesViewModel extends BaseViewModel {
 
   Future<void> openEditSupplier(
       BuildContext context, SupplierModel supplier) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,

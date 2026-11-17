@@ -3,6 +3,7 @@ import 'package:stacked/stacked.dart';
 import 'package:marina_aqua/models/category_model.dart';
 import 'package:marina_aqua/models/product_model.dart';
 import 'package:marina_aqua/models/unit_model.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'products_viewmodel.dart';
 import 'widgets/category_form_dialog.dart';
@@ -1616,6 +1617,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
 
   void _openProductFormDialog(BuildContext context, ProductsViewModel viewModel,
       {ProductModel? product}) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1624,6 +1626,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
         categories: viewModel.categories,
         units: viewModel.units,
         onAddUnit: () async {
+          if (!SubscriptionGuard.checkAccess(context)) return null;
           final result = await showDialog<dynamic>(
             context: context,
             barrierDismissible: false,
@@ -1655,6 +1658,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
   void _openCategoryFormDialog(
       BuildContext context, ProductsViewModel viewModel,
       {CategoryModel? category}) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1676,6 +1680,7 @@ class ProductsView extends StackedView<ProductsViewModel> {
 
   void _openUnitFormDialog(BuildContext context, ProductsViewModel viewModel,
       {UnitModel? unit}) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog<bool>(
       context: context,
       barrierDismissible: false,

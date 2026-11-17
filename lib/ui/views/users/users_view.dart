@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
 import '../../../models/user_model.dart';
+import '../../../services/subscription_guard.dart';
 import '../../common/app_colors.dart';
 import 'users_viewmodel.dart';
 
@@ -459,7 +460,12 @@ class UsersView extends StackedView<UsersViewModel> {
               Switch(
                 value: user.isActive,
                 activeThumbColor: kcPrimaryColor,
-                onChanged: isSelf ? null : (_) => viewModel.toggleStatus(user),
+                onChanged: isSelf
+                    ? null
+                    : (_) {
+                        if (!SubscriptionGuard.checkAccess(context)) return;
+                        viewModel.toggleStatus(user);
+                      },
               ),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
@@ -548,6 +554,7 @@ class UsersView extends StackedView<UsersViewModel> {
   }
 
   void _showAddUserDialog(BuildContext context, UsersViewModel viewModel) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final nameCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
@@ -687,6 +694,7 @@ class UsersView extends StackedView<UsersViewModel> {
 
   void _showEditUserDialog(
       BuildContext context, UsersViewModel viewModel, UserModel user) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final nameCtrl = TextEditingController(text: user.name);
     final emailCtrl = TextEditingController(text: user.email);
     final phoneCtrl = TextEditingController(text: user.phone ?? '');
@@ -815,6 +823,7 @@ class UsersView extends StackedView<UsersViewModel> {
 
   void _confirmDelete(
       BuildContext context, UsersViewModel viewModel, UserModel user) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

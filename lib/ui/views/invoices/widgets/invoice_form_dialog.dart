@@ -229,6 +229,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
 
   bool _enableAdditionalTax = false;
   List<AdditionalTaxEntry> _additionalTaxes = [];
+  bool _showBankDetails = false;
 
   late String _gstMode; // 'with_gst' | 'without_gst'
   late String _invoiceType;
@@ -398,6 +399,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
           (inv.terms != null && inv.terms!.trim().isNotEmpty)
               ? inv.terms!
               : widget.companySettings.invoiceFooterNotes;
+      _showBankDetails = inv.showBankDetails;
 
       _rows = inv.items.map((it) {
         final prod = widget.products.cast<ProductModel?>().firstWhere(
@@ -441,6 +443,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _invoicePaymentMode = 'Cash';
       _enableAdditionalTax = false;
       _additionalTaxes = [];
+      _showBankDetails = false;
       _termsController.text = widget.companySettings.invoiceFooterNotes;
       _loadNextInvoiceNo();
 
@@ -957,6 +960,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
             : (widget.companySettings.invoiceFooterNotes.trim().isNotEmpty
                 ? widget.companySettings.invoiceFooterNotes.trim()
                 : null),
+        'show_bank_details': _isWithoutGst ? _showBankDetails : false,
         'status': isFinal ? 'finalized' : 'draft',
         'is_final': isFinal,
         'items': itemsPayload,
@@ -1508,6 +1512,46 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         ),
                       ),
                     ],
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: kcVeryLightGrey,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: kcBorderColor),
+              ),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: _showBankDetails,
+                    onChanged: (val) {
+                      setState(() {
+                        _showBankDetails = val ?? false;
+                      });
+                    },
+                    activeColor: kcPrimaryColor,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _showBankDetails = !_showBankDetails;
+                      });
+                    },
+                    child: Text(
+                      'Show Bank Details in Invoice',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: kcDeepNavy,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2087,23 +2131,23 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                   child: Table(
                     columnWidths: _isWithoutGst
                         ? const {
-                            0: FlexColumnWidth(2.8), // Product / Description
-                            1: FlexColumnWidth(1.0), // HSN/SAC
-                            2: FlexColumnWidth(1.0), // Qty & Unit
+                            0: FlexColumnWidth(2.6), // Product / Description
+                            1: FlexColumnWidth(1.1), // HSN/SAC
+                            2: FlexColumnWidth(1.1), // Qty & Unit
                             3: FlexColumnWidth(1.2), // Unit Price
                             4: FlexColumnWidth(1.0), // Discount
                             5: FlexColumnWidth(1.4), // Line Total
                             6: FixedColumnWidth(44), // Action
                           }
                         : const {
-                            0: FlexColumnWidth(2.3), // Product / Description
-                            1: FlexColumnWidth(0.8), // HSN/SAC
-                            2: FlexColumnWidth(0.8), // Qty & Unit
+                            0: FlexColumnWidth(2.1), // Product / Description
+                            1: FlexColumnWidth(1.1), // HSN/SAC
+                            2: FlexColumnWidth(1.0), // Qty & Unit
                             3: FlexColumnWidth(1.0), // Unit Price
                             4: FlexColumnWidth(0.8), // Discount
-                            5: FlexColumnWidth(1.2), // SGST (% / ₹)
-                            6: FlexColumnWidth(1.2), // CGST (% / ₹)
-                            7: FlexColumnWidth(1.2), // IGST (% / ₹)
+                            5: FlexColumnWidth(1.1), // SGST (% / ₹)
+                            6: FlexColumnWidth(1.1), // CGST (% / ₹)
+                            7: FlexColumnWidth(1.1), // IGST (% / ₹)
                             8: FlexColumnWidth(1.3), // Line Total
                             9: FixedColumnWidth(44), // Action
                           },

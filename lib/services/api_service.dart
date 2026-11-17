@@ -43,6 +43,7 @@ class ApiService {
   late final Dio _dio;
 
   VoidCallback? onUnauthorized;
+  VoidCallback? onSubscriptionExpired;
 
   ApiService([StorageService? storageService])
       : _storageService = storageService ?? locator<StorageService>() {
@@ -87,6 +88,13 @@ class ApiService {
         onError: (DioException e, handler) {
           if (e.response?.statusCode == 401) {
             onUnauthorized?.call();
+          } else if (e.response?.statusCode == 403) {
+            final data = e.response?.data;
+            if (data is Map &&
+                (data['error_code'] == 'SUBSCRIPTION_EXPIRED' ||
+                    data['is_plan_expired'] == true)) {
+              onSubscriptionExpired?.call();
+            }
           }
           return handler.next(e);
         },
@@ -156,7 +164,8 @@ class ApiService {
   static String? resolveLogoUrl(String? rawUrl) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
     final trimmed = rawUrl.trim();
-    if (trimmed.startsWith('data:')) return trimmed;
+    // Strictly ignore base64 byte code / data URIs - only valid HTTP/storage URLs are used
+    if (trimmed.startsWith('data:')) return null;
 
     String baseOrigin = ApiConfig.baseOrigin;
     try {

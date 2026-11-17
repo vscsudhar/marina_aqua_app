@@ -10,6 +10,7 @@ import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 import 'package:marina_aqua/ui/common/ui_helpers.dart';
 import 'package:marina_aqua/ui/views/invoices/invoices_viewmodel.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/cancel_invoice_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/company_settings_dialog.dart';
 import 'package:marina_aqua/ui/views/invoices/widgets/credit_note_dialog.dart';
@@ -1038,6 +1039,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openCreateInvoice(
       BuildContext context, InvoicesViewModel viewModel) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog(
       context: context,
       barrierDismissible: false,
@@ -1061,6 +1063,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     InvoicesViewModel viewModel,
     InvoiceModel invoice,
   ) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final option = await InvoiceCopyOptionsDialog.show(
       context,
       invoice: invoice,
@@ -1080,6 +1083,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     InvoicesViewModel viewModel,
     InvoiceModel invoice,
   ) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final option = await InvoiceCopyOptionsDialog.show(
       context,
       invoice: invoice,
@@ -1101,45 +1105,60 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       builder: (ctx) => InvoicePreviewDialog(
         invoice: invoice,
         companySettings: viewModel.companySettings,
-        onDownloadPdf: () =>
-            _handleDownloadInvoice(context, viewModel, invoice),
-        onPrint: () => _handlePrintInvoice(context, viewModel, invoice),
-        onOpenBrowser: () => viewModel.openInvoiceInBrowser(invoice.id),
+        onDownloadPdf: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
+          _handleDownloadInvoice(context, viewModel, invoice);
+        },
+        onPrint: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
+          _handlePrintInvoice(context, viewModel, invoice);
+        },
+        onOpenBrowser: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
+          viewModel.openInvoiceInBrowser(invoice.id);
+        },
         onFinalize: invoice.isDraft
             ? () {
+                if (!SubscriptionGuard.checkAccess(context)) return;
                 Navigator.of(ctx).pop();
                 viewModel.finalizeInvoice(invoice.id);
               }
             : null,
         onEditDraft: invoice.isDraft
             ? () {
+                if (!SubscriptionGuard.checkAccess(context)) return;
                 Navigator.of(ctx).pop();
                 _openEditDraft(context, viewModel, invoice);
               }
             : null,
         onRecordPayment: invoice.isFinalized && invoice.balanceDue > 0
             ? () {
+                if (!SubscriptionGuard.checkAccess(context)) return;
                 Navigator.of(ctx).pop();
                 _openRecordPayment(context, viewModel, invoice);
               }
             : null,
         onIssueCreditNote: invoice.isFinalized
             ? () {
+                if (!SubscriptionGuard.checkAccess(context)) return;
                 Navigator.of(ctx).pop();
                 _openCreditNote(context, viewModel, invoice);
               }
             : null,
         onCancelInvoice: invoice.isFinalized
             ? () {
+                if (!SubscriptionGuard.checkAccess(context)) return;
                 Navigator.of(ctx).pop();
                 _openCancelInvoice(context, viewModel, invoice);
               }
             : null,
         onDelete: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
           Navigator.of(ctx).pop();
           _confirmDeleteInvoice(context, viewModel, invoice);
         },
         onChangeNumber: () {
+          if (!SubscriptionGuard.checkAccess(context)) return;
           Navigator.of(ctx).pop();
           _openChangeInvoiceNumberDialog(context, viewModel, invoice);
         },
@@ -1149,6 +1168,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openEditDraft(BuildContext context, InvoicesViewModel viewModel,
       InvoiceModel invoice) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog(
       context: context,
       barrierDismissible: false,
@@ -1170,6 +1190,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openRecordPayment(
       BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1182,6 +1203,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openCreditNote(
       BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1194,6 +1216,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openCancelInvoice(
       BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1205,6 +1228,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
   }
 
   void _openCompanySettings(BuildContext context, InvoicesViewModel viewModel) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1221,6 +1245,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     InvoiceModel invoice,
     String action,
   ) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     switch (action) {
       case 'open_html':
         viewModel.openInvoiceInBrowser(invoice.id);
@@ -1251,6 +1276,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _openChangeInvoiceNumberDialog(
       BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final controller = TextEditingController(text: invoice.invoiceNo);
     final reasonController = TextEditingController();
     String? validationMessage;
@@ -1430,6 +1456,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
 
   void _confirmDeleteInvoice(
       BuildContext context, InvoicesViewModel viewModel, InvoiceModel invoice) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

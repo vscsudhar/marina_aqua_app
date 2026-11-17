@@ -9,6 +9,7 @@ import '../../../models/product_model.dart';
 import '../../../services/damaged_product_service.dart';
 import '../../../services/export_print_service.dart';
 import '../../../services/product_master_service.dart';
+import '../../../services/subscription_guard.dart';
 import 'widgets/damaged_product_form_dialog.dart';
 
 class DamagedProductsViewModel extends BaseViewModel {
@@ -162,6 +163,7 @@ class DamagedProductsViewModel extends BaseViewModel {
   }
 
   Future<void> openCreateDialog(BuildContext context) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     String nextNo = 'DMG-AUTO';
     try {
       nextNo = await _damagedService.getNextDamageNo();
@@ -204,6 +206,7 @@ class DamagedProductsViewModel extends BaseViewModel {
 
   Future<void> openEditDialog(
       BuildContext context, DamagedProductModel entry) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -240,6 +243,7 @@ class DamagedProductsViewModel extends BaseViewModel {
 
   Future<void> deleteEntry(
       BuildContext context, DamagedProductModel entry) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -334,6 +338,7 @@ class DamagedProductsViewModel extends BaseViewModel {
   }
 
   Future<void> exportPdfReport(BuildContext context) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     _isExporting = true;
     notifyListeners();
 

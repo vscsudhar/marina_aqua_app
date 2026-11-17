@@ -11,6 +11,7 @@ import 'package:marina_aqua/services/company_service.dart';
 import 'package:marina_aqua/services/dealer_service.dart';
 import 'package:marina_aqua/services/product_master_service.dart';
 import 'package:marina_aqua/services/storage_service.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 
 class DealersViewModel extends BaseViewModel {
   final _dealerService = locator<DealerService>();
@@ -174,6 +175,7 @@ class DealersViewModel extends BaseViewModel {
   }
 
   Future<void> saveCompany(Map<String, dynamic> data, {int? companyId}) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     if (companyId != null) {
       await _companyService.updateCompany(companyId, data);
       await _dialogService.showDialog(
@@ -191,6 +193,7 @@ class DealersViewModel extends BaseViewModel {
   }
 
   Future<void> saveDealer(Map<String, dynamic> data, {int? dealerId}) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     if (dealerId != null) {
       await _dealerService.updateDealer(dealerId, data);
     } else {
@@ -200,6 +203,7 @@ class DealersViewModel extends BaseViewModel {
   }
 
   Future<void> toggleDealerStatus(DealerModel dealer) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       final updated = await _dealerService.toggleDealerStatus(dealer.id);
       _dealers = _dealers.map((d) => d.id == dealer.id ? updated : d).toList();
@@ -227,6 +231,7 @@ class DealersViewModel extends BaseViewModel {
 
   Future<void> confirmDeleteDealer(
       BuildContext context, DealerModel dealer) async {
+    if (!SubscriptionGuard.checkAccess(context)) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

@@ -8,6 +8,7 @@ import 'package:marina_aqua/services/dealer_service.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/services/export_print_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 
 class DealerLedgerViewModel extends ReactiveViewModel {
   final DealerLedgerReportService _reportService;
@@ -153,6 +154,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
   }
 
   Future<bool> saveOthers(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     try {
       await _reportService.saveOthers(payload);
       await generateReport();
@@ -165,6 +167,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
   }
 
   Future<void> exportPdf() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _exportSuccessMessage = null;
     notifyListeners();
@@ -198,6 +201,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
   }
 
   Future<void> exportExcel() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _exportSuccessMessage = null;
     notifyListeners();
@@ -231,6 +235,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
   }
 
   Future<void> exportCsv() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _exportSuccessMessage = null;
     notifyListeners();
@@ -264,6 +269,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
   }
 
   Future<void> printReport() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     _isExporting = true;
     _exportSuccessMessage = null;
     notifyListeners();

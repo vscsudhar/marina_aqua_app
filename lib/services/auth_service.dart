@@ -8,6 +8,7 @@ import '../models/auth_response.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
+import 'subscription_guard.dart';
 
 class AuthService with ListenableServiceMixin {
   final StorageService _storageService;
@@ -22,6 +23,7 @@ class AuthService with ListenableServiceMixin {
         _apiService = apiService ?? locator<ApiService>() {
     listenToReactiveValues([_currentUser, _initialized]);
     _apiService.onUnauthorized = _handleUnauthorized;
+    _apiService.onSubscriptionExpired = _handleSubscriptionExpired;
   }
 
   UserModel? get currentUser => _currentUser;
@@ -48,6 +50,10 @@ class AuthService with ListenableServiceMixin {
 
   Future<void> _handleUnauthorized() async {
     await logout();
+  }
+
+  void _handleSubscriptionExpired() {
+    SubscriptionGuard.showExpiredDialog();
   }
 
   /// Initialize session on app startup
@@ -166,6 +172,7 @@ class AuthService with ListenableServiceMixin {
     } finally {
       await _storageService.clearAuthSession();
       _currentUser = null;
+      SubscriptionGuard.resetSession();
       notifyListeners();
 
       // Navigate to login view

@@ -13,6 +13,9 @@ class UserModel {
   final String? companyLogo;
   final Map<String, dynamic>? plan;
   final String? planExpiresAt;
+  final bool? isPlanExpiredFromApi;
+  final int? planDaysRemainingFromApi;
+  final bool? isNearExpiryFromApi;
 
   const UserModel({
     required this.id,
@@ -29,6 +32,9 @@ class UserModel {
     this.companyLogo,
     this.plan,
     this.planExpiresAt,
+    this.isPlanExpiredFromApi,
+    this.planDaysRemainingFromApi,
+    this.isNearExpiryFromApi,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -56,6 +62,11 @@ class UserModel {
           (json['plan'] is Map<String, dynamic>
               ? json['plan']['expires_at'] as String?
               : null),
+      isPlanExpiredFromApi: json['is_plan_expired'] as bool?,
+      planDaysRemainingFromApi: json['plan_days_remaining'] is int
+          ? json['plan_days_remaining'] as int
+          : int.tryParse(json['plan_days_remaining']?.toString() ?? ''),
+      isNearExpiryFromApi: json['is_near_expiry'] as bool?,
     );
   }
 
@@ -75,6 +86,9 @@ class UserModel {
       'company_logo': companyLogo,
       'plan': plan,
       'plan_expires_at': planExpiresAt,
+      'is_plan_expired': isPlanExpiredFromApi,
+      'plan_days_remaining': planDaysRemainingFromApi,
+      'is_near_expiry': isNearExpiryFromApi,
     };
   }
 
@@ -125,6 +139,7 @@ class UserModel {
 
   bool get isPlanExpired {
     if (role == 'super_admin') return false;
+    if (isPlanExpiredFromApi != null) return isPlanExpiredFromApi!;
     if (plan != null &&
         (plan?['status'] == 'inactive' || plan?['status'] == 'expired')) {
       return true;
@@ -138,11 +153,30 @@ class UserModel {
   }
 
   int? get planDaysRemaining {
+    if (planDaysRemainingFromApi != null) return planDaysRemainingFromApi;
     final raw = planExpiresAt ?? (plan?['expires_at'] as String?);
     if (raw == null || raw.isEmpty) return null;
     final dt = DateTime.tryParse(raw);
     if (dt == null) return null;
-    final diff = dt.difference(DateTime.now()).inDays;
-    return diff >= 0 ? diff : 0;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(dt.year, dt.month, dt.day);
+    return target.difference(today).inDays;
+  }
+
+  bool get isNearExpiry {
+    if (isPlanExpired) return false;
+    if (isNearExpiryFromApi != null) return isNearExpiryFromApi!;
+    final remaining = planDaysRemaining;
+    if (remaining == null) return false;
+    return remaining >= 0 && remaining <= 2;
+  }
+
+  String get remainingDaysText {
+    final remaining = planDaysRemaining;
+    if (remaining == null) return '';
+    if (remaining <= 0) return 'Expires today';
+    if (remaining == 1) return '1 day left';
+    return '$remaining days left';
   }
 }

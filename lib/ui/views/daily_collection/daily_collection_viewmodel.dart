@@ -13,6 +13,7 @@ import '../../../models/product_model.dart';
 import '../../../services/daily_collection_service.dart';
 import '../../../services/export_print_service.dart';
 import '../../../services/product_master_service.dart';
+import '../../../services/subscription_guard.dart';
 
 class DailyCollectionViewModel extends BaseViewModel {
   final DailyCollectionService _collectionService;
@@ -188,6 +189,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> createSupply(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.createSupply(payload);
@@ -203,6 +205,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> updateSupply(int id, Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.updateSupply(id, payload);
@@ -218,6 +221,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> deleteSupply(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.deleteSupply(id);
@@ -233,6 +237,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> recordPayment(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.recordPayment(payload);
@@ -248,6 +253,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> updatePayment(int id, Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.updatePayment(id, payload);
@@ -263,6 +269,7 @@ class DailyCollectionViewModel extends BaseViewModel {
   }
 
   Future<bool> deletePayment(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     setBusy(true);
     try {
       await _collectionService.deletePayment(id);

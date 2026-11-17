@@ -7,6 +7,7 @@ import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/models/tax_rate_model.dart';
 import 'package:marina_aqua/services/auth_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
+import 'package:marina_aqua/services/subscription_guard.dart';
 
 class SettingsViewModel extends ReactiveViewModel {
   final SettingsService _settingsService;
@@ -111,6 +112,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> updateCompanySettings(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     setBusy(true);
     _errorMessage = null;
     _successMessage = null;
@@ -132,6 +134,7 @@ class SettingsViewModel extends ReactiveViewModel {
   /// Validates and uploads logo file
   Future<bool> pickAndUploadLogo(
       Uint8List bytes, String filename, int sizeBytes) async {
+    if (!SubscriptionGuard.checkAccess()) return false;
     final lowerName = filename.toLowerCase();
     final isAllowedExtension = lowerName.endsWith('.png') ||
         lowerName.endsWith('.jpg') ||
@@ -163,6 +166,8 @@ class SettingsViewModel extends ReactiveViewModel {
     try {
       final updated = await _settingsService.uploadCompanyLogo(bytes, filename);
       _companySettings = updated;
+      _previewLogoBytes = null;
+      _previewLogoName = null;
       try {
         await _authService.refreshProfile();
       } catch (_) {}
@@ -178,6 +183,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> deleteCompanyLogo() async {
+    if (!SubscriptionGuard.checkAccess()) return;
     setBusy(true);
     _errorMessage = null;
 
@@ -234,6 +240,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> createTaxRate(Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _settingsService.createTaxRate(payload);
       _successMessage = 'Tax slab created successfully!';
@@ -246,6 +253,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> updateTaxRate(int id, Map<String, dynamic> payload) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _settingsService.updateTaxRate(id, payload);
       _successMessage = 'Tax slab updated successfully!';
@@ -258,6 +266,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> toggleTaxRateStatus(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _settingsService.toggleTaxRateStatus(id);
       _successMessage = 'Tax status updated!';
@@ -269,6 +278,7 @@ class SettingsViewModel extends ReactiveViewModel {
   }
 
   Future<void> deleteTaxRate(int id) async {
+    if (!SubscriptionGuard.checkAccess()) return;
     try {
       await _settingsService.deleteTaxRate(id);
       _successMessage = 'Tax slab deleted!';

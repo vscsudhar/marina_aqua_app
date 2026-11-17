@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
@@ -264,36 +263,16 @@ class SettingsView extends StackedView<SettingsViewModel> {
                     child: viewModel.previewLogoBytes != null
                         ? Image.memory(viewModel.previewLogoBytes!,
                             fit: BoxFit.contain)
-                        : (s.logoUrl != null || s.logoPath != null || s.logoData != null)
-                            ? (() {
-                                final raw = s.logoUrl ?? s.logoPath ?? s.logoData;
-                                final res = ApiService.resolveLogoUrl(raw) ?? raw!;
-                                if (res.startsWith('data:image')) {
-                                  try {
-                                    final b64 = res.split(',').last;
-                                    final u8 = base64Decode(b64);
-                                    return Image.memory(u8, fit: BoxFit.contain);
-                                  } catch (_) {}
-                                }
-                                return Image.network(
-                                  res,
-                                  key: ValueKey(res),
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) {
-                                    if (s.logoData != null && s.logoData!.startsWith('data:image')) {
-                                      try {
-                                        final b64 = s.logoData!.split(',').last;
-                                        final u8 = base64Decode(b64);
-                                        return Image.memory(u8, fit: BoxFit.contain);
-                                      } catch (_) {}
-                                    }
-                                    return const Center(
-                                      child: Icon(Icons.water_drop,
-                                          color: kcPrimaryColor, size: 36),
-                                    );
-                                  },
-                                );
-                              })()
+                        : (s.logoUrl != null || s.logoPath != null)
+                            ? Image.network(
+                                ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? (s.logoUrl ?? s.logoPath)!,
+                                key: ValueKey(s.logoUrl ?? s.logoPath),
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Center(
+                                  child: Icon(Icons.water_drop,
+                                      color: kcPrimaryColor, size: 36),
+                                ),
+                              )
                             : const Center(
                                 child: Icon(Icons.water_drop,
                                     color: kcPrimaryColor, size: 36),
@@ -1277,33 +1256,17 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                               ? s.logoUrl
                               : ((s.logoPath != null && s.logoPath!.isNotEmpty)
                                   ? s.logoPath
-                                  : (viewModel.companyLogo ?? s.logoData));
+                                  : viewModel.companyLogo);
                           final resolved = ApiService.resolveLogoUrl(rawUrl);
                           if (resolved != null && resolved.isNotEmpty) {
-                            if (resolved.startsWith('data:image')) {
-                              try {
-                                final b64 = resolved.split(',').last;
-                                final u8 = base64Decode(b64);
-                                return Image.memory(u8, fit: BoxFit.contain);
-                              } catch (_) {}
-                            }
                             return Image.network(
                               resolved,
                               key: ValueKey(resolved),
                               fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) {
-                                if (s.logoData != null && s.logoData!.startsWith('data:image')) {
-                                  try {
-                                    final b64 = s.logoData!.split(',').last;
-                                    final u8 = base64Decode(b64);
-                                    return Image.memory(u8, fit: BoxFit.contain);
-                                  } catch (_) {}
-                                }
-                                return const Center(
-                                  child: Icon(Icons.water_drop,
-                                      color: kcPrimaryColor, size: 40),
-                                );
-                              },
+                              errorBuilder: (_, __, ___) => const Center(
+                                child: Icon(Icons.water_drop,
+                                    color: kcPrimaryColor, size: 40),
+                              ),
                             );
                           }
                           return const Center(
