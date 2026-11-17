@@ -145,6 +145,13 @@ class DealerLedgerViewModel extends ReactiveViewModel {
     notifyListeners();
   }
 
+  void setDetailedMode(bool value) {
+    if (_isDetailedMode != value) {
+      _isDetailedMode = value;
+      notifyListeners();
+    }
+  }
+
   Future<bool> saveOthers(Map<String, dynamic> payload) async {
     try {
       await _reportService.saveOthers(payload);
@@ -166,6 +173,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
       final queryParams = <String, dynamic>{
         'year': _selectedYear,
         'month': _selectedMonth,
+        'detailed': _isDetailedMode ? '1' : '0',
       };
       if (_selectedDealerIds.isNotEmpty) {
         queryParams['dealer_ids'] = _selectedDealerIds.join(',');
@@ -177,7 +185,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
       );
 
       final fileName =
-          'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}.pdf';
+          'Dealer_Ledger_${_selectedYear}_${_selectedMonth.toString().padLeft(2, '0')}${_isDetailedMode ? '_Detailed' : ''}.pdf';
       _exportPrintService.downloadBytes(
           bytes, fileName, ExportPrintService.mimePdf);
       _exportSuccessMessage = 'PDF generated and downloaded successfully.';
@@ -198,6 +206,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
       final queryParams = <String, dynamic>{
         'year': _selectedYear,
         'month': _selectedMonth,
+        'detailed': _isDetailedMode ? '1' : '0',
       };
       if (_selectedDealerIds.isNotEmpty) {
         queryParams['dealer_ids'] = _selectedDealerIds.join(',');
@@ -230,6 +239,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
       final queryParams = <String, dynamic>{
         'year': _selectedYear,
         'month': _selectedMonth,
+        'detailed': _isDetailedMode ? '1' : '0',
       };
       if (_selectedDealerIds.isNotEmpty) {
         queryParams['dealer_ids'] = _selectedDealerIds.join(',');
@@ -262,6 +272,7 @@ class DealerLedgerViewModel extends ReactiveViewModel {
       final queryParams = <String, dynamic>{
         'year': _selectedYear,
         'month': _selectedMonth,
+        'detailed': _isDetailedMode ? '1' : '0',
       };
       if (_selectedDealerIds.isNotEmpty) {
         queryParams['dealer_ids'] = _selectedDealerIds.join(',');

@@ -195,22 +195,60 @@ class LedgerDateRowModel {
   }
 }
 
+class PaymentMethodBreakdownItem {
+  final String method;
+  final double amount;
+  final String color;
+
+  const PaymentMethodBreakdownItem({
+    required this.method,
+    required this.amount,
+    required this.color,
+  });
+
+  factory PaymentMethodBreakdownItem.fromJson(Map<String, dynamic> json) {
+    return PaymentMethodBreakdownItem(
+      method: (json['method'] ?? '').toString(),
+      amount: _toDouble(json['amount']),
+      color: (json['color'] ?? '#15803d').toString(),
+    );
+  }
+}
+
 class LedgerDealerDayEntry {
   final int caneQty;
   final double fillingAmount;
   final double paymentsReceived;
+  final double paymentCash;
+  final double paymentUpi;
+  final double paymentCard;
+  final double paymentOther;
+  final List<PaymentMethodBreakdownItem> paymentBreakdown;
 
   const LedgerDealerDayEntry({
     required this.caneQty,
     required this.fillingAmount,
     required this.paymentsReceived,
+    this.paymentCash = 0.0,
+    this.paymentUpi = 0.0,
+    this.paymentCard = 0.0,
+    this.paymentOther = 0.0,
+    this.paymentBreakdown = const [],
   });
 
   factory LedgerDealerDayEntry.fromJson(Map<String, dynamic> json) {
+    final rawBreakdown = json['payment_breakdown'] as List? ?? [];
     return LedgerDealerDayEntry(
       caneQty: _toInt(json['cane_qty']),
       fillingAmount: _toDouble(json['filling_amount']),
       paymentsReceived: _toDouble(json['payments_received']),
+      paymentCash: _toDouble(json['payment_cash']),
+      paymentUpi: _toDouble(json['payment_upi']),
+      paymentCard: _toDouble(json['payment_card']),
+      paymentOther: _toDouble(json['payment_other']),
+      paymentBreakdown: rawBreakdown
+          .map((item) => PaymentMethodBreakdownItem.fromJson(_toMap(item)))
+          .toList(),
     );
   }
 }

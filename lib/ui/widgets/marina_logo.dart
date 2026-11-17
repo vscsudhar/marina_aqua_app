@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../app/app.locator.dart';
@@ -73,17 +74,37 @@ class MarinaLogo extends StatelessWidget {
             borderRadius: BorderRadius.circular(7),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-              child: Image.network(
-                finalLogo,
-                key: ValueKey(finalLogo),
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Center(
-                  child: CustomPaint(
-                    size: Size(size * 0.6, size * 0.6),
-                    painter: _WaterDropletPainter(),
-                  ),
-                ),
-              ),
+              child: () {
+                if (finalLogo.startsWith('data:image')) {
+                  try {
+                    final b64 = finalLogo.split(',').last;
+                    final u8 = base64Decode(b64);
+                    return Image.memory(u8, fit: BoxFit.contain);
+                  } catch (_) {}
+                }
+                return Image.network(
+                  finalLogo,
+                  key: ValueKey(finalLogo),
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) {
+                    try {
+                      final logoData =
+                          locator<SettingsService>().settings.logoData;
+                      if (logoData != null && logoData.startsWith('data:image')) {
+                        final b64 = logoData.split(',').last;
+                        final u8 = base64Decode(b64);
+                        return Image.memory(u8, fit: BoxFit.contain);
+                      }
+                    } catch (_) {}
+                    return Center(
+                      child: CustomPaint(
+                        size: Size(size * 0.6, size * 0.6),
+                        painter: _WaterDropletPainter(),
+                      ),
+                    );
+                  },
+                );
+              }(),
             ),
           ),
         );

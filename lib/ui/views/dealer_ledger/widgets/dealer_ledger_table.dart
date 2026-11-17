@@ -505,10 +505,26 @@ class DealerLedgerTable extends StatelessWidget {
                         Text(fmt.format(ent!.fillingAmount),
                             style: GoogleFonts.inter(
                                 fontSize: 9, color: const Color(0xFF3730A3))),
-                      if ((ent?.paymentsReceived ?? 0) > 0)
-                        Text('${fmt.format(ent!.paymentsReceived)} pd',
+                      if ((ent?.paymentBreakdown.isNotEmpty ?? false))
+                        ...ent!.paymentBreakdown.map((pb) {
+                          Color c;
+                          if (pb.method.toLowerCase() == 'cash') {
+                            c = const Color(0xFF15803D);
+                          } else if (pb.method.toLowerCase() == 'upi') {
+                            c = const Color(0xFF7E22CE);
+                          } else {
+                            c = const Color(0xFF0F172A);
+                          }
+                          return Text('${pb.method}: ${fmt.format(pb.amount)}',
+                              style: GoogleFonts.inter(
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: c));
+                        })
+                      else if ((ent?.paymentsReceived ?? 0) > 0)
+                        Text('Cash: ${fmt.format(ent!.paymentsReceived)}',
                             style: GoogleFonts.inter(
-                                fontSize: 9,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF15803D))),
                     ],
@@ -544,9 +560,9 @@ class DealerLedgerTable extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFF0369A1))),
                       if (day.others.paymentsReceived > 0)
-                        Text('${fmt.format(day.others.paymentsReceived)} pd',
+                        Text('Cash: ${fmt.format(day.others.paymentsReceived)}',
                             style: GoogleFonts.inter(
-                                fontSize: 9,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF15803D))),
                     ],
@@ -596,27 +612,114 @@ class DealerLedgerTable extends StatelessWidget {
           ...dealers.map((d) {
             final ent = day.dealers[d.id];
             final q = ent?.caneQty ?? 0;
-            final text = q > 0 ? '$q' : '-';
-            return _cell(text, dealerW,
-                fontSize: 10,
-                bold: q > 0,
-                textColor: AppColors.textPrimary,
-                onTap: () => onDealerCellTap?.call(d, day.date, ent),
-                tooltip:
-                    'Tap to view transactions for ${d.name} on ${day.formatted}');
+            final hasPayment = (ent?.paymentsReceived ?? 0) > 0;
+            if (!hasPayment) {
+              final text = q > 0 ? '$q' : '-';
+              return _cell(text, dealerW,
+                  fontSize: 10,
+                  bold: q > 0,
+                  textColor: AppColors.textPrimary,
+                  onTap: () => onDealerCellTap?.call(d, day.date, ent),
+                  tooltip:
+                      'Tap to view transactions for ${d.name} on ${day.formatted}');
+            }
+            return InkWell(
+              onTap: () => onDealerCellTap?.call(d, day.date, ent),
+              child: Container(
+                width: dealerW,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  border: Border(
+                      right: BorderSide(color: AppColors.border, width: 0.5)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (q > 0)
+                      Text('$q',
+                          style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary)),
+                    if (ent!.paymentBreakdown.isNotEmpty)
+                      ...ent.paymentBreakdown.map((pb) {
+                        Color c;
+                        if (pb.method.toLowerCase() == 'cash') {
+                          c = const Color(0xFF15803D);
+                        } else if (pb.method.toLowerCase() == 'upi') {
+                          c = const Color(0xFF7E22CE);
+                        } else {
+                          c = const Color(0xFF0F172A);
+                        }
+                        return Text('${pb.method}: ${fmt.format(pb.amount)}',
+                            style: GoogleFonts.inter(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                                color: c));
+                      })
+                    else
+                      Text('Cash: ${fmt.format(ent.paymentsReceived)}',
+                          style: GoogleFonts.inter(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF15803D))),
+                  ],
+                ),
+              ),
+            );
           }),
-          _cell(
-            day.others.caneQty > 0 ? '${day.others.caneQty}' : '-',
-            othersW,
-            fontSize: 10,
-            bgColor: const Color(0x0A0284C7),
-            onTap: () => onOthersTap?.call(
-              DateTime(
-                  report.reportMeta.year, report.reportMeta.month, day.day),
-              day.others,
-            ),
-            tooltip: 'Tap to edit Others entry for ${day.formatted}',
-          ),
+          Builder(builder: (ctx) {
+            final hasPayment = day.others.paymentsReceived > 0;
+            final q = day.others.caneQty;
+            if (!hasPayment) {
+              return _cell(
+                q > 0 ? '$q' : '-',
+                othersW,
+                fontSize: 10,
+                bgColor: const Color(0x0A0284C7),
+                onTap: () => onOthersTap?.call(
+                  DateTime(
+                      report.reportMeta.year, report.reportMeta.month, day.day),
+                  day.others,
+                ),
+                tooltip: 'Tap to edit Others entry for ${day.formatted}',
+              );
+            }
+            return InkWell(
+              onTap: () => onOthersTap?.call(
+                DateTime(
+                    report.reportMeta.year, report.reportMeta.month, day.day),
+                day.others,
+              ),
+              child: Container(
+                width: othersW,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Color(0x0A0284C7),
+                  border: Border(
+                      right: BorderSide(color: AppColors.border, width: 0.5)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (q > 0)
+                      Text('$q',
+                          style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary)),
+                    Text('Cash: ${fmt.format(day.others.paymentsReceived)}',
+                        style: GoogleFonts.inter(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF15803D))),
+                  ],
+                ),
+              ),
+            );
+          }),
           _cell('${day.totals.caneQty} cans', totalW,
               fontSize: 10,
               bold: true,

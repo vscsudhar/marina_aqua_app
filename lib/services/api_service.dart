@@ -156,6 +156,7 @@ class ApiService {
   static String? resolveLogoUrl(String? rawUrl) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
     final trimmed = rawUrl.trim();
+    if (trimmed.startsWith('data:')) return trimmed;
 
     String baseOrigin = ApiConfig.baseOrigin;
     try {

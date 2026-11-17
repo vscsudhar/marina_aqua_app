@@ -1051,7 +1051,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       ),
     );
 
-    if (result is InvoiceModel) {
+    if (result is InvoiceModel && result.id > 0) {
       viewModel.openInvoiceInBrowser(result.id);
     }
   }
@@ -1163,7 +1163,7 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
       ),
     );
 
-    if (result is InvoiceModel) {
+    if (result is InvoiceModel && result.id > 0) {
       viewModel.openInvoiceInBrowser(result.id);
     }
   }

@@ -290,8 +290,15 @@ class InvoicesViewModel extends ReactiveViewModel {
 
   /// Open live HTML invoice rendered by backend URL in browser
   void openInvoiceInBrowser(int id) {
+    if (id <= 0) {
+      _errorMessage = 'Invalid invoice ID for HTML view.';
+      notifyListeners();
+      return;
+    }
     final url = _billingService.getInvoiceHtmlUrl(id);
-    _exportPrintService.openUrlInBrowser(url);
+    if (url.isNotEmpty) {
+      _exportPrintService.openUrlInBrowser(url);
+    }
   }
 
   Future<void> updateInvoiceNumber(int id, String newInvoiceNo,

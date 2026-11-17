@@ -688,8 +688,16 @@ class ExportPrintService {
 
     // Resolve and fetch company logo for PDF header
     Uint8List? effectiveLogoBytes = customLogoBytes;
+    if (effectiveLogoBytes == null &&
+        settings.logoData != null &&
+        settings.logoData!.startsWith('data:image')) {
+      try {
+        final b64 = settings.logoData!.split(',').last;
+        effectiveLogoBytes = Uint8List.fromList(base64Decode(b64));
+      } catch (_) {}
+    }
     if (effectiveLogoBytes == null) {
-      final rawLogo = settings.logoUrl ?? settings.logoPath;
+      final rawLogo = settings.logoUrl ?? settings.logoPath ?? settings.logoData;
       if (rawLogo != null && rawLogo.isNotEmpty) {
         final resolvedUrl = ApiService.resolveLogoUrl(rawLogo);
         if (resolvedUrl != null && resolvedUrl.isNotEmpty) {

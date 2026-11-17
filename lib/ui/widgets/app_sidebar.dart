@@ -190,7 +190,7 @@ class AppSidebar extends StatelessWidget {
                   settingsService?.settings.logoPath != null &&
                   settingsService!.settings.logoPath!.isNotEmpty
               ? settingsService.settings.logoPath
-              : effectiveUser?.companyLogo);
+              : (settingsService?.settings.logoData ?? effectiveUser?.companyLogo));
       final resolvedLogo = ApiService.resolveLogoUrl(rawLogo);
 
       final companyName = (settingsService?.isInitialized == true &&

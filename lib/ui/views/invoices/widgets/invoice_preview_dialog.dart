@@ -504,7 +504,7 @@ class InvoicePreviewDialog extends StatelessWidget {
                             scrollDirection: Axis.horizontal,
                             child: SizedBox(
                               width: max(tableConstraints.maxWidth,
-                                  invoice.isWithoutGst ? 680.0 : (invoice.isInterstate ? 820.0 : 920.0)),
+                                  invoice.isWithoutGst ? 680.0 : 1050.0),
                               child: Table(
                                 border: TableBorder.all(
                                     color: kcBorderColor, width: 1),
@@ -518,30 +518,18 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         5: FlexColumnWidth(1.2), // Disc
                                         6: FlexColumnWidth(1.6), // Total
                                       }
-                                    : (invoice.isInterstate
-                                        ? const {
-                                            0: FixedColumnWidth(36), // Sl
-                                            1: FlexColumnWidth(3.0), // Description
-                                            2: FlexColumnWidth(1.1), // HSN
-                                            3: FlexColumnWidth(1.1), // Qty
-                                            4: FlexColumnWidth(1.2), // Rate
-                                            5: FlexColumnWidth(1.0), // Disc
-                                            6: FlexColumnWidth(1.3), // Taxable
-                                            7: FlexColumnWidth(1.3), // IGST
-                                            8: FlexColumnWidth(1.4), // Total
-                                          }
-                                        : const {
-                                            0: FixedColumnWidth(34), // Sl
-                                            1: FlexColumnWidth(2.7), // Description
-                                            2: FlexColumnWidth(1.0), // HSN
-                                            3: FlexColumnWidth(1.0), // Qty
-                                            4: FlexColumnWidth(1.1), // Rate
-                                            5: FlexColumnWidth(0.9), // Disc
-                                            6: FlexColumnWidth(1.2), // Taxable
-                                            7: FlexColumnWidth(1.2), // CGST
-                                            8: FlexColumnWidth(1.2), // SGST
-                                            9: FlexColumnWidth(1.3), // Total
-                                          }),
+                                    : const {
+                                        0: FixedColumnWidth(36), // Sl
+                                        1: FlexColumnWidth(2.6), // Description
+                                        2: FlexColumnWidth(1.0), // HSN
+                                        3: FlexColumnWidth(1.0), // Qty
+                                        4: FlexColumnWidth(1.1), // Rate
+                                        5: FlexColumnWidth(1.2), // Amount (Taxable)
+                                        6: FlexColumnWidth(1.4), // SGST (% / ₹)
+                                        7: FlexColumnWidth(1.4), // CGST (% / ₹)
+                                        8: FlexColumnWidth(1.4), // IGST (% / ₹)
+                                        9: FlexColumnWidth(1.4), // Total
+                                      },
                                 children: [
                                   TableRow(
                                     decoration: const BoxDecoration(
@@ -561,25 +549,23 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       _pCell('Rate (₹)',
                                           isHeader: true,
                                           align: TextAlign.right),
-                                      _pCell('Disc (₹)',
-                                          isHeader: true,
-                                          align: TextAlign.right),
-                                      if (!invoice.isWithoutGst) ...[
-                                        _pCell('Taxable (₹)',
+                                      if (invoice.isWithoutGst) ...[
+                                        _pCell('Disc (₹)',
                                             isHeader: true,
                                             align: TextAlign.right),
-                                        if (!invoice.isInterstate) ...[
-                                          _pCell('CGST (₹)',
-                                              isHeader: true,
-                                              align: TextAlign.right),
-                                          _pCell('SGST (₹)',
-                                              isHeader: true,
-                                              align: TextAlign.right),
-                                        ] else ...[
-                                          _pCell('IGST (₹)',
-                                              isHeader: true,
-                                              align: TextAlign.right),
-                                        ],
+                                      ] else ...[
+                                        _pCell('Amount (₹)',
+                                            isHeader: true,
+                                            align: TextAlign.right),
+                                        _pCell('SGST',
+                                            isHeader: true,
+                                            align: TextAlign.center),
+                                        _pCell('CGST',
+                                            isHeader: true,
+                                            align: TextAlign.center),
+                                        _pCell('IGST',
+                                            isHeader: true,
+                                            align: TextAlign.center),
                                       ],
                                       _pCell('Total (₹)',
                                           isHeader: true,
@@ -589,6 +575,20 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   ...invoice.items.asMap().entries.map((entry) {
                                     final idx = entry.key + 1;
                                     final it = entry.value;
+                                    final isIgst = invoice.isInterstate || it.igstRate > 0;
+                                    final sgstRateStr = !isIgst && it.sgstRate > 0
+                                        ? (it.sgstRate % 1 == 0 ? it.sgstRate.toInt().toString() : it.sgstRate.toStringAsFixed(1))
+                                        : '0';
+                                    final cgstRateStr = !isIgst && it.cgstRate > 0
+                                        ? (it.cgstRate % 1 == 0 ? it.cgstRate.toInt().toString() : it.cgstRate.toStringAsFixed(1))
+                                        : '0';
+                                    final igstRateStr = isIgst && it.igstRate > 0
+                                        ? (it.igstRate % 1 == 0 ? it.igstRate.toInt().toString() : it.igstRate.toStringAsFixed(1))
+                                        : '0';
+                                    final sgstAmt = !isIgst ? it.sgstAmount : 0.0;
+                                    final cgstAmt = !isIgst ? it.cgstAmount : 0.0;
+                                    final igstAmt = isIgst ? it.igstAmount : 0.0;
+
                                     return TableRow(
                                       children: [
                                         _pCell('$idx', align: TextAlign.center),
@@ -600,38 +600,21 @@ class InvoicePreviewDialog extends StatelessWidget {
                                             align: TextAlign.right),
                                         _pCell(it.unitPrice.toStringAsFixed(2),
                                             align: TextAlign.right),
-                                        _pCell(
-                                            it.discountAmount > 0
-                                                ? it.discountAmount
-                                                    .toStringAsFixed(2)
-                                                : '-',
-                                            align: TextAlign.right),
-                                        if (!invoice.isWithoutGst) ...[
+                                        if (invoice.isWithoutGst) ...[
+                                          _pCell(
+                                              it.discountAmount > 0
+                                                  ? it.discountAmount
+                                                      .toStringAsFixed(2)
+                                                  : '-',
+                                              align: TextAlign.right),
+                                        ] else ...[
                                           _pCell(
                                               it.taxableAmount
                                                   .toStringAsFixed(2),
                                               align: TextAlign.right),
-                                          if (!invoice.isInterstate) ...[
-                                            _pCell(
-                                              it.taxRate > 0
-                                                  ? '${it.cgstAmount.toStringAsFixed(2)}\n(${it.cgstRate.toStringAsFixed(it.cgstRate % 1 == 0 ? 0 : 1)}%)'
-                                                  : '0.00',
-                                              align: TextAlign.right,
-                                            ),
-                                            _pCell(
-                                              it.taxRate > 0
-                                                  ? '${it.sgstAmount.toStringAsFixed(2)}\n(${it.sgstRate.toStringAsFixed(it.sgstRate % 1 == 0 ? 0 : 1)}%)'
-                                                  : '0.00',
-                                              align: TextAlign.right,
-                                            ),
-                                          ] else ...[
-                                            _pCell(
-                                              it.taxRate > 0
-                                                  ? '${it.igstAmount.toStringAsFixed(2)}\n(${it.igstRate.toStringAsFixed(it.igstRate % 1 == 0 ? 0 : 1)}%)'
-                                                  : '0.00',
-                                              align: TextAlign.right,
-                                            ),
-                                          ],
+                                          _pTaxCell(sgstAmt, sgstRateStr),
+                                          _pTaxCell(cgstAmt, cgstRateStr),
+                                          _pTaxCell(igstAmt, igstRateStr),
                                         ],
                                         _pCell(it.lineTotal.toStringAsFixed(2),
                                             align: TextAlign.right,
@@ -762,52 +745,45 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 _sumRow('Taxable Amount:',
                                     formatAmount(invoice.taxableAmount),
                                     isBold: true),
-                                if (!invoice.isInterstate) ...[
-                                  () {
-                                    final cgstPct = invoice.taxableAmount > 0
-                                        ? (invoice.cgstAmount / invoice.taxableAmount * 100)
-                                        : 0.0;
-                                    final sgstPct = invoice.taxableAmount > 0
-                                        ? (invoice.sgstAmount / invoice.taxableAmount * 100)
-                                        : 0.0;
-                                    final cgstStr = cgstPct % 1 == 0 ? cgstPct.toInt().toString() : cgstPct.toStringAsFixed(1);
-                                    final sgstStr = sgstPct % 1 == 0 ? sgstPct.toInt().toString() : sgstPct.toStringAsFixed(1);
-                                    return Column(
-                                      children: [
-                                        _sumRow('CGST ($cgstStr%):',
-                                            formatAmount(invoice.cgstAmount)),
-                                        _sumRow('SGST ($sgstStr%):',
-                                            formatAmount(invoice.sgstAmount)),
-                                      ],
-                                    );
-                                  }(),
-                                ] else ...[
-                                  () {
-                                    final igstPct = invoice.taxableAmount > 0
-                                        ? (invoice.igstAmount / invoice.taxableAmount * 100)
-                                        : 0.0;
-                                    final igstStr = igstPct % 1 == 0 ? igstPct.toInt().toString() : igstPct.toStringAsFixed(1);
-                                    return Column(
-                                      children: [
-                                        _sumRow('IGST ($igstStr%):',
-                                            formatAmount(invoice.igstAmount)),
-                                        if (invoice.additionalTaxes != null &&
-                                            invoice.additionalTaxes!.isNotEmpty)
-                                          ...invoice.additionalTaxes!.map((t) {
-                                            final name = t['name']?.toString() ?? 'Additional Tax';
-                                            final rate = t['rate'] != null
-                                                ? double.tryParse(t['rate'].toString()) ?? 0.0
-                                                : 0.0;
-                                            final amt = t['amount'] != null
-                                                ? double.tryParse(t['amount'].toString()) ?? 0.0
-                                                : ((invoice.taxableAmount * (rate / 100)) * 100).round() / 100;
-                                            final rStr = rate % 1 == 0 ? rate.toInt().toString() : rate.toStringAsFixed(1);
-                                            return _sumRow('$name ($rStr%):', formatAmount(amt));
-                                          }),
-                                      ],
-                                    );
-                                  }(),
-                                ],
+                                () {
+                                  final isIgst = invoice.isInterstate || invoice.igstAmount > 0;
+                                  final double sgstPct = !isIgst && invoice.taxableAmount > 0
+                                      ? (invoice.sgstAmount / invoice.taxableAmount * 100)
+                                      : 0.0;
+                                  final double cgstPct = !isIgst && invoice.taxableAmount > 0
+                                      ? (invoice.cgstAmount / invoice.taxableAmount * 100)
+                                      : 0.0;
+                                  final double igstPct = isIgst && invoice.taxableAmount > 0
+                                      ? (invoice.igstAmount / invoice.taxableAmount * 100)
+                                      : 0.0;
+                                  final sgstStr = sgstPct % 1 == 0 ? sgstPct.toInt().toString() : sgstPct.toStringAsFixed(1);
+                                  final cgstStr = cgstPct % 1 == 0 ? cgstPct.toInt().toString() : cgstPct.toStringAsFixed(1);
+                                  final igstStr = igstPct % 1 == 0 ? igstPct.toInt().toString() : igstPct.toStringAsFixed(1);
+                                  final sgstAmt = !isIgst ? invoice.sgstAmount : 0.0;
+                                  final cgstAmt = !isIgst ? invoice.cgstAmount : 0.0;
+                                  final igstAmt = isIgst ? invoice.igstAmount : 0.0;
+
+                                  return Column(
+                                    children: [
+                                      _sumRow('SGST ($sgstStr%):', formatAmount(sgstAmt)),
+                                      _sumRow('CGST ($cgstStr%):', formatAmount(cgstAmt)),
+                                      _sumRow('IGST ($igstStr%):', formatAmount(igstAmt)),
+                                      if (invoice.additionalTaxes != null &&
+                                          invoice.additionalTaxes!.isNotEmpty)
+                                        ...invoice.additionalTaxes!.map((t) {
+                                          final name = t['name']?.toString() ?? 'Additional Tax';
+                                          final rate = t['rate'] != null
+                                              ? double.tryParse(t['rate'].toString()) ?? 0.0
+                                              : 0.0;
+                                          final amt = t['amount'] != null
+                                              ? double.tryParse(t['amount'].toString()) ?? 0.0
+                                              : ((invoice.taxableAmount * (rate / 100)) * 100).round() / 100;
+                                          final rStr = rate % 1 == 0 ? rate.toInt().toString() : rate.toStringAsFixed(1);
+                                          return _sumRow('$name ($rStr%):', formatAmount(amt));
+                                        }),
+                                    ],
+                                  );
+                                }(),
                               ],
                               _sumRow(
                                 'Round Off:',
@@ -1019,6 +995,40 @@ class InvoicePreviewDialog extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  static Widget _pTaxCell(double amt, String rateStr) {
+    final amtFormatted = amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00';
+    final rateFormatted =
+        (double.tryParse(rateStr) ?? 0) > 0 ? '$rateStr%' : '0%';
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            amtFormatted,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: amt > 0 ? FontWeight.w700 : FontWeight.w600,
+              color: amt > 0 ? kcTextPrimary : kcTextSecondary,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            rateFormatted,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: kcTextSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }

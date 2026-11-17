@@ -20,6 +20,7 @@ class CompanySettingModel {
   final String currencyCode;
   final double defaultTaxRate;
   final String? logoPath;
+  final String? logoData;
   final String? logoUrl;
   final String invoicePrefix;
   final int invoiceNumberPadding;
@@ -49,6 +50,7 @@ class CompanySettingModel {
     this.currencyCode = 'INR',
     this.defaultTaxRate = 18.0,
     this.logoPath,
+    this.logoData,
     this.logoUrl,
     this.invoicePrefix = '',
     this.invoiceNumberPadding = 4,
@@ -85,6 +87,7 @@ class CompanySettingModel {
           ? double.tryParse(json['default_tax_rate'].toString()) ?? 18.0
           : 18.0,
       logoPath: json['logo_path'] as String?,
+      logoData: json['logo_data'] as String?,
       logoUrl: json['logo_url'] as String?,
       invoicePrefix: json['invoice_prefix'] as String? ?? '',
       invoiceNumberPadding: json['invoice_number_padding'] is int
@@ -119,6 +122,7 @@ class CompanySettingModel {
     String? currencyCode,
     double? defaultTaxRate,
     String? logoPath,
+    String? logoData,
     String? logoUrl,
     String? invoicePrefix,
     int? invoiceNumberPadding,
@@ -147,6 +151,7 @@ class CompanySettingModel {
       currencyCode: currencyCode ?? this.currencyCode,
       defaultTaxRate: defaultTaxRate ?? this.defaultTaxRate,
       logoPath: logoPath ?? this.logoPath,
+      logoData: logoData ?? this.logoData,
       logoUrl: logoUrl ?? this.logoUrl,
       invoicePrefix: invoicePrefix ?? this.invoicePrefix,
       invoiceNumberPadding: invoiceNumberPadding ?? this.invoiceNumberPadding,
@@ -177,6 +182,7 @@ class CompanySettingModel {
         'currency_code': currencyCode,
         'default_tax_rate': defaultTaxRate,
         'logo_path': logoPath,
+        'logo_data': logoData,
         'logo_url': logoUrl,
         'invoice_prefix': invoicePrefix,
         'invoice_number_padding': invoiceNumberPadding,
@@ -445,6 +451,9 @@ class InvoiceModel {
   final Map<String, dynamic>? customerCompany;
   final String? createdBy;
   final String? createdAt;
+  final String? htmlUrl;
+  final String? pdfUrl;
+  final String? printUrl;
 
   const InvoiceModel({
     required this.id,
@@ -496,6 +505,9 @@ class InvoiceModel {
     this.customerCompany,
     this.createdBy,
     this.createdAt,
+    this.htmlUrl,
+    this.pdfUrl,
+    this.printUrl,
   });
 
   bool get isDraft => status.toLowerCase() == 'draft';
@@ -607,6 +619,9 @@ class InvoiceModel {
       customerCompany: json['customer_company'] as Map<String, dynamic>?,
       createdBy: json['created_by'] as String?,
       createdAt: json['created_at'] as String?,
+      htmlUrl: json['html_url'] as String?,
+      pdfUrl: json['pdf_url'] as String?,
+      printUrl: json['print_url'] as String?,
     );
   }
 }

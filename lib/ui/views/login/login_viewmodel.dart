@@ -93,7 +93,7 @@ class LoginViewModel extends BaseViewModel {
       );
 
       try {
-        await locator<SettingsService>().loadCompanySettings();
+        await locator<SettingsService>().loadCompanySettings(forceRefresh: true);
       } catch (_) {}
 
       _navigationService.clearStackAndShow(Routes.homeView);

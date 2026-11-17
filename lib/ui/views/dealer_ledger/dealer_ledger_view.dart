@@ -346,6 +346,56 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
                 ),
               ),
 
+              // Detailed Checkbox in Print / Download PDF Options
+              InkWell(
+                onTap: viewModel.toggleDetailedMode,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: viewModel.isDetailedMode
+                          ? AppColors.primary
+                          : const Color(0xFFCBD5E1),
+                      width: viewModel.isDetailedMode ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Checkbox(
+                          value: viewModel.isDetailedMode,
+                          onChanged: (val) =>
+                              viewModel.setDetailedMode(val ?? false),
+                          activeColor: AppColors.primary,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Detailed',
+                        style: GoogleFonts.inter(
+                          fontSize: 12.5,
+                          fontWeight: viewModel.isDetailedMode
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: viewModel.isDetailedMode
+                              ? AppColors.primary
+                              : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               // Print Report
               OutlinedButton.icon(
                 onPressed: viewModel.isExporting ? null : viewModel.printReport,

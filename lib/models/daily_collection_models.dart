@@ -376,6 +376,65 @@ class DealerSupplyItemModel {
           .format(lineTotal);
 }
 
+class PaymentSplitDetailModel {
+  final int? id;
+  final String paymentMode;
+  final double amount;
+  final String? referenceNo;
+  final String? notes;
+
+  const PaymentSplitDetailModel({
+    this.id,
+    required this.paymentMode,
+    required this.amount,
+    this.referenceNo,
+    this.notes,
+  });
+
+  factory PaymentSplitDetailModel.fromJson(Map<String, dynamic> json) {
+    return PaymentSplitDetailModel(
+      id: (json['id'] as num?)?.toInt(),
+      paymentMode: json['payment_mode'] ?? 'cash',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      referenceNo: json['reference_no'],
+      notes: json['notes'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (id != null) 'id': id,
+      'payment_mode': paymentMode,
+      'amount': amount,
+      if (referenceNo != null) 'reference_no': referenceNo,
+      if (notes != null) 'notes': notes,
+    };
+  }
+
+  String get amountFormatted =>
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
+          .format(amount);
+
+  String get paymentModeLabel {
+    switch (paymentMode.toLowerCase()) {
+      case 'cash':
+        return 'Cash';
+      case 'upi':
+        return 'UPI';
+      case 'bank_transfer':
+      case 'neft':
+        return 'Bank Transfer';
+      case 'card':
+        return 'Card';
+      case 'cheque':
+        return 'Cheque';
+      case 'other':
+      default:
+        return 'Other';
+    }
+  }
+}
+
 class DealerPaymentModel {
   final int id;
   final String paymentNo;
@@ -393,6 +452,8 @@ class DealerPaymentModel {
   final String? notes;
   final String? collectedByName;
   final String? createdAt;
+  final bool isSplit;
+  final List<PaymentSplitDetailModel> paymentSplits;
 
   const DealerPaymentModel({
     required this.id,
@@ -411,9 +472,18 @@ class DealerPaymentModel {
     this.notes,
     this.collectedByName,
     this.createdAt,
+    this.isSplit = false,
+    this.paymentSplits = const [],
   });
 
   factory DealerPaymentModel.fromJson(Map<String, dynamic> json) {
+    final splitList = (json['payment_splits'] as List? ?? [])
+        .map((s) => PaymentSplitDetailModel.fromJson(s as Map<String, dynamic>))
+        .toList();
+    final bool split = json['is_split'] == true ||
+        json['payment_method'] == 'split' ||
+        splitList.length > 1;
+
     return DealerPaymentModel(
       id: (json['id'] as num).toInt(),
       paymentNo: json['payment_no'] ?? '',
@@ -431,10 +501,38 @@ class DealerPaymentModel {
       notes: json['notes'],
       collectedByName: json['collected_by_name'],
       createdAt: json['created_at'],
+      isSplit: split,
+      paymentSplits: splitList,
     );
   }
 
   String get amountFormatted =>
       NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0)
           .format(amount);
+
+  String get paymentMethodLabel {
+    if (isSplit) {
+      if (paymentSplits.isNotEmpty) {
+        return 'Split (${paymentSplits.map((s) => '${s.paymentModeLabel}: ${s.amountFormatted}').join(', ')})';
+      }
+      return 'Split Payment';
+    }
+    switch (paymentMethod.toLowerCase()) {
+      case 'cash':
+        return 'Cash';
+      case 'upi':
+        return 'UPI';
+      case 'bank_transfer':
+      case 'neft':
+        return 'Bank Transfer';
+      case 'card':
+        return 'Card';
+      case 'cheque':
+        return 'Cheque';
+      case 'other':
+        return 'Other';
+      default:
+        return paymentMethod.toUpperCase();
+    }
+  }
 }

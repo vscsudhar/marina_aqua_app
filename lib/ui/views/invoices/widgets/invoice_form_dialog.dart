@@ -24,7 +24,9 @@ class InvoiceItemRow {
   final TextEditingController unitController;
   final TextEditingController unitPriceController;
   final TextEditingController discountController;
-  double taxRate;
+  double sgstRate;
+  double cgstRate;
+  double igstRate;
 
   InvoiceItemRow({
     this.product,
@@ -34,7 +36,10 @@ class InvoiceItemRow {
     String unit = 'Unit',
     double unitPrice = 0.0,
     double discount = 0.0,
-    this.taxRate = 18.0,
+    this.sgstRate = 0.0,
+    this.cgstRate = 0.0,
+    this.igstRate = 0.0,
+    double? taxRate,
   })  : descriptionController = TextEditingController(text: description),
         hsnSacController = TextEditingController(text: hsnSac),
         quantityController = TextEditingController(
@@ -51,7 +56,12 @@ class InvoiceItemRow {
                 ? '0'
                 : (discount % 1 == 0
                     ? discount.toInt().toString()
-                    : discount.toStringAsFixed(2)));
+                    : discount.toStringAsFixed(2))) {
+    if (taxRate != null && taxRate > 0 && sgstRate == 0 && cgstRate == 0 && igstRate == 0) {
+      cgstRate = taxRate / 2.0;
+      sgstRate = taxRate / 2.0;
+    }
+  }
 
   String get description => descriptionController.text;
   set description(String val) => descriptionController.text = val;
@@ -84,8 +94,14 @@ class InvoiceItemRow {
     discountController.dispose();
   }
 
-  void populateFromProduct(ProductModel p,
-      {double? fixedPrice, bool isWithoutGst = false}) {
+  void populateFromProduct(
+    ProductModel p, {
+    double? fixedPrice,
+    bool isWithoutGst = false,
+    double selectedGstRate = 0.0,
+    double selectedIgstRate = 0.0,
+    bool isIgst = false,
+  }) {
     product = p;
     descriptionController.text = p.name;
     hsnSacController.text = p.hsnCode.isNotEmpty ? p.hsnCode : '2201';
@@ -100,22 +116,45 @@ class InvoiceItemRow {
       quantityController.text = '1';
     }
 
-    taxRate = isWithoutGst ? 0.0 : p.taxRate;
+    if (isWithoutGst) {
+      sgstRate = 0.0;
+      cgstRate = 0.0;
+      igstRate = 0.0;
+    } else if (isIgst && selectedIgstRate > 0) {
+      igstRate = selectedIgstRate;
+      sgstRate = 0.0;
+      cgstRate = 0.0;
+    } else if (selectedGstRate > 0) {
+      sgstRate = selectedGstRate / 2.0;
+      cgstRate = selectedGstRate / 2.0;
+      igstRate = 0.0;
+    } else {
+      final r = p.taxRate;
+      sgstRate = r / 2.0;
+      cgstRate = r / 2.0;
+      igstRate = 0.0;
+    }
   }
 
   double get taxableAmount =>
       ((quantity * unitPrice) - discount).clamp(0.0, double.infinity);
-  double get taxAmount => taxableAmount * (taxRate / 100);
-  double get cgstRate => taxRate / 2;
-  double get sgstRate => taxRate / 2;
-  double get cgstAmount =>
-      ((taxableAmount * (cgstRate / 100)) * 100).round() / 100;
   double get sgstAmount =>
       ((taxableAmount * (sgstRate / 100)) * 100).round() / 100;
-  double get igstRate => taxRate;
+  double get cgstAmount =>
+      ((taxableAmount * (cgstRate / 100)) * 100).round() / 100;
   double get igstAmount =>
       ((taxableAmount * (igstRate / 100)) * 100).round() / 100;
-  double get lineTotal => taxableAmount + (taxRate > 0 ? taxAmount : 0.0);
+  double get totalTaxAmount => sgstAmount + cgstAmount + igstAmount;
+  double get lineTotal => taxableAmount + totalTaxAmount;
+  double get taxRate => igstRate > 0 ? igstRate : (cgstRate + sgstRate);
+  set taxRate(double val) {
+    if (igstRate > 0) {
+      igstRate = val;
+    } else {
+      cgstRate = val / 2.0;
+      sgstRate = val / 2.0;
+    }
+  }
 }
 
 class AdditionalTaxEntry {
@@ -191,16 +230,17 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   bool _enableAdditionalTax = false;
   List<AdditionalTaxEntry> _additionalTaxes = [];
 
-  late String _gstMode; // 'cgst_sgst' | 'igst' | 'without_gst'
+  late String _gstMode; // 'with_gst' | 'without_gst'
   late String _invoiceType;
+  String _activeTaxTreatment = 'gst'; // 'gst' (Intra-State) | 'igst' (Inter-State)
+  double _selectedGstRate = 5.0;
+  double _selectedIgstRate = 0.0;
   final TextEditingController _igstRateController =
-      TextEditingController(text: '18');
+      TextEditingController(text: '0');
 
   bool get _isWithoutGst => _gstMode == 'without_gst';
-  bool get _isIgst => _gstMode == 'igst';
-  bool get _isCgstSgst => _gstMode == 'cgst_sgst';
-  double get _igstRate =>
-      double.tryParse(_igstRateController.text.trim()) ?? 18.0;
+  bool get _isIgst => !_isWithoutGst && _activeTaxTreatment == 'igst';
+  bool get _isCgstSgst => !_isWithoutGst && _activeTaxTreatment == 'gst';
 
   String _customerType = 'dealer'; // 'dealer' | 'company' | 'direct'
   bool get _isDealerCustomer => _customerType == 'dealer';
@@ -246,15 +286,43 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     if (inv != null) {
       if (inv.invoiceType == 'without_gst') {
         _gstMode = 'without_gst';
-      } else if (inv.isInterstate) {
-        _gstMode = 'igst';
-        if (inv.items.isNotEmpty && inv.items.first.taxRate > 0) {
-          final r = inv.items.first.taxRate;
-          _igstRateController.text =
-              r % 1 == 0 ? r.toInt().toString() : r.toString();
+        _activeTaxTreatment = 'gst';
+        _selectedGstRate = 0.0;
+        _selectedIgstRate = 0.0;
+      } else if (inv.isInterstate || inv.igstAmount > 0) {
+        _gstMode = 'with_gst';
+        _activeTaxTreatment = 'igst';
+        double r = 18.0;
+        if (inv.items.isNotEmpty) {
+          final first = inv.items.first;
+          if (first.igstRate > 0) {
+            r = first.igstRate;
+          } else if (first.taxRate > 0) {
+            r = first.taxRate;
+          }
         }
+        _selectedIgstRate = r;
+        _selectedGstRate = widget.companySettings.defaultTaxRate > 0
+            ? widget.companySettings.defaultTaxRate
+            : 5.0;
+        _igstRateController.text =
+            r % 1 == 0 ? r.toInt().toString() : r.toString();
       } else {
-        _gstMode = 'cgst_sgst';
+        _gstMode = 'with_gst';
+        _activeTaxTreatment = 'gst';
+        double r = 5.0;
+        if (inv.items.isNotEmpty) {
+          final first = inv.items.first;
+          if (first.cgstRate > 0 || first.sgstRate > 0) {
+            r = first.cgstRate + first.sgstRate;
+          } else if (first.taxRate > 0) {
+            r = first.taxRate;
+          }
+        } else if (widget.companySettings.defaultTaxRate > 0) {
+          r = widget.companySettings.defaultTaxRate;
+        }
+        _selectedGstRate = r;
+        _selectedIgstRate = 18.0;
       }
       _invoiceType = _gstMode == 'without_gst' ? 'without_gst' : 'with_gst';
 
@@ -344,6 +412,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
           unit: it.unit,
           unitPrice: it.unitPrice,
           discount: it.discountAmount,
+          cgstRate: it.cgstRate,
+          sgstRate: it.sgstRate,
+          igstRate: it.igstRate,
           taxRate: it.taxRate,
         );
       }).toList();
@@ -353,10 +424,16 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       if (widget.defaultInvoiceType == 'without_gst') {
         _gstMode = 'without_gst';
         _invoiceType = 'without_gst';
+        _activeTaxTreatment = 'gst';
       } else {
-        _gstMode = 'cgst_sgst';
+        _gstMode = 'with_gst';
         _invoiceType = 'with_gst';
+        _activeTaxTreatment = 'gst';
       }
+      _selectedGstRate = widget.companySettings.defaultTaxRate > 0
+          ? widget.companySettings.defaultTaxRate
+          : 5.0;
+      _selectedIgstRate = 18.0;
       _invoiceDate = DateTime.now();
       _enableDueDate = false;
       _dueDate = null;
@@ -524,40 +601,68 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     } catch (_) {}
   }
 
-  void _setGstMode(String mode) {
-    if (_gstMode == mode) return;
+  void _applyTaxRatesToAllRows() {
     setState(() {
-      _gstMode = mode;
-      _invoiceType = mode == 'without_gst' ? 'without_gst' : 'with_gst';
       for (final r in _rows) {
         if (_isWithoutGst) {
-          r.taxRate = 0.0;
-        } else if (_isIgst) {
-          r.taxRate = _igstRate;
+          r.sgstRate = 0.0;
+          r.cgstRate = 0.0;
+          r.igstRate = 0.0;
+        } else if (_activeTaxTreatment == 'igst') {
+          r.igstRate = _selectedIgstRate;
+          r.sgstRate = 0.0;
+          r.cgstRate = 0.0;
         } else {
-          r.taxRate =
-              r.product?.taxRate ?? widget.companySettings.defaultTaxRate;
+          r.sgstRate = _selectedGstRate / 2.0;
+          r.cgstRate = _selectedGstRate / 2.0;
+          r.igstRate = 0.0;
         }
       }
     });
   }
 
-  void _toggleIgst(bool enable) {
-    _setGstMode(enable ? 'igst' : 'cgst_sgst');
+  void _setGstMode(String mode) {
+    if (_gstMode == mode) return;
+    setState(() {
+      _gstMode = mode;
+      _invoiceType = mode == 'without_gst' ? 'without_gst' : 'with_gst';
+      _applyTaxRatesToAllRows();
+    });
   }
 
-  void _onIgstRateChanged(String val) {
-    final rate = double.tryParse(val.trim());
-    if (rate != null && rate >= 0 && rate <= 100) {
-      if (_isIgst) {
-        setState(() {
-          for (final r in _rows) {
-            r.taxRate = rate;
-          }
-        });
-      }
-    }
+  void _selectGstRate(double rate) {
+    setState(() {
+      _selectedGstRate = rate;
+      _activeTaxTreatment = 'gst';
+      _applyTaxRatesToAllRows();
+    });
   }
+
+  void _selectIgstRate(double rate) {
+    setState(() {
+      _selectedIgstRate = rate;
+      _activeTaxTreatment = 'igst';
+      _igstRateController.text =
+          rate % 1 == 0 ? rate.toInt().toString() : rate.toString();
+      _applyTaxRatesToAllRows();
+    });
+  }
+
+  void _setActiveTaxTreatment(String treatment) {
+    if (_activeTaxTreatment == treatment) return;
+    setState(() {
+      _activeTaxTreatment = treatment;
+      _applyTaxRatesToAllRows();
+    });
+  }
+
+  List<double> _taxOptions(double currentVal) {
+    final Set<double> rates = {0.0, 5.0, 7.0, 9.0, 12.0, 18.0, 28.0, currentVal};
+    final list = rates.toList()..sort();
+    return list;
+  }
+
+
 
   Future<void> _loadDealerPrices(int dealerId) async {
     try {
@@ -595,10 +700,10 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         p,
         fixedPrice: fixedPrice,
         isWithoutGst: _isWithoutGst,
+        selectedGstRate: _selectedGstRate,
+        selectedIgstRate: _selectedIgstRate,
+        isIgst: _activeTaxTreatment == 'igst',
       );
-      if (_isIgst) {
-        r.taxRate = _igstRate;
-      }
     });
 
     if (_isDealerCustomer && _selectedDealer != null && fixedPrice == null) {
@@ -639,25 +744,31 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
         : null;
 
     setState(() {
-      final initialTax = _isWithoutGst
+      final double initialSgst = _isWithoutGst || _activeTaxTreatment == 'igst'
           ? 0.0
-          : (_isIgst
-              ? _igstRate
-              : (defaultProd?.taxRate ??
-                  widget.companySettings.defaultTaxRate));
+          : _selectedGstRate / 2.0;
+      final double initialCgst = _isWithoutGst || _activeTaxTreatment == 'igst'
+          ? 0.0
+          : _selectedGstRate / 2.0;
+      final double initialIgst = !_isWithoutGst && _activeTaxTreatment == 'igst'
+          ? _selectedIgstRate
+          : 0.0;
+
       final row = InvoiceItemRow(
         product: defaultProd,
-        taxRate: initialTax,
+        sgstRate: initialSgst,
+        cgstRate: initialCgst,
+        igstRate: initialIgst,
       );
       if (defaultProd != null) {
         row.populateFromProduct(
           defaultProd,
           fixedPrice: fixedPrice,
           isWithoutGst: _isWithoutGst,
+          selectedGstRate: _selectedGstRate,
+          selectedIgstRate: _selectedIgstRate,
+          isIgst: _activeTaxTreatment == 'igst',
         );
-        if (_isIgst) {
-          row.taxRate = _igstRate;
-        }
       }
       _rows.add(row);
     });
@@ -793,7 +904,15 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
           'unit': r.unit.trim(),
           'unit_price': r.unitPrice,
           'discount_amount': r.discount,
-          'tax_rate': _isWithoutGst ? 0.0 : (_isIgst ? _igstRate : r.taxRate),
+          'taxable_amount': r.taxableAmount,
+          'tax_rate': _isWithoutGst ? 0.0 : (_isIgst ? r.igstRate : r.taxRate),
+          'cgst_rate': _isWithoutGst || _isIgst ? 0.0 : r.cgstRate,
+          'cgst_amount': _isWithoutGst || _isIgst ? 0.0 : r.cgstAmount,
+          'sgst_rate': _isWithoutGst || _isIgst ? 0.0 : r.sgstRate,
+          'sgst_amount': _isWithoutGst || _isIgst ? 0.0 : r.sgstAmount,
+          'igst_rate': !_isWithoutGst && _isIgst ? r.igstRate : 0.0,
+          'igst_amount': !_isWithoutGst && _isIgst ? r.igstAmount : 0.0,
+          'line_total': r.lineTotal,
         };
       }).toList();
 
@@ -1096,18 +1215,13 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  // 3 Mutually exclusive GST modes
+                  // Mutually exclusive GST modes: With GST vs Without GST (Estimate)
                   SegmentedButton<String>(
                     segments: const [
                       ButtonSegment(
-                        value: 'cgst_sgst',
-                        label: Text('CGST + SGST'),
+                        value: 'with_gst',
+                        label: Text('With GST (Tax Invoice)'),
                         icon: Icon(Icons.receipt_long, size: 16),
-                      ),
-                      ButtonSegment(
-                        value: 'igst',
-                        label: Text('IGST'),
-                        icon: Icon(Icons.swap_horiz, size: 16),
                       ),
                       ButtonSegment(
                         value: 'without_gst',
@@ -1115,7 +1229,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         icon: Icon(Icons.description_outlined, size: 16),
                       ),
                     ],
-                    selected: {_gstMode},
+                    selected: {_isWithoutGst ? 'without_gst' : 'with_gst'},
                     onSelectionChanged: (val) => _setGstMode(val.first),
                     style: SegmentedButton.styleFrom(
                       selectedBackgroundColor: kcPrimaryColor,
@@ -1123,58 +1237,6 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                       visualDensity: VisualDensity.compact,
                     ),
                   ),
-                  if (!_isWithoutGst)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: kcVeryLightGrey,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: kcBorderColor),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: _isIgst,
-                            onChanged: (val) => _toggleIgst(val == true),
-                            activeColor: kcPrimaryColor,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          InkWell(
-                            onTap: () => _toggleIgst(!_isIgst),
-                            child: Text(
-                              'Enable IGST',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: kcDeepNavy,
-                              ),
-                            ),
-                          ),
-                          if (_isIgst) ...[
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              width: 120,
-                              child: TextFormField(
-                                controller: _igstRateController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                decoration: const InputDecoration(
-                                  labelText: 'IGST Rate (%)',
-                                  isDense: true,
-                                  border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 6),
-                                ),
-                                onChanged: _onIgstRateChanged,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
                   // Toggle: Dealer vs Company vs Walk-in
                   SegmentedButton<String>(
                     segments: const [
@@ -1239,6 +1301,218 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               ),
             ],
           ),
+          if (!_isWithoutGst) ...[
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: kcVeryLightGrey,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: kcBorderColor),
+              ),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 10,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Tax Treatment:',
+                        style: GoogleFonts.inter(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: kcDeepNavy,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(
+                            value: 'gst',
+                            label: Text('Intra-State (GST)'),
+                            icon: Icon(Icons.location_on_outlined, size: 15),
+                          ),
+                          ButtonSegment(
+                            value: 'igst',
+                            label: Text('Inter-State (IGST)'),
+                            icon: Icon(Icons.flight_takeoff, size: 15),
+                          ),
+                        ],
+                        selected: {_activeTaxTreatment},
+                        onSelectionChanged: (val) =>
+                            _setActiveTaxTreatment(val.first),
+                        style: SegmentedButton.styleFrom(
+                          selectedBackgroundColor: kcPrimaryDark,
+                          selectedForegroundColor: Colors.white,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 10,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      // Dropdown 1: GST (CGST + SGST)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _activeTaxTreatment == 'gst'
+                                ? kcPrimaryColor
+                                : kcBorderColor,
+                            width: _activeTaxTreatment == 'gst' ? 1.5 : 1.0,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _activeTaxTreatment == 'gst'
+                                    ? kcPrimaryColor.withValues(alpha: 0.12)
+                                    : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _activeTaxTreatment == 'gst' ? 'ACTIVE' : 'INACTIVE',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: _activeTaxTreatment == 'gst'
+                                      ? kcPrimaryColor
+                                      : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'GST (CGST + SGST):',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: kcDeepNavy,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            DropdownButton<double>(
+                              value: _selectedGstRate,
+                              isDense: true,
+                              underline: const SizedBox(),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: kcDeepNavy,
+                              ),
+                              items: _taxOptions(_selectedGstRate).map((rate) {
+                                final half = (rate / 2.0);
+                                final halfStr = half % 1 == 0
+                                    ? half.toInt().toString()
+                                    : half.toStringAsFixed(1);
+                                final rateStr = rate % 1 == 0
+                                    ? rate.toInt().toString()
+                                    : rate.toString();
+                                return DropdownMenuItem(
+                                  value: rate,
+                                  child: Text(
+                                    '$rateStr% (CGST $halfStr% + SGST $halfStr%)',
+                                    style: GoogleFonts.inter(fontSize: 12),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                if (val != null) _selectGstRate(val);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Dropdown 2: IGST
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _activeTaxTreatment == 'igst'
+                                ? kcPrimaryColor
+                                : kcBorderColor,
+                            width: _activeTaxTreatment == 'igst' ? 1.5 : 1.0,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _activeTaxTreatment == 'igst'
+                                    ? kcPrimaryColor.withValues(alpha: 0.12)
+                                    : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _activeTaxTreatment == 'igst' ? 'ACTIVE' : 'INACTIVE',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: _activeTaxTreatment == 'igst'
+                                      ? kcPrimaryColor
+                                      : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'IGST:',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: kcDeepNavy,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            DropdownButton<double>(
+                              value: _selectedIgstRate,
+                              isDense: true,
+                              underline: const SizedBox(),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: kcDeepNavy,
+                              ),
+                              items: _taxOptions(_selectedIgstRate).map((rate) {
+                                final rateStr = rate % 1 == 0
+                                    ? rate.toInt().toString()
+                                    : rate.toString();
+                                return DropdownMenuItem(
+                                  value: rate,
+                                  child: Text(
+                                    '$rateStr% IGST',
+                                    style: GoogleFonts.inter(fontSize: 12),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                if (val != null) _selectIgstRate(val);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
           const Divider(height: 24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1821,27 +2095,18 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                             5: FlexColumnWidth(1.4), // Line Total
                             6: FixedColumnWidth(44), // Action
                           }
-                        : (_isIgst
-                            ? const {
-                                0: FlexColumnWidth(2.4), // Product / Description
-                                1: FlexColumnWidth(0.9), // HSN/SAC
-                                2: FlexColumnWidth(0.9), // Qty & Unit
-                                3: FlexColumnWidth(1.1), // Unit Price
-                                4: FlexColumnWidth(0.9), // Discount
-                                5: FlexColumnWidth(1.4), // IGST Column
-                                6: FlexColumnWidth(1.4), // Line Total
-                                7: FixedColumnWidth(44), // Action
-                              }
-                            : const {
-                                0: FlexColumnWidth(2.3), // Product / Description
-                                1: FlexColumnWidth(0.9), // HSN/SAC
-                                2: FlexColumnWidth(0.9), // Qty & Unit
-                                3: FlexColumnWidth(1.1), // Unit Price
-                                4: FlexColumnWidth(0.9), // Discount
-                                5: FlexColumnWidth(1.8), // Tax Rate % / GST Split
-                                6: FlexColumnWidth(1.4), // Line Total
-                                7: FixedColumnWidth(44), // Action
-                              }),
+                        : const {
+                            0: FlexColumnWidth(2.3), // Product / Description
+                            1: FlexColumnWidth(0.8), // HSN/SAC
+                            2: FlexColumnWidth(0.8), // Qty & Unit
+                            3: FlexColumnWidth(1.0), // Unit Price
+                            4: FlexColumnWidth(0.8), // Discount
+                            5: FlexColumnWidth(1.2), // SGST (% / ₹)
+                            6: FlexColumnWidth(1.2), // CGST (% / ₹)
+                            7: FlexColumnWidth(1.2), // IGST (% / ₹)
+                            8: FlexColumnWidth(1.3), // Line Total
+                            9: FixedColumnWidth(44), // Action
+                          },
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     children: [
                       TableRow(
@@ -1855,10 +2120,11 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                           _tableHeader('Qty & Unit'),
                           _tableHeader('Rate (₹)'),
                           _tableHeader('Disc (₹)'),
-                          if (!_isWithoutGst)
-                            _tableHeader(_isIgst
-                                ? 'IGST Rate (%)'
-                                : 'GST % (CGST + SGST)'),
+                          if (!_isWithoutGst) ...[
+                            _tableHeader('SGST'),
+                            _tableHeader('CGST'),
+                            _tableHeader('IGST'),
+                          ],
                           _tableHeader('Total (₹)'),
                           const SizedBox(),
                         ],
@@ -1988,91 +2254,163 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                 onChanged: (v) => setState(() {}),
                               ),
                             ),
-                            // Col 5: Tax Rate % (Split) (Only for With GST)
-                            if (!_isWithoutGst)
+                            // Col 5, 6, 7: SGST, CGST, IGST (Only for With GST)
+                            if (!_isWithoutGst) ...[
+                              // SGST Column
                               Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: _isIgst
-                                    ? Container(
-                                        alignment: Alignment.centerLeft,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: kcVeryLightGrey,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          border:
-                                              Border.all(color: kcBorderColor),
-                                        ),
-                                        child: Text(
-                                          'IGST: ${_igstRate % 1 == 0 ? _igstRate.toInt() : _igstRate}%',
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: kcVeryLightGrey,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: kcBorderColor),
+                                  ),
+                                  child: () {
+                                    final isGstActive = _activeTaxTreatment == 'gst';
+                                    final rate = isGstActive ? r.sgstRate : 0.0;
+                                    final amt = isGstActive ? r.sgstAmount : 0.0;
+                                    final rateStr = rate % 1 == 0
+                                        ? rate.toInt().toString()
+                                        : rate.toStringAsFixed(1);
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
                                           style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: kcDeepNavy),
+                                            fontSize: 11.5,
+                                            fontWeight: isGstActive && amt > 0
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                            color: isGstActive && amt > 0
+                                                ? kcDeepNavy
+                                                : kcTextSecondary,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
-                                      )
-                                    : DropdownButtonFormField<double>(
-                                        key: ValueKey(
-                                            'tax_${r.product?.id}_${r.taxRate}'),
-                                        initialValue: r.taxRate,
-                                        isExpanded: true,
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: 0.0,
-                                            child: Text('0% (Nil GST)',
-                                                style: GoogleFonts.inter(
-                                                    fontSize: 12)),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          rate > 0 ? '$rateStr%' : '0%',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: kcTextSecondary,
                                           ),
-                                          DropdownMenuItem(
-                                            value: 5.0,
-                                            child: Text(
-                                              '5% (CGST 2.5% + SGST 2.5%)',
-                                              style: GoogleFonts.inter(
-                                                  fontSize: 12),
-                                            ),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: 12.0,
-                                            child: Text(
-                                              '12% (CGST 6% + SGST 6%)',
-                                              style: GoogleFonts.inter(
-                                                  fontSize: 12),
-                                            ),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: 18.0,
-                                            child: Text(
-                                              '18% (CGST 9% + SGST 9%)',
-                                              style: GoogleFonts.inter(
-                                                  fontSize: 12),
-                                            ),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: 28.0,
-                                            child: Text(
-                                              '28% (CGST 14% + SGST 14%)',
-                                              style: GoogleFonts.inter(
-                                                  fontSize: 12),
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (rate) {
-                                          if (rate != null) {
-                                            setState(() {
-                                              r.taxRate = rate;
-                                            });
-                                          }
-                                        },
-                                        decoration: const InputDecoration(
-                                          isDense: true,
-                                          border: OutlineInputBorder(),
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 8),
+                                          textAlign: TextAlign.center,
                                         ),
-                                      ),
+                                      ],
+                                    );
+                                  }(),
+                                ),
                               ),
-                            // Col 6: Line Total
+                              // CGST Column
+                              Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: kcVeryLightGrey,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: kcBorderColor),
+                                  ),
+                                  child: () {
+                                    final isGstActive = _activeTaxTreatment == 'gst';
+                                    final rate = isGstActive ? r.cgstRate : 0.0;
+                                    final amt = isGstActive ? r.cgstAmount : 0.0;
+                                    final rateStr = rate % 1 == 0
+                                        ? rate.toInt().toString()
+                                        : rate.toStringAsFixed(1);
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11.5,
+                                            fontWeight: isGstActive && amt > 0
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                            color: isGstActive && amt > 0
+                                                ? kcDeepNavy
+                                                : kcTextSecondary,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          rate > 0 ? '$rateStr%' : '0%',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: kcTextSecondary,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    );
+                                  }(),
+                                ),
+                              ),
+                              // IGST Column
+                              Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: kcVeryLightGrey,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: kcBorderColor),
+                                  ),
+                                  child: () {
+                                    final isIgstActive = _activeTaxTreatment == 'igst';
+                                    final rate = isIgstActive ? r.igstRate : 0.0;
+                                    final amt = isIgstActive ? r.igstAmount : 0.0;
+                                    final rateStr = rate % 1 == 0
+                                        ? rate.toInt().toString()
+                                        : rate.toStringAsFixed(1);
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11.5,
+                                            fontWeight: isIgstActive && amt > 0
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                            color: isIgstActive && amt > 0
+                                                ? kcDeepNavy
+                                                : kcTextSecondary,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          rate > 0 ? '$rateStr%' : '0%',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: kcTextSecondary,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    );
+                                  }(),
+                                ),
+                              ),
+                            ],
+                            // Col: Line Total
                             Padding(
                               padding: const EdgeInsets.all(6.0),
                               child: Column(
@@ -2085,32 +2423,6 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                       color: kcDeepNavy,
                                     ),
                                   ),
-                                  if (!_isWithoutGst) ...[
-                                    if (_isCgstSgst && r.taxRate > 0) ...[
-                                      Text(
-                                        'CGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${formatAmount(r.cgstAmount)}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10, color: kcMediumGrey),
-                                      ),
-                                      Text(
-                                        'SGST (${(r.taxRate / 2).toStringAsFixed(r.taxRate % 2 == 0 ? 0 : 1)}%): ${formatAmount(r.sgstAmount)}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10, color: kcMediumGrey),
-                                      ),
-                                    ] else if (_isIgst && r.taxRate > 0) ...[
-                                      Text(
-                                        'IGST (${r.taxRate.toStringAsFixed(r.taxRate % 1 == 0 ? 0 : 1)}%): ${formatAmount(r.igstAmount)}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10, color: kcMediumGrey),
-                                      ),
-                                    ] else ...[
-                                      Text(
-                                        'Tax: ₹0.00',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10, color: kcMediumGrey),
-                                      ),
-                                    ],
-                                  ],
                                 ],
                               ),
                             ),
@@ -2272,48 +2584,50 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 _summaryRow('Taxable Value:', formatAmount(_taxableTotal),
                     isBold: true),
                 const SizedBox(height: 8),
-                if (_isCgstSgst) ...[
-                  () {
-                    final effRate = _taxableTotal > 0
-                        ? ((_cgstTotal + _sgstTotal) / _taxableTotal * 100)
-                        : 0.0;
-                    final cgstRate = effRate / 2;
-                    final rateStr = cgstRate % 1 == 0
-                        ? cgstRate.toInt().toString()
-                        : cgstRate.toStringAsFixed(1);
-                    return Column(
-                      children: [
-                        _summaryRow(
-                            'CGST ($rateStr%):', formatAmount(_cgstTotal)),
-                        _summaryRow(
-                            'SGST ($rateStr%):', formatAmount(_sgstTotal)),
-                      ],
-                    );
-                  }(),
-                ] else if (_isIgst) ...[
-                  () {
-                    final rateStr = _igstRate % 1 == 0
-                        ? _igstRate.toInt().toString()
-                        : _igstRate.toStringAsFixed(1);
-                    return Column(
-                      children: [
-                        _summaryRow('IGST ($rateStr%):',
-                            formatAmount(_igstTotal),
-                            color: kcPrimaryDark),
-                        if (_enableAdditionalTax)
-                          for (final t in _additionalTaxes)
-                            if (t.name.isNotEmpty && t.rate > 0)
-                              _summaryRow(
-                                '${t.name} (${t.rate % 1 == 0 ? t.rate.toInt().toString() : t.rate.toString()}%):',
-                                formatAmount(
-                                    ((_taxableTotal * (t.rate / 100)) * 100)
-                                            .round() /
-                                        100),
-                                color: kcPrimaryDark),
-                      ],
-                    );
-                  }(),
-                ],
+                () {
+                  final isIgstActive = _activeTaxTreatment == 'igst';
+                  final double sgstPct = !isIgstActive && _taxableTotal > 0
+                      ? (_sgstTotal / _taxableTotal * 100)
+                      : (!isIgstActive ? _selectedGstRate / 2.0 : 0.0);
+                  final double cgstPct = !isIgstActive && _taxableTotal > 0
+                      ? (_cgstTotal / _taxableTotal * 100)
+                      : (!isIgstActive ? _selectedGstRate / 2.0 : 0.0);
+                  final double igstPct = isIgstActive && _taxableTotal > 0
+                      ? (_igstTotal / _taxableTotal * 100)
+                      : (isIgstActive ? _selectedIgstRate : 0.0);
+
+                  final sgstStr = sgstPct % 1 == 0
+                      ? sgstPct.toInt().toString()
+                      : sgstPct.toStringAsFixed(1);
+                  final cgstStr = cgstPct % 1 == 0
+                      ? cgstPct.toInt().toString()
+                      : cgstPct.toStringAsFixed(1);
+                  final igstStr = igstPct % 1 == 0
+                      ? igstPct.toInt().toString()
+                      : igstPct.toStringAsFixed(1);
+
+                  final sgstAmt = !isIgstActive ? _sgstTotal : 0.0;
+                  final cgstAmt = !isIgstActive ? _cgstTotal : 0.0;
+                  final igstAmt = isIgstActive ? _igstTotal : 0.0;
+
+                  return Column(
+                    children: [
+                      _summaryRow('SGST ($sgstStr%):', formatAmount(sgstAmt)),
+                      _summaryRow('CGST ($cgstStr%):', formatAmount(cgstAmt)),
+                      _summaryRow('IGST ($igstStr%):', formatAmount(igstAmt)),
+                      if (isIgstActive && _enableAdditionalTax)
+                        for (final t in _additionalTaxes)
+                          if (t.name.isNotEmpty && t.rate > 0)
+                            _summaryRow(
+                              '${t.name} (${t.rate % 1 == 0 ? t.rate.toInt().toString() : t.rate.toString()}%):',
+                              formatAmount(
+                                  ((_taxableTotal * (t.rate / 100)) * 100)
+                                          .round() /
+                                      100),
+                              color: kcPrimaryDark),
+                    ],
+                  );
+                }(),
                 _summaryRow('Total GST Tax:', formatAmount(_taxTotal)),
               ],
               _summaryRow('Round Off:',

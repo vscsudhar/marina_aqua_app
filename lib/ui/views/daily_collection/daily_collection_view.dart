@@ -9,6 +9,7 @@ import '../../widgets/marina_logo.dart';
 import '../../widgets/report_export_actions_bar.dart';
 import 'daily_collection_viewmodel.dart';
 import 'widgets/payment_entry_dialog.dart';
+import 'widgets/split_payment_section.dart';
 import 'widgets/supply_details_dialog.dart';
 import 'widgets/supply_entry_dialog.dart';
 
@@ -1635,7 +1636,7 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Mode: ${p.paymentMethod.toUpperCase()}${p.referenceNo != null ? ' (Ref: ${p.referenceNo})' : ''} • Collected by: ${p.collectedByName ?? 'Staff'}',
+                      'Mode: ${p.paymentMethodLabel}${p.referenceNo != null && !p.isSplit ? ' (Ref: ${p.referenceNo})' : ''} • Collected by: ${p.collectedByName ?? 'Staff'}',
                       style:
                           GoogleFonts.inter(fontSize: 12, color: kcTextMuted),
                     ),
@@ -1814,7 +1815,7 @@ class _EditCollectionSupplyDialogState
     _paymentMode = widget.supply.payments.isNotEmpty
         ? widget.supply.payments.first.paymentMethod.toLowerCase()
         : 'cash';
-    if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft']
+    if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft', 'card', 'other']
         .contains(_paymentMode)) {
       _paymentMode = 'cash';
     }
@@ -1974,10 +1975,11 @@ class _EditCollectionSupplyDialogState
                   DropdownMenuItem(value: 'cash', child: Text('Cash')),
                   DropdownMenuItem(
                       value: 'upi', child: Text('UPI / GPay / PhonePe')),
-                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                  DropdownMenuItem(value: 'card', child: Text('Card / POS')),
                   DropdownMenuItem(
                       value: 'bank_transfer', child: Text('Bank Transfer')),
-                  DropdownMenuItem(value: 'neft', child: Text('NEFT / RTGS')),
+                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _paymentMode = val);
@@ -2093,6 +2095,8 @@ class EditPaymentEntryDialog extends StatefulWidget {
 class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
   late DateTime _paymentDate;
   late String _paymentMode;
+  late String _paymentType; // 'single' | 'split'
+  final List<SplitPaymentRow> _splitRows = [];
   late TextEditingController _referenceController;
   late TextEditingController _notesController;
 
@@ -2102,9 +2106,25 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
     _paymentDate =
         DateTime.tryParse(widget.payment.paymentDate) ?? DateTime.now();
     _paymentMode = widget.payment.paymentMethod.toLowerCase();
-    if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft']
-        .contains(_paymentMode)) {
-      _paymentMode = 'cash';
+    _paymentType = widget.payment.isSplit ? 'split' : 'single';
+
+    if (widget.payment.isSplit && widget.payment.paymentSplits.isNotEmpty) {
+      for (final split in widget.payment.paymentSplits) {
+        _splitRows.add(SplitPaymentRow(
+          mode: split.paymentMode,
+          amountController: TextEditingController(
+            text: split.amount == split.amount.roundToDouble()
+                ? split.amount.toInt().toString()
+                : split.amount.toStringAsFixed(2),
+          ),
+          refController: TextEditingController(text: split.referenceNo ?? ''),
+        ));
+      }
+    } else {
+      if (!['cash', 'upi', 'cheque', 'bank_transfer', 'neft', 'card', 'other']
+          .contains(_paymentMode)) {
+        _paymentMode = 'cash';
+      }
     }
     _referenceController =
         TextEditingController(text: widget.payment.referenceNo ?? '');
@@ -2113,6 +2133,9 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
 
   @override
   void dispose() {
+    for (final r in _splitRows) {
+      r.dispose();
+    }
     _referenceController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -2124,8 +2147,8 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       backgroundColor: kcSurfaceWhite,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500),
-        child: Padding(
+        constraints: const BoxConstraints(maxWidth: 540),
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2238,57 +2261,207 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
-              Text('Payment Mode',
+              const SizedBox(height: 16),
+              Text('Payment Type',
                   style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: kcDeepNavy)),
               const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                initialValue: _paymentMode,
-                decoration: InputDecoration(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: kcBorderColor),
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (_paymentType != 'single') {
+                          setState(() => _paymentType = 'single');
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: _paymentType == 'single'
+                              ? kcPrimaryDark.withValues(alpha: 0.1)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _paymentType == 'single'
+                                ? kcPrimaryDark
+                                : kcBorderColor,
+                            width: _paymentType == 'single' ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.payment_rounded,
+                                size: 18,
+                                color: _paymentType == 'single'
+                                    ? kcPrimaryDark
+                                    : kcMediumGrey),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Single Payment',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: _paymentType == 'single'
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: _paymentType == 'single'
+                                    ? kcPrimaryDark
+                                    : kcTextPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'cash', child: Text('Cash')),
-                  DropdownMenuItem(
-                      value: 'upi', child: Text('UPI / GPay / PhonePe')),
-                  DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
-                  DropdownMenuItem(
-                      value: 'bank_transfer', child: Text('Bank Transfer')),
-                  DropdownMenuItem(value: 'neft', child: Text('NEFT / RTGS')),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (_paymentType != 'split') {
+                          setState(() {
+                            _paymentType = 'split';
+                            if (_splitRows.isEmpty) {
+                              _splitRows.add(SplitPaymentRow(
+                                mode: _paymentMode,
+                                amountController: TextEditingController(
+                                  text: widget.payment.amount ==
+                                          widget.payment.amount.roundToDouble()
+                                      ? widget.payment.amount.toInt().toString()
+                                      : widget.payment.amount
+                                          .toStringAsFixed(2),
+                                ),
+                              ));
+                              _splitRows.add(SplitPaymentRow(mode: 'upi'));
+                            }
+                          });
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: _paymentType == 'split'
+                              ? kcSuccessColor.withValues(alpha: 0.1)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _paymentType == 'split'
+                                ? kcSuccessColor
+                                : kcBorderColor,
+                            width: _paymentType == 'split' ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.call_split_rounded,
+                                size: 18,
+                                color: _paymentType == 'split'
+                                    ? kcSuccessColor
+                                    : kcMediumGrey),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Split Payment',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: _paymentType == 'split'
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: _paymentType == 'split'
+                                    ? kcSuccessColor
+                                    : kcTextPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
-                onChanged: (val) {
-                  if (val != null) setState(() => _paymentMode = val);
-                },
               ),
               const SizedBox(height: 14),
-              Text('Reference / Transaction ID',
-                  style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: kcDeepNavy)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _referenceController,
-                decoration: InputDecoration(
-                  hintText: 'e.g. UPI Ref / UTR / Cheque No',
-                  hintStyle:
-                      GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: kcBorderColor),
+              if (_paymentType == 'single') ...[
+                Text('Payment Mode',
+                    style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kcDeepNavy)),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<String>(
+                  initialValue: _paymentMode,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: kcBorderColor),
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                    DropdownMenuItem(
+                        value: 'upi', child: Text('UPI / GPay / PhonePe')),
+                    DropdownMenuItem(value: 'card', child: Text('Card / POS')),
+                    DropdownMenuItem(
+                        value: 'bank_transfer', child: Text('Bank Transfer')),
+                    DropdownMenuItem(value: 'cheque', child: Text('Cheque')),
+                    DropdownMenuItem(value: 'other', child: Text('Other')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setState(() => _paymentMode = val);
+                  },
+                ),
+                const SizedBox(height: 14),
+                Text('Reference / Transaction ID',
+                    style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kcDeepNavy)),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _referenceController,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. UPI Ref / UTR / Cheque No',
+                    hintStyle:
+                        GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: kcBorderColor),
+                    ),
                   ),
                 ),
-              ),
+              ] else ...[
+                SplitPaymentSection(
+                  targetAmount: widget.payment.amount,
+                  rows: _splitRows,
+                  onRowsChanged: () => setState(() {}),
+                  onAddRow: () => setState(
+                      () => _splitRows.add(SplitPaymentRow(mode: 'cash'))),
+                  onRemoveRow: (idx) {
+                    if (_splitRows.length <= 1) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'At least one split payment row is required.')),
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _splitRows[idx].dispose();
+                      _splitRows.removeAt(idx);
+                    });
+                  },
+                ),
+              ],
               const SizedBox(height: 14),
               Text('Remarks / Notes',
                   style: GoogleFonts.inter(
@@ -2330,20 +2503,77 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
                           horizontal: 20, vertical: 12),
                     ),
                     onPressed: () {
-                      final payload = <String, dynamic>{
-                        'payment_date':
-                            DateFormat('yyyy-MM-dd').format(_paymentDate),
-                        'payment_method': _paymentMode,
-                        'reference_no':
-                            _referenceController.text.trim().isNotEmpty
-                                ? _referenceController.text.trim()
-                                : null,
-                        'notes': _notesController.text.trim().isNotEmpty
-                            ? _notesController.text.trim()
-                            : null,
-                      };
-                      widget.onSave(payload);
-                      Navigator.of(context).pop();
+                      if (_paymentType == 'split') {
+                        if (_splitRows.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please add at least one split payment row.')),
+                          );
+                          return;
+                        }
+                        for (int i = 0; i < _splitRows.length; i++) {
+                          if (_splitRows[i].amount <= 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Please enter a valid amount (> 0) for row #${i + 1}.')),
+                            );
+                            return;
+                          }
+                        }
+                        final totalSplit = _splitRows.fold(
+                            0.0, (sum, r) => sum + r.amount);
+                        if ((totalSplit - widget.payment.amount).abs() > 0.01) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Split payment total (₹${totalSplit.toStringAsFixed(2)}) must match the payment amount (₹${widget.payment.amount.toStringAsFixed(2)}) exactly.',
+                              ),
+                              backgroundColor: Colors.red.shade700,
+                            ),
+                          );
+                          return;
+                        }
+
+                        final payload = <String, dynamic>{
+                          'payment_date':
+                              DateFormat('yyyy-MM-dd').format(_paymentDate),
+                          'payment_method': 'split',
+                          'payment_splits': _splitRows
+                              .map((r) => {
+                                    'payment_mode': r.mode,
+                                    'amount': r.amount,
+                                    'reference_no': r.refController.text
+                                            .trim()
+                                            .isNotEmpty
+                                        ? r.refController.text.trim()
+                                        : null,
+                                  })
+                              .toList(),
+                          'reference_no': null,
+                          'notes': _notesController.text.trim().isNotEmpty
+                              ? _notesController.text.trim()
+                              : null,
+                        };
+                        widget.onSave(payload);
+                        Navigator.of(context).pop();
+                      } else {
+                        final payload = <String, dynamic>{
+                          'payment_date':
+                              DateFormat('yyyy-MM-dd').format(_paymentDate),
+                          'payment_method': _paymentMode,
+                          'reference_no':
+                              _referenceController.text.trim().isNotEmpty
+                                  ? _referenceController.text.trim()
+                                  : null,
+                          'notes': _notesController.text.trim().isNotEmpty
+                              ? _notesController.text.trim()
+                              : null,
+                        };
+                        widget.onSave(payload);
+                        Navigator.of(context).pop();
+                      }
                     },
                     child: const Text('Save Changes',
                         style: TextStyle(fontWeight: FontWeight.bold)),

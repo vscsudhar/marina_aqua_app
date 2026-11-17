@@ -196,6 +196,7 @@ class BillingService {
 
   /// Get direct HTML view URL (accessible directly by any browser tab)
   String getInvoiceHtmlUrl(int id) {
+    if (id <= 0) return '';
     final base = _apiService.client.options.baseUrl;
     final root = base.replaceAll(RegExp(r'/api/v1/?$'), '');
     return '$root/invoices/$id';
