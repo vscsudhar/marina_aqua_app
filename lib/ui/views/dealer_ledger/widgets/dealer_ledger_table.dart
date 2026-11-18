@@ -579,7 +579,7 @@ class DealerLedgerTable extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('${day.totals.caneQty} cans',
+                  Text('${day.totals.caneQty}',
                       style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -720,7 +720,7 @@ class DealerLedgerTable extends StatelessWidget {
               ),
             );
           }),
-          _cell('${day.totals.caneQty} cans', totalW,
+          _cell('${day.totals.caneQty}', totalW,
               fontSize: 10,
               bold: true,
               bgColor: const Color(0xFFF1F5F9),
