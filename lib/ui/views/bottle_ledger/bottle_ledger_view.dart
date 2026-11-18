@@ -1076,6 +1076,7 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
         productKey: productKey,
         source: source,
       ),
+      onDeleted: () => viewModel.loadLedger(),
     );
   }
 

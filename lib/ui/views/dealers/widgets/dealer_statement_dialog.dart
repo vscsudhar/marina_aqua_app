@@ -31,6 +31,23 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   final _dealerService = locator<DealerService>();
   final _exportService = locator<ExportPrintService>();
 
+  static const List<String> _months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  late int _selectedMonth;
+  late int _selectedYear;
   late DateTime _startDate;
   late DateTime _endDate;
   bool _isLoading = true;
@@ -49,39 +66,76 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   double _othersPayments = 0;
   double _p1RefillAmount = 0;
   double _p2RefillAmount = 0;
+
   List<Map<String, dynamic>> _entries = [];
+  List<Map<String, dynamic>> _products = [];
+  List<Map<String, dynamic>> _monthlyLedger = [];
+  Map<String, dynamic> _monthlyTotals = {};
+  bool _showDetailedTransactions = false;
 
   final _currency =
       NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
-  final _dateFormat = DateFormat('dd MMM yyyy');
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
-    // Default to first day of current month to today
-    _startDate = DateTime(now.year, now.month, 1);
-    _endDate = now;
+    _selectedMonth = now.month;
+    _selectedYear = now.year;
+    // Default to first and last day of current month
+    _startDate = DateTime(_selectedYear, _selectedMonth, 1);
+    _endDate = DateTime(_selectedYear, _selectedMonth + 1, 0);
     _loadLedger();
   }
 
-  void _applyPreset(int days) {
-    final now = DateTime.now();
+  void _previousMonth() {
     setState(() {
-      if (days == 0) {
-        // This Month
-        _startDate = DateTime(now.year, now.month, 1);
-        _endDate = now;
-      } else if (days == -1) {
-        // All Time
-        _startDate = DateTime(now.year - 2, 1, 1);
-        _endDate = now;
+      if (_selectedMonth == 1) {
+        _selectedMonth = 12;
+        _selectedYear--;
       } else {
-        _startDate = now.subtract(Duration(days: days));
-        _endDate = now;
+        _selectedMonth--;
       }
+      _startDate = DateTime(_selectedYear, _selectedMonth, 1);
+      _endDate = DateTime(_selectedYear, _selectedMonth + 1, 0);
     });
     _loadLedger();
+  }
+
+  void _nextMonth() {
+    setState(() {
+      if (_selectedMonth == 12) {
+        _selectedMonth = 1;
+        _selectedYear++;
+      } else {
+        _selectedMonth++;
+      }
+      _startDate = DateTime(_selectedYear, _selectedMonth, 1);
+      _endDate = DateTime(_selectedYear, _selectedMonth + 1, 0);
+    });
+    _loadLedger();
+  }
+
+  void _setMonth(int month) {
+    if (_selectedMonth != month) {
+      setState(() {
+        _selectedMonth = month;
+        _startDate = DateTime(_selectedYear, _selectedMonth, 1);
+        _endDate = DateTime(_selectedYear, _selectedMonth + 1, 0);
+      });
+      _loadLedger();
+    }
+  }
+
+  void _setYear(int year) {
+    if (_selectedYear != year) {
+      setState(() {
+        _selectedYear = year;
+        _startDate = DateTime(_selectedYear, _selectedMonth, 1);
+        _endDate = DateTime(_selectedYear, _selectedMonth + 1, 0);
+      });
+      _loadLedger();
+    }
   }
 
   Future<void> _loadLedger() async {
@@ -99,6 +153,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
       try {
         data = await _dealerService.getDealerStatement(
           widget.dealer.id,
+          month: _selectedMonth,
+          year: _selectedYear,
           startDate: startStr,
           endDate: endStr,
         );
@@ -114,6 +170,20 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
           (data['transactions'] ?? data['entries']) as List? ?? [];
       _entries =
           rawEntries.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+
+      final rawProducts = data['products'] as List? ?? [];
+      _products = rawProducts
+          .map((p) => Map<String, dynamic>.from(p as Map))
+          .toList();
+
+      final rawMonthlyLedger = data['monthly_ledger'] as List? ?? [];
+      _monthlyLedger = rawMonthlyLedger
+          .map((m) => Map<String, dynamic>.from(m as Map))
+          .toList();
+
+      _monthlyTotals = data['monthly_totals'] is Map
+          ? Map<String, dynamic>.from(data['monthly_totals'] as Map)
+          : {};
 
       final summary = data['summary'] as Map<String, dynamic>?;
       if (summary != null) {
@@ -161,55 +231,65 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
   }
 
   Map<String, dynamic> _prepareExportData() {
+    final currencyNoSymbol = NumberFormat('#,##,##0', 'en_IN');
+
     final headers = [
       'Date',
-      'Ref No',
-      'Type',
-      'Narration',
-      'Debit (₹)',
-      'Credit (₹)',
-      'Running Balance (₹)',
+      'Filling',
+      for (final p in _products) (p['name']?.toString() ?? 'Product'),
+      'Cash (₹)',
+      'UPI (₹)',
     ];
 
     final rows = <List<String>>[];
-    for (final e in _entries) {
-      final dateVal = e['entry_date'] != null
-          ? DateFormat('dd-MM-yyyy')
-              .format(DateTime.parse(e['entry_date'].toString()))
-          : '';
-      final refNo = e['reference_no']?.toString() ?? '-';
-      final type = (e['entry_type']?.toString() ?? '').toUpperCase();
-      final narration = e['narration']?.toString() ?? '';
-      final debit = (e['debit'] is num) ? (e['debit'] as num).toDouble() : 0.0;
-      final credit =
-          (e['credit'] is num) ? (e['credit'] as num).toDouble() : 0.0;
-      final running = (e['running_balance'] is num)
-          ? (e['running_balance'] as num).toDouble()
-          : 0.0;
+    for (final row in _monthlyLedger) {
+      final dateVal = row['date']?.toString() ?? '';
+      final filling = (row['filling'] != null && row['filling'] > 0)
+          ? row['filling'].toString()
+          : '-';
+
+      final prodCells = <String>[];
+      for (final p in _products) {
+        final pId = p['id'];
+        final q = row['products']?[pId] ?? row['products']?['$pId'];
+        prodCells.add((q != null && q > 0) ? q.toString() : '-');
+      }
+
+      final cash = (row['cash'] as num?)?.toDouble();
+      final upi = (row['upi'] as num?)?.toDouble();
 
       rows.add([
         dateVal,
-        refNo,
-        type,
-        narration,
-        debit > 0 ? _currency.format(debit) : '-',
-        credit > 0 ? _currency.format(credit) : '-',
-        _currency.format(running),
+        filling,
+        ...prodCells,
+        cash != null && cash > 0 ? currencyNoSymbol.format(cash) : '-',
+        upi != null && upi > 0 ? currencyNoSymbol.format(upi) : '-',
       ]);
     }
 
+    final totalFilling = _monthlyTotals['filling']?.toString() ?? '0';
+    final totalProdCells = <String>[];
+    for (final p in _products) {
+      final pId = p['id'];
+      final q = _monthlyTotals['products']?[pId] ??
+          _monthlyTotals['products']?['$pId'] ??
+          0;
+      totalProdCells.add(q.toString());
+    }
+
+    final totalCash = (_monthlyTotals['cash'] as num?)?.toDouble() ?? 0.0;
+    final totalUpi = (_monthlyTotals['upi'] as num?)?.toDouble() ?? 0.0;
+
     final summaryRow = [
-      'TOTAL',
-      '${_entries.length} Entries',
-      '',
-      '',
-      _currency.format(_totalDebit),
-      _currency.format(_totalCredit),
-      'Due: ${_currency.format(_closingBalance)}',
+      'Monthly Total',
+      totalFilling,
+      ...totalProdCells,
+      currencyNoSymbol.format(totalCash),
+      currencyNoSymbol.format(totalUpi),
     ];
 
     final periodStr =
-        '${_dateFormat.format(_startDate)} to ${_dateFormat.format(_endDate)}';
+        '${_months[_selectedMonth - 1]} $_selectedYear (${DateFormat('dd-MM-yyyy').format(_startDate)} to ${DateFormat('dd-MM-yyyy').format(_endDate)})';
 
     final metadata = {
       'Dealer': '${widget.dealer.name} (${widget.dealer.code})',
@@ -466,9 +546,9 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           ),
                         ),
 
-                      // FILTER & EXPORT ACTION STRIP
+                      // FILTER & EXPORT ACTION STRIP (Month/Year Navigation)
                       Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -480,58 +560,107 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                           alignment: WrapAlignment.spaceBetween,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            // Date Range and Presets
+                            // Month & Year Navigation
                             Wrap(
                               spacing: 8,
                               runSpacing: 6,
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                ActionChip(
-                                  label: const Text('This Month'),
-                                  onPressed: () => _applyPreset(0),
-                                  backgroundColor: const Color(0xFFF1F5F9),
+                                IconButton.outlined(
+                                  icon: const Icon(Icons.chevron_left_rounded,
+                                      size: 18),
+                                  visualDensity: VisualDensity.compact,
+                                  tooltip: 'Previous Month',
+                                  onPressed: _isLoading ? null : _previousMonth,
                                 ),
-                                ActionChip(
-                                  label: const Text('Last 30 Days'),
-                                  onPressed: () => _applyPreset(30),
-                                  backgroundColor: const Color(0xFFF1F5F9),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: const Color(0xFFCBD5E1)),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<int>(
+                                      value: _selectedMonth,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF1E293B),
+                                      ),
+                                      items: [
+                                        for (int i = 0; i < _months.length; i++)
+                                          DropdownMenuItem<int>(
+                                            value: i + 1,
+                                            child: Text(_months[i]),
+                                          ),
+                                      ],
+                                      onChanged: _isLoading
+                                          ? null
+                                          : (val) {
+                                              if (val != null) _setMonth(val);
+                                            },
+                                    ),
+                                  ),
                                 ),
-                                ActionChip(
-                                  label: const Text('Last 90 Days'),
-                                  onPressed: () => _applyPreset(90),
-                                  backgroundColor: const Color(0xFFF1F5F9),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: const Color(0xFFCBD5E1)),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<int>(
+                                      value: _selectedYear,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF1E293B),
+                                      ),
+                                      items: [
+                                        for (int y = DateTime.now().year - 4;
+                                            y <= DateTime.now().year + 2;
+                                            y++)
+                                          DropdownMenuItem<int>(
+                                            value: y,
+                                            child: Text('$y'),
+                                          ),
+                                      ],
+                                      onChanged: _isLoading
+                                          ? null
+                                          : (val) {
+                                              if (val != null) _setYear(val);
+                                            },
+                                    ),
+                                  ),
                                 ),
-                                ActionChip(
-                                  label: const Text('All History'),
-                                  onPressed: () => _applyPreset(-1),
-                                  backgroundColor: const Color(0xFFF1F5F9),
+                                IconButton.outlined(
+                                  icon: const Icon(Icons.chevron_right_rounded,
+                                      size: 18),
+                                  visualDensity: VisualDensity.compact,
+                                  tooltip: 'Next Month',
+                                  onPressed: _isLoading ? null : _nextMonth,
                                 ),
-                                const SizedBox(width: 4),
-                                // Custom Date Picker
-                                OutlinedButton.icon(
-                                  onPressed: () async {
-                                    final picked = await showDateRangePicker(
-                                      context: context,
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime.now()
-                                          .add(const Duration(days: 30)),
-                                      initialDateRange: DateTimeRange(
-                                          start: _startDate, end: _endDate),
-                                    );
-                                    if (picked != null) {
-                                      setState(() {
-                                        _startDate = picked.start;
-                                        _endDate = picked.end;
-                                      });
-                                      _loadLedger();
-                                    }
-                                  },
-                                  icon: const Icon(Icons.date_range, size: 15),
-                                  label: Text(
-                                      '${_dateFormat.format(_startDate)} - ${_dateFormat.format(_endDate)}'),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF003366)
+                                        .withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${_months[_selectedMonth - 1]} $_selectedYear',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF003366),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -714,172 +843,74 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                       ),
                       const SizedBox(height: 14),
 
-                      // LEDGER TRANSACTION ENTRIES TABLE
+                      // MONTHLY STATEMENT ACCOUNT LEDGER TABLE SECTION
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Monthly Statement Ledger',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF0F172A),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2E8F0),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_monthlyLedger.length} active dates',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF475569),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (_entries.isNotEmpty)
+                            TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _showDetailedTransactions =
+                                      !_showDetailedTransactions;
+                                });
+                              },
+                              icon: Icon(
+                                _showDetailedTransactions
+                                    ? Icons.table_chart_outlined
+                                    : Icons.receipt_long_outlined,
+                                size: 16,
+                              ),
+                              label: Text(
+                                _showDetailedTransactions
+                                    ? 'Show Monthly Account Ledger'
+                                    : 'Show Transaction Details (${_entries.length})',
+                                style: GoogleFonts.inter(
+                                    fontSize: 12, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
                       if (_isLoading)
                         const Center(
                             child: Padding(
                                 padding: EdgeInsets.all(40),
                                 child: CircularProgressIndicator()))
-                      else if (_entries.isEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(40),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Column(
-                            children: [
-                              const Icon(Icons.receipt_long_outlined,
-                                  size: 48, color: Color(0xFF94A3B8)),
-                              const SizedBox(height: 12),
-                              Text(
-                                  'No ledger entries recorded for this date range',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF64748B))),
-                              const SizedBox(height: 4),
-                              Text(
-                                  'Try adjusting your date range filter above.',
-                                  style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: const Color(0xFF94A3B8))),
-                            ],
-                          ),
-                        )
+                      else if (_showDetailedTransactions)
+                        _buildDetailedTransactionsTable()
                       else
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border:
-                                    Border.all(color: const Color(0xFFE2E8F0)),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: SizedBox(
-                                  width: max(constraints.maxWidth, 820),
-                                  child: Table(
-                                    columnWidths: const {
-                                      0: FixedColumnWidth(110),
-                                      1: FixedColumnWidth(130),
-                                      2: FixedColumnWidth(100),
-                                      3: FlexColumnWidth(2),
-                                      4: FixedColumnWidth(120),
-                                      5: FixedColumnWidth(120),
-                                      6: FixedColumnWidth(130),
-                                    },
-                                    children: [
-                                      // Table Header
-                                      TableRow(
-                                        decoration: const BoxDecoration(
-                                            color: Color(0xFF003366)),
-                                        children: [
-                                          _tableHeaderCell('Date'),
-                                          _tableHeaderCell('Ref No'),
-                                          _tableHeaderCell('Type'),
-                                          _tableHeaderCell('Narration'),
-                                          _tableHeaderCell('Debit (₹)'),
-                                          _tableHeaderCell('Credit (₹)'),
-                                          _tableHeaderCell('Balance (₹)'),
-                                        ],
-                                      ),
-                                      // Rows
-                                      ..._entries.asMap().entries.map((entry) {
-                                        final idx = entry.key;
-                                        final e = entry.value;
-                                        final isZebra = idx % 2 == 1;
-
-                                        final dateVal = e['entry_date'] != null
-                                            ? DateFormat('dd-MM-yyyy').format(
-                                                DateTime.parse(
-                                                    e['entry_date'].toString()))
-                                            : '';
-                                        final refNo =
-                                            e['reference_no']?.toString() ??
-                                                '-';
-                                        final type =
-                                            (e['entry_type']?.toString() ?? '')
-                                                .toUpperCase();
-                                        final narration =
-                                            e['narration']?.toString() ?? '';
-                                        final debit = (e['debit'] is num)
-                                            ? (e['debit'] as num).toDouble()
-                                            : 0.0;
-                                        final credit = (e['credit'] is num)
-                                            ? (e['credit'] as num).toDouble()
-                                            : 0.0;
-                                        final running =
-                                            (e['running_balance'] is num)
-                                                ? (e['running_balance'] as num)
-                                                    .toDouble()
-                                                : 0.0;
-
-                                        return TableRow(
-                                          decoration: BoxDecoration(
-                                              color: isZebra
-                                                  ? const Color(0xFFF8FAFC)
-                                                  : Colors.white),
-                                          children: [
-                                            _tableDataCell(dateVal),
-                                            _tableDataCell(refNo, isBold: true),
-                                            _tableDataCell(type),
-                                            _tableDataCell(narration),
-                                            _tableDataCell(
-                                                debit > 0
-                                                    ? _currency.format(debit)
-                                                    : '-',
-                                                color: debit > 0
-                                                    ? const Color(0xFFDC2626)
-                                                    : null),
-                                            _tableDataCell(
-                                                credit > 0
-                                                    ? _currency.format(credit)
-                                                    : '-',
-                                                color: credit > 0
-                                                    ? const Color(0xFF16A34A)
-                                                    : null),
-                                            _tableDataCell(
-                                                _currency.format(running),
-                                                isBold: true),
-                                          ],
-                                        );
-                                      }),
-                                      // Totals Footer Row
-                                      TableRow(
-                                        decoration: const BoxDecoration(
-                                            color: Color(0xFFE6F0FA)),
-                                        children: [
-                                          _tableDataCell('TOTAL', isBold: true),
-                                          _tableDataCell(
-                                              '${_entries.length} items',
-                                              isBold: true),
-                                          _tableDataCell(''),
-                                          _tableDataCell(''),
-                                          _tableDataCell(
-                                              _currency.format(_totalDebit),
-                                              isBold: true,
-                                              color: const Color(0xFFDC2626)),
-                                          _tableDataCell(
-                                              _currency.format(_totalCredit),
-                                              isBold: true,
-                                              color: const Color(0xFF16A34A)),
-                                          _tableDataCell(
-                                              _currency.format(_closingBalance),
-                                              isBold: true),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        _buildMonthlyLedgerTable(),
                     ],
                   ),
                 ),
@@ -888,6 +919,326 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMonthlyLedgerTable() {
+    if (_monthlyLedger.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(40),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.receipt_long_outlined,
+                size: 48, color: Color(0xFF94A3B8)),
+            const SizedBox(height: 12),
+            Text(
+              'No statement records found for ${_months[_selectedMonth - 1]} $_selectedYear',
+              style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600, color: const Color(0xFF64748B)),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Try navigating to another month using the controls above.',
+              style:
+                  GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final currencyNoSymbol = NumberFormat('#,##,##0', 'en_IN');
+    final numProducts = _products.length;
+    final minTableWidth =
+        110.0 + 95.0 + (numProducts * 100.0) + 115.0 + 115.0;
+
+    final columnWidths = <int, TableColumnWidth>{
+      0: const FixedColumnWidth(110), // Date
+      1: const FixedColumnWidth(95), // Filling
+      for (int i = 0; i < numProducts; i++)
+        (i + 2): const FixedColumnWidth(100), // Product columns
+      (numProducts + 2): const FixedColumnWidth(115), // Cash
+      (numProducts + 3): const FixedColumnWidth(115), // UPI
+    };
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: max(constraints.maxWidth, minTableWidth),
+              child: Table(
+                columnWidths: columnWidths,
+                children: [
+                  // Table Header
+                  TableRow(
+                    decoration: const BoxDecoration(color: Color(0xFF003366)),
+                    children: [
+                      _tableHeaderCell('Date'),
+                      _tableHeaderCell('Filling', align: TextAlign.right),
+                      for (final p in _products)
+                        _tableHeaderCell(
+                          p['name']?.toString() ?? 'Product',
+                          align: TextAlign.right,
+                        ),
+                      _tableHeaderCell('Cash', align: TextAlign.right),
+                      _tableHeaderCell('UPI', align: TextAlign.right),
+                    ],
+                  ),
+
+                  // Daily Rows
+                  ..._monthlyLedger.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final row = entry.value;
+                    final isZebra = idx % 2 == 1;
+
+                    final dateVal = row['date']?.toString() ?? '';
+                    final filling = (row['filling'] != null && row['filling'] > 0)
+                        ? '${row['filling']}'
+                        : '-';
+
+                    final cash = (row['cash'] as num?)?.toDouble();
+                    final upi = (row['upi'] as num?)?.toDouble();
+
+                    return TableRow(
+                      decoration: BoxDecoration(
+                        color:
+                            isZebra ? const Color(0xFFF8FAFC) : Colors.white,
+                      ),
+                      children: [
+                        _tableDataCell(dateVal, isBold: true),
+                        _tableDataCell(
+                          filling,
+                          align: TextAlign.right,
+                          color: filling != '-'
+                              ? const Color(0xFF0284C7)
+                              : null,
+                          isBold: filling != '-',
+                        ),
+                        for (final p in _products)
+                          _buildProductDataCell(row['products'], p['id']),
+                        _tableDataCell(
+                          cash != null && cash > 0
+                              ? currencyNoSymbol.format(cash)
+                              : '-',
+                          align: TextAlign.right,
+                          color: (cash != null && cash > 0)
+                              ? const Color(0xFF16A34A)
+                              : null,
+                          isBold: cash != null && cash > 0,
+                        ),
+                        _tableDataCell(
+                          upi != null && upi > 0
+                              ? currencyNoSymbol.format(upi)
+                              : '-',
+                          align: TextAlign.right,
+                          color: (upi != null && upi > 0)
+                              ? const Color(0xFF7E22CE)
+                              : null,
+                          isBold: upi != null && upi > 0,
+                        ),
+                      ],
+                    );
+                  }),
+
+                  // Monthly Total Row
+                  TableRow(
+                    decoration: const BoxDecoration(color: Color(0xFFE6F0FA)),
+                    children: [
+                      _tableDataCell('Monthly Total',
+                          isBold: true, color: const Color(0xFF003366)),
+                      _tableDataCell(
+                        '${_monthlyTotals['filling'] ?? 0}',
+                        align: TextAlign.right,
+                        isBold: true,
+                        color: const Color(0xFF0284C7),
+                      ),
+                      for (final p in _products)
+                        _buildProductTotalCell(p['id']),
+                      _tableDataCell(
+                        currencyNoSymbol.format(
+                            (_monthlyTotals['cash'] as num?)?.toDouble() ??
+                                0.0),
+                        align: TextAlign.right,
+                        isBold: true,
+                        color: const Color(0xFF16A34A),
+                      ),
+                      _tableDataCell(
+                        currencyNoSymbol.format(
+                            (_monthlyTotals['upi'] as num?)?.toDouble() ??
+                                0.0),
+                        align: TextAlign.right,
+                        isBold: true,
+                        color: const Color(0xFF7E22CE),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductDataCell(dynamic productsData, dynamic productId) {
+    if (productsData is Map) {
+      final q = productsData[productId] ?? productsData['$productId'];
+      if (q != null && (q is num) && q > 0) {
+        return _tableDataCell('$q', align: TextAlign.right);
+      }
+    }
+    return _tableDataCell('-', align: TextAlign.right);
+  }
+
+  Widget _buildProductTotalCell(dynamic productId) {
+    final totalsMap = _monthlyTotals['products'];
+    if (totalsMap is Map) {
+      final q = totalsMap[productId] ?? totalsMap['$productId'];
+      if (q != null && (q is num)) {
+        return _tableDataCell('$q', align: TextAlign.right, isBold: true);
+      }
+    }
+    return _tableDataCell('0', align: TextAlign.right, isBold: true);
+  }
+
+  Widget _buildDetailedTransactionsTable() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: max(constraints.maxWidth, 820),
+              child: Table(
+                columnWidths: const {
+                  0: FixedColumnWidth(110),
+                  1: FixedColumnWidth(130),
+                  2: FixedColumnWidth(100),
+                  3: FlexColumnWidth(2),
+                  4: FixedColumnWidth(120),
+                  5: FixedColumnWidth(120),
+                  6: FixedColumnWidth(130),
+                },
+                children: [
+                  TableRow(
+                    decoration:
+                        const BoxDecoration(color: Color(0xFF003366)),
+                    children: [
+                      _tableHeaderCell('Date'),
+                      _tableHeaderCell('Ref No'),
+                      _tableHeaderCell('Type'),
+                      _tableHeaderCell('Narration'),
+                      _tableHeaderCell('Debit (₹)', align: TextAlign.right),
+                      _tableHeaderCell('Credit (₹)', align: TextAlign.right),
+                      _tableHeaderCell('Balance (₹)', align: TextAlign.right),
+                    ],
+                  ),
+                  ..._entries.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final e = entry.value;
+                    final isZebra = idx % 2 == 1;
+
+                    final dateVal = e['entry_date'] != null
+                        ? DateFormat('dd-MM-yyyy').format(
+                            DateTime.parse(e['entry_date'].toString()))
+                        : '';
+                    final refNo = e['reference_no']?.toString() ?? '-';
+                    final type =
+                        (e['entry_type']?.toString() ?? '').toUpperCase();
+                    final narration = e['narration']?.toString() ?? '';
+                    final debit = (e['debit'] is num)
+                        ? (e['debit'] as num).toDouble()
+                        : 0.0;
+                    final credit = (e['credit'] is num)
+                        ? (e['credit'] as num).toDouble()
+                        : 0.0;
+                    final running = (e['running_balance'] is num)
+                        ? (e['running_balance'] as num).toDouble()
+                        : 0.0;
+
+                    return TableRow(
+                      decoration: BoxDecoration(
+                          color: isZebra
+                              ? const Color(0xFFF8FAFC)
+                              : Colors.white),
+                      children: [
+                        _tableDataCell(dateVal),
+                        _tableDataCell(refNo, isBold: true),
+                        _tableDataCell(type),
+                        _tableDataCell(narration),
+                        _tableDataCell(
+                          debit > 0 ? _currency.format(debit) : '-',
+                          align: TextAlign.right,
+                          color: debit > 0 ? const Color(0xFFDC2626) : null,
+                        ),
+                        _tableDataCell(
+                          credit > 0 ? _currency.format(credit) : '-',
+                          align: TextAlign.right,
+                          color: credit > 0 ? const Color(0xFF16A34A) : null,
+                        ),
+                        _tableDataCell(
+                          _currency.format(running),
+                          align: TextAlign.right,
+                          isBold: true,
+                        ),
+                      ],
+                    );
+                  }),
+                  TableRow(
+                    decoration:
+                        const BoxDecoration(color: Color(0xFFE6F0FA)),
+                    children: [
+                      _tableDataCell('TOTAL', isBold: true),
+                      _tableDataCell('${_entries.length} items',
+                          isBold: true),
+                      _tableDataCell(''),
+                      _tableDataCell(''),
+                      _tableDataCell(
+                        _currency.format(_totalDebit),
+                        align: TextAlign.right,
+                        isBold: true,
+                        color: const Color(0xFFDC2626),
+                      ),
+                      _tableDataCell(
+                        _currency.format(_totalCredit),
+                        align: TextAlign.right,
+                        isBold: true,
+                        color: const Color(0xFF16A34A),
+                      ),
+                      _tableDataCell(
+                        _currency.format(_closingBalance),
+                        align: TextAlign.right,
+                        isBold: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -940,22 +1291,25 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
     );
   }
 
-  Widget _tableHeaderCell(String text) {
+  Widget _tableHeaderCell(String text, {TextAlign align = TextAlign.left}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
         text,
+        textAlign: align,
         style: GoogleFonts.inter(
             fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
 
-  Widget _tableDataCell(String text, {bool isBold = false, Color? color}) {
+  Widget _tableDataCell(String text,
+      {bool isBold = false, Color? color, TextAlign align = TextAlign.left}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Text(
         text,
+        textAlign: align,
         style: GoogleFonts.inter(
           fontSize: 11,
           fontWeight: isBold ? FontWeight.bold : FontWeight.w500,

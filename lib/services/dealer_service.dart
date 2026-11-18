@@ -178,10 +178,14 @@ class DealerService {
     int dealerId, {
     String? startDate,
     String? endDate,
+    int? month,
+    int? year,
   }) async {
     final queryParams = <String, dynamic>{};
     if (startDate != null) queryParams['start_date'] = startDate;
     if (endDate != null) queryParams['end_date'] = endDate;
+    if (month != null) queryParams['month'] = month;
+    if (year != null) queryParams['year'] = year;
 
     final response = await _apiService.client.get(
       '/dealers/$dealerId/statement',

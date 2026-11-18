@@ -205,6 +205,9 @@ class BottleLedgerReportModel {
 }
 
 class BottleLedgerDrilldownItemModel {
+  final int? id;
+  final String? entryType;
+  final int? supplyId;
   final String partyName;
   final String referenceNo;
   final String date;
@@ -216,6 +219,9 @@ class BottleLedgerDrilldownItemModel {
   final String notes;
 
   const BottleLedgerDrilldownItemModel({
+    this.id,
+    this.entryType,
+    this.supplyId,
     required this.partyName,
     required this.referenceNo,
     required this.date,
@@ -229,6 +235,9 @@ class BottleLedgerDrilldownItemModel {
 
   factory BottleLedgerDrilldownItemModel.fromJson(Map<String, dynamic> json) {
     return BottleLedgerDrilldownItemModel(
+      id: json['id'] != null ? _toInt(json['id']) : null,
+      entryType: json['entry_type']?.toString(),
+      supplyId: json['supply_id'] != null ? _toInt(json['supply_id']) : null,
       partyName: json['party_name'] ?? '',
       referenceNo: json['reference_no'] ?? '',
       date: json['date'] ?? '',

@@ -172,4 +172,16 @@ class BottleLedgerService {
       title: title ?? 'Others Statement',
     );
   }
+
+  /// Delete a bottle purchase entry (dealer supply item or others entry)
+  /// and synchronize Daily Collection and Other Statement.
+  Future<bool> deleteBottlePurchaseEntry({
+    required String entryType,
+    required int id,
+  }) async {
+    final response = await _apiService.client.delete(
+      '/bottle-ledger/transaction/$entryType/$id',
+    );
+    return response.statusCode == 200;
+  }
 }
