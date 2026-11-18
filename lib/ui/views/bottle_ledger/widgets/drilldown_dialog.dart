@@ -161,9 +161,10 @@ class _BottleLedgerDrilldownDialogState
             ),
             const SizedBox(height: 12),
             Text(
-              'This entry will be permanently deleted. Related bottle counts and amounts in Daily Collection and Other Statement will be synchronized and recalculated.',
+              'The associated bottle count and amount will also be deducted from Daily Collection and the corresponding payment records.\n\nThis action cannot be undone.',
               style: GoogleFonts.inter(
                 fontSize: 12,
+                fontWeight: FontWeight.w500,
                 color: Colors.red.shade800,
               ),
             ),

@@ -136785,7 +136785,7 @@ n.push(p.yc("Product",o.w))
 n.push(p.yc("Quantity",B.i.N(o.x,0)+" bottles"))
 n.push(p.yc("Amount",this.c.L(o.z)))
 n.push(p.yc("Date",o.f))
-s=A.J(A.b([s,B.ai,A.A(l,A.J(n,B.G,B.p,B.q),B.u,l,l,new A.E(B.bE,l,q,r,l,l,B.w),l,l,l,B.b1,l,l,l),B.ai,A.c("This entry will be permanently deleted. Related bottle counts and amounts in Daily Collection and Other Statement will be synchronized and recalculated.",l,l,l,l,l,A.k().$2$color$fontSize(B.he,12),l,l,l)],i),B.G,B.p,B.Y)
+s=A.J(A.b([s,B.ai,A.A(l,A.J(n,B.G,B.p,B.q),B.u,l,l,new A.E(B.bE,l,q,r,l,l,B.w),l,l,l,B.b1,l,l,l),B.ai,A.c("The associated bottle count and amount will also be deducted from Daily Collection and the corresponding payment records.\n\nThis action cannot be undone.",l,l,l,l,l,A.k().$3$color$fontSize$fontWeight(B.he,12,B.al),l,l,l)],i),B.G,B.p,B.Y)
 return A.h2(A.b([A.hB(B.c7,new A.aZh(a),A.du(l,l,l,l,l,l,l,l,l,B.U,l,l,l,l,l,new A.aH(B.bF,1,B.y,-1),l,l,l,l)),A.fm(B.lh,new A.aZi(a),A.bE(l,l,B.eT,l,l,l,l,l,l,B.v,l,l,l,l,l,l,l,l,l,l))],i),l,l,s,l,l,new A.aM(k,B.H),l,j,l,l)},
 $S:29}
 A.aZh.prototype={
