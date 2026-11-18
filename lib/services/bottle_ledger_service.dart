@@ -88,4 +88,88 @@ class BottleLedgerService {
       title: title ?? 'Bottle Ledger',
     );
   }
+
+  /// Fetch eligible Without Refill products for dropdown.
+  Future<List<BottleOtherProductModel>> getWithoutRefillProducts() async {
+    final response = await _apiService.client.get('/bottle-ledger/products');
+    final list = response.data['data'] as List? ?? [];
+    return list
+        .map((item) => BottleOtherProductModel.fromJson(
+            item is Map<String, dynamic> ? item : Map<String, dynamic>.from(item)))
+        .toList();
+  }
+
+  /// Fetch Others Statement for a month (date-wise summary and entries).
+  Future<BottleOthersStatementModel> getOthersStatement({
+    required int year,
+    required int month,
+  }) async {
+    final response = await _apiService.client.get(
+      '/bottle-ledger/others',
+      queryParameters: {
+        'year': year,
+        'month': month,
+      },
+    );
+    final data = response.data['data'] as Map<String, dynamic>;
+    return BottleOthersStatementModel.fromJson(data);
+  }
+
+  /// Create a new Bottle Other Entry.
+  Future<bool> createOtherEntry(Map<String, dynamic> payload) async {
+    final response = await _apiService.client.post(
+      '/bottle-ledger/others',
+      data: payload,
+    );
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  /// Update an existing Bottle Other Entry.
+  Future<bool> updateOtherEntry(int id, Map<String, dynamic> payload) async {
+    final response = await _apiService.client.put(
+      '/bottle-ledger/others/$id',
+      data: payload,
+    );
+    return response.statusCode == 200;
+  }
+
+  /// Delete an existing Bottle Other Entry.
+  Future<bool> deleteOtherEntry(int id) async {
+    final response = await _apiService.client.delete('/bottle-ledger/others/$id');
+    return response.statusCode == 200;
+  }
+
+  /// Download Others Statement A4 portrait PDF.
+  Future<void> downloadOthersStatementPdf({
+    required int year,
+    required int month,
+  }) async {
+    final fileName =
+        'others_statement_${year}_${month.toString().padLeft(2, '0')}.pdf';
+    await _exportPrintService.downloadFromApi(
+      endpoint: '/bottle-ledger/others/pdf',
+      queryParams: {
+        'year': year,
+        'month': month,
+      },
+      fileName: fileName,
+      mimeType: ExportPrintService.mimePdf,
+    );
+  }
+
+  /// Print Others Statement A4 portrait PDF.
+  Future<void> printOthersStatementPdf({
+    required int year,
+    required int month,
+    String? title,
+  }) async {
+    await _exportPrintService.printFromApi(
+      endpoint: '/bottle-ledger/others/pdf',
+      queryParams: {
+        'year': year,
+        'month': month,
+      },
+      title: title ?? 'Others Statement',
+    );
+  }
 }

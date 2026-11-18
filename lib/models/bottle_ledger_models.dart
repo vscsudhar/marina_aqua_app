@@ -241,3 +241,150 @@ class BottleLedgerDrilldownItemModel {
     );
   }
 }
+
+class BottleOtherProductModel {
+  final int id;
+  final String name;
+  final String? sku;
+  final String? productType;
+  final double defaultPrice;
+
+  const BottleOtherProductModel({
+    required this.id,
+    required this.name,
+    this.sku,
+    this.productType,
+    this.defaultPrice = 0.0,
+  });
+
+  factory BottleOtherProductModel.fromJson(Map<String, dynamic> json) {
+    return BottleOtherProductModel(
+      id: _toInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      sku: json['sku']?.toString(),
+      productType: json['product_type']?.toString(),
+      defaultPrice: _toDouble(json['default_price']),
+    );
+  }
+}
+
+class BottleOtherEntryModel {
+  final int id;
+  final String date;
+  final String formattedDate;
+  final int productId;
+  final String productName;
+  final String productSku;
+  final int quantity;
+  final double amount;
+  final double totalAmount;
+  final String notes;
+
+  const BottleOtherEntryModel({
+    required this.id,
+    required this.date,
+    required this.formattedDate,
+    required this.productId,
+    required this.productName,
+    this.productSku = '',
+    required this.quantity,
+    required this.amount,
+    required this.totalAmount,
+    this.notes = '',
+  });
+
+  factory BottleOtherEntryModel.fromJson(Map<String, dynamic> json) {
+    return BottleOtherEntryModel(
+      id: _toInt(json['id']),
+      date: json['date']?.toString() ?? '',
+      formattedDate: json['formatted_date']?.toString() ?? '',
+      productId: _toInt(json['product_id']),
+      productName: json['product_name']?.toString() ?? '',
+      productSku: json['product_sku']?.toString() ?? '',
+      quantity: _toInt(json['quantity']),
+      amount: _toDouble(json['amount']),
+      totalAmount: _toDouble(json['total_amount']),
+      notes: json['notes']?.toString() ?? '',
+    );
+  }
+}
+
+class BottleOthersStatementDateGroup {
+  final String date;
+  final String formattedDate;
+  final String dayName;
+  final int bottleCount;
+  final double amount;
+  final List<BottleOtherEntryModel> entries;
+
+  const BottleOthersStatementDateGroup({
+    required this.date,
+    required this.formattedDate,
+    required this.dayName,
+    required this.bottleCount,
+    required this.amount,
+    required this.entries,
+  });
+
+  factory BottleOthersStatementDateGroup.fromJson(Map<String, dynamic> json) {
+    final rawEntries = json['entries'] as List? ?? [];
+    return BottleOthersStatementDateGroup(
+      date: json['date']?.toString() ?? '',
+      formattedDate: json['formatted_date']?.toString() ?? '',
+      dayName: json['day_name']?.toString() ?? '',
+      bottleCount: _toInt(json['bottle_count']),
+      amount: _toDouble(json['amount']),
+      entries: rawEntries
+          .map((e) => BottleOtherEntryModel.fromJson(
+              e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
+          .toList(),
+    );
+  }
+}
+
+class BottleOthersStatementModel {
+  final String companyName;
+  final String? companyLogo;
+  final int year;
+  final int month;
+  final String monthName;
+  final List<BottleOthersStatementDateGroup> statement;
+  final int totalBottleCount;
+  final double grandTotalAmount;
+  final List<BottleOtherEntryModel> entries;
+
+  const BottleOthersStatementModel({
+    required this.companyName,
+    this.companyLogo,
+    required this.year,
+    required this.month,
+    required this.monthName,
+    required this.statement,
+    required this.totalBottleCount,
+    required this.grandTotalAmount,
+    required this.entries,
+  });
+
+  factory BottleOthersStatementModel.fromJson(Map<String, dynamic> json) {
+    final rawStmt = json['statement'] as List? ?? [];
+    final rawEntries = json['entries'] as List? ?? [];
+
+    return BottleOthersStatementModel(
+      companyName: json['company_name']?.toString() ?? 'SS AquaFlow',
+      companyLogo: json['company_logo']?.toString(),
+      year: _toInt(json['year']),
+      month: _toInt(json['month']),
+      monthName: json['month_name']?.toString() ?? '',
+      statement: rawStmt
+          .map((e) => BottleOthersStatementDateGroup.fromJson(
+              e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
+          .toList(),
+      totalBottleCount: _toInt(json['total_bottle_count']),
+      grandTotalAmount: _toDouble(json['grand_total_amount']),
+      entries: rawEntries
+          .map((e) => BottleOtherEntryModel.fromJson(
+              e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
+          .toList(),
+    );
+  }
+}

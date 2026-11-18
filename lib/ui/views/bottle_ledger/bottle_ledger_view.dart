@@ -6,7 +6,10 @@ import '../../common/app_colors.dart';
 import '../../widgets/marina_logo.dart';
 import 'bottle_ledger_viewmodel.dart';
 import 'widgets/bottle_ledger_table.dart';
+import 'widgets/bottle_others_entry_dialog.dart';
+import 'widgets/bottle_others_statement_dialog.dart';
 import 'widgets/drilldown_dialog.dart';
+import '../../../services/subscription_guard.dart';
 
 class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
   final VoidCallback? onBack;
@@ -207,6 +210,102 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         ),
                       ),
                     ] else ...[
+                      // Dual Purchase Ledger: Others Entry & Others Statement Action Bar
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0F3460)
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Icon(
+                                    Icons.storefront_rounded,
+                                    color: Color(0xFF0F3460),
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Dealer Bottle Purchase (Without Refill) & Others',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF0F3460),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () => _openOthersEntryDialog(
+                                      context, viewModel),
+                                  icon: const Icon(
+                                      Icons.add_circle_outline_rounded,
+                                      size: 16),
+                                  label: const Text('Others Entry'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF0F3460),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 9),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    textStyle: GoogleFonts.inter(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                OutlinedButton.icon(
+                                  onPressed: () =>
+                                      _openOthersStatementDialog(
+                                          context, viewModel),
+                                  icon: const Icon(Icons.receipt_long_rounded,
+                                      size: 16),
+                                  label: const Text('Others Statement'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: const Color(0xFF0F3460),
+                                    side: const BorderSide(
+                                        color: Color(0xFF0F3460)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 9),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    textStyle: GoogleFonts.inter(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
                       // Dual Dealer & Supplier Tables
                       if (isDesktop)
                         Row(
@@ -976,6 +1075,40 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
         date: date,
         productKey: productKey,
         source: source,
+      ),
+    );
+  }
+
+  void _openOthersEntryDialog(
+    BuildContext context,
+    BottleLedgerViewModel viewModel,
+  ) {
+    if (!SubscriptionGuard.checkAccess(context)) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => BottleOthersEntryDialog(
+        initialDate: DateTime.now(),
+        onSaved: () {
+          viewModel.loadLedger();
+        },
+      ),
+    );
+  }
+
+  void _openOthersStatementDialog(
+    BuildContext context,
+    BottleLedgerViewModel viewModel,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => BottleOthersStatementDialog(
+        initialYear: viewModel.selectedYear,
+        initialMonth: viewModel.selectedMonth,
+        onChanged: () {
+          viewModel.loadLedger();
+        },
       ),
     );
   }
