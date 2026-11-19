@@ -173,14 +173,32 @@ class BottleLedgerService {
     );
   }
 
+  /// Get pre-deletion financial and payment adjustment breakdown for a bottle purchase entry.
+  Future<BottleLedgerDeleteBreakdownModel> getDeleteBreakdown({
+    required String entryType,
+    required int id,
+  }) async {
+    final response = await _apiService.client.get(
+      '/bottle-ledger/transaction/$entryType/$id/delete-breakdown',
+    );
+    final data = response.data['data'] as Map<String, dynamic>;
+    return BottleLedgerDeleteBreakdownModel.fromJson(data);
+  }
+
   /// Delete a bottle purchase entry (dealer supply item or others entry)
   /// and synchronize Daily Collection and Other Statement.
   Future<bool> deleteBottlePurchaseEntry({
     required String entryType,
     required int id,
+    double cashDeduction = 0.0,
+    double upiDeduction = 0.0,
   }) async {
     final response = await _apiService.client.delete(
       '/bottle-ledger/transaction/$entryType/$id',
+      data: {
+        'cash_deduction': cashDeduction,
+        'upi_deduction': upiDeduction,
+      },
     );
     return response.statusCode == 200;
   }

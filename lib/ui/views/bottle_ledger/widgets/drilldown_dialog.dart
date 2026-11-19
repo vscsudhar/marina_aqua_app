@@ -96,160 +96,555 @@ class _BottleLedgerDrilldownDialogState
   ) async {
     if (!SubscriptionGuard.checkAccess(context)) return;
 
-    final currencyFormat =
-        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+    final entryType = item.entryType ??
+        (item.referenceNo.startsWith('OTH')
+            ? 'others_entry'
+            : 'dealer_supply_item');
+    final itemId = item.id;
 
-    final confirmed = await showDialog<bool>(
+    if (itemId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Cannot identify record ID for deletion.')),
+        );
+      }
+      return;
+    }
+
+    // Show loading indicator while fetching pre-delete breakdown
+    showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Icon(Icons.delete_outline_rounded,
-                  color: Colors.red.shade700, size: 22),
+      barrierDismissible: false,
+      builder: (ctx) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: AppColors.primary),
+                SizedBox(width: 16),
+                Text('Checking transaction details...'),
+              ],
             ),
-            const SizedBox(width: 10),
-            Text(
-              'Delete Bottle Purchase?',
-              style: GoogleFonts.outfit(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Are you sure you want to delete this bottle purchase entry?',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _detailRow('Party', item.partyName),
-                  if (item.referenceNo.isNotEmpty)
-                    _detailRow('Reference', item.referenceNo),
-                  _detailRow('Product', item.productName),
-                  _detailRow(
-                      'Quantity', '${item.quantity.toStringAsFixed(0)} bottles'),
-                  _detailRow('Amount', currencyFormat.format(item.totalAmount)),
-                  _detailRow('Date', item.date),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'The associated bottle count and amount will also be deducted from Daily Collection and the corresponding payment records.\n\nThis action cannot be undone.',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.red.shade800,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          OutlinedButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.textPrimary,
-              side: BorderSide(color: Colors.grey.shade300),
-            ),
-            child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
+        ),
       ),
     );
 
-    if (confirmed == true) {
-      final entryType = item.entryType ??
-          (item.referenceNo.startsWith('OTH')
-              ? 'others_entry'
-              : 'dealer_supply_item');
-      final itemId = item.id;
+    final BottleLedgerDeleteBreakdownModel breakdown;
+    try {
+      breakdown = await _ledgerService.getDeleteBreakdown(
+        entryType: entryType,
+        id: itemId,
+      );
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load transaction details: $e')),
+        );
+      }
+      return;
+    }
 
-      if (itemId == null) {
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+
+    if (!mounted) return;
+
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+
+    double cashDeduction = 0.0;
+    double upiDeduction = 0.0;
+
+    if (breakdown.requiresPaymentAdjustment) {
+      // Scenario 1: Paid or partially paid via Cash / UPI -> Show Payment Adjustment Dialog
+      final result =
+          await _showPaymentAdjustmentDialog(item, breakdown, currencyFormat);
+      if (result == null) {
+        // User cancelled, leave all records untouched
+        return;
+      }
+      cashDeduction = result['cash'] ?? 0.0;
+      upiDeduction = result['upi'] ?? 0.0;
+    } else {
+      if (!mounted) return;
+      // Scenario 2: Unpaid / Already included in Dealer Outstanding, or Others Entry
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(Icons.delete_outline_rounded,
+                    color: Colors.red.shade700, size: 22),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Delete Bottle Purchase?',
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to delete this bottle purchase entry?',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _detailRow('Party', item.partyName),
+                    if (item.referenceNo.isNotEmpty)
+                      _detailRow('Reference', item.referenceNo),
+                    _detailRow('Product', item.productName),
+                    _detailRow('Quantity',
+                        '${item.quantity.toStringAsFixed(0)} bottles'),
+                    _detailRow(
+                        'Amount', currencyFormat.format(item.totalAmount)),
+                    _detailRow('Date', item.date),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (breakdown.isOutstanding)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.amber.shade300),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline,
+                          color: Colors.amber.shade800, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "The deleted product amount is already included in the dealer's outstanding balance. It will be adjusted from the existing outstanding amount. No Cash or UPI adjustment is required.",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.amber.shade900,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Text(
+                  'The associated bottle count and amount will also be deducted from Daily Collection and the corresponding records.\n\nThis action cannot be undone.',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.red.shade800,
+                  ),
+                ),
+            ],
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+                side: BorderSide(color: Colors.grey.shade300),
+              ),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade700,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+    }
+
+    setState(() => _isDeleting = true);
+
+    try {
+      final success = await _ledgerService.deleteBottlePurchaseEntry(
+        entryType: entryType,
+        id: itemId,
+        cashDeduction: cashDeduction,
+        upiDeduction: upiDeduction,
+      );
+
+      if (success) {
+        setState(() {
+          _items.removeWhere(
+              (it) => it.id == item.id && it.entryType == item.entryType);
+          _isDeleting = false;
+        });
+
+        widget.onDeleted?.call();
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Cannot identify record ID for deletion.')),
+              content: Text(
+                  'Bottle purchase entry deleted and synchronized successfully.'),
+            ),
           );
         }
-        return;
-      }
-
-      setState(() => _isDeleting = true);
-
-      try {
-        final success = await _ledgerService.deleteBottlePurchaseEntry(
-          entryType: entryType,
-          id: itemId,
-        );
-
-        if (success) {
-          setState(() {
-            _items.removeWhere((it) => it.id == item.id && it.entryType == item.entryType);
-            _isDeleting = false;
-          });
-
-          widget.onDeleted?.call();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Bottle purchase entry deleted and synchronized successfully.'),
-              ),
-            );
-          }
-        } else {
-          setState(() => _isDeleting = false);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Failed to delete bottle purchase entry.')),
-            );
-          }
-        }
-      } catch (e) {
+      } else {
         setState(() => _isDeleting = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting entry: $e')),
+            const SnackBar(
+                content: Text('Failed to delete bottle purchase entry.')),
           );
         }
       }
+    } catch (e) {
+      setState(() => _isDeleting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting entry: $e')),
+        );
+      }
     }
+  }
+
+  Future<Map<String, double>?> _showPaymentAdjustmentDialog(
+    BottleLedgerDrilldownItemModel item,
+    BottleLedgerDeleteBreakdownModel breakdown,
+    NumberFormat currencyFormat,
+  ) {
+    final double targetTotal = breakdown.paymentToDeduct;
+    final double availCash = breakdown.availableCash;
+    final double availUpi = breakdown.availableUpi;
+
+    final cashController = TextEditingController(
+      text: breakdown.defaultCashDeduction.toStringAsFixed(
+        breakdown.defaultCashDeduction % 1 == 0 ? 0 : 2,
+      ),
+    );
+    final upiController = TextEditingController(
+      text: breakdown.defaultUpiDeduction.toStringAsFixed(
+        breakdown.defaultUpiDeduction % 1 == 0 ? 0 : 2,
+      ),
+    );
+
+    return showDialog<Map<String, double>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (dialogCtx, setDialogState) {
+            final double? enteredCash =
+                double.tryParse(cashController.text.trim());
+            final double? enteredUpi =
+                double.tryParse(upiController.text.trim());
+
+            String? validationError;
+            if (enteredCash == null || enteredUpi == null) {
+              validationError = 'Please enter valid deduction amounts.';
+            } else if (enteredCash < 0 || enteredUpi < 0) {
+              validationError = 'Deduction amounts cannot be negative.';
+            } else if (enteredCash > availCash + 0.001) {
+              validationError =
+                  'Cash deduction cannot exceed available cash (${currencyFormat.format(availCash)}).';
+            } else if (enteredUpi > availUpi + 0.001) {
+              validationError =
+                  'UPI deduction cannot exceed available UPI (${currencyFormat.format(availUpi)}).';
+            } else {
+              final double sum = enteredCash + enteredUpi;
+              if ((sum - targetTotal).abs() > 0.01) {
+                validationError =
+                    'Total deduction (${currencyFormat.format(sum)}) must equal ${currencyFormat.format(targetTotal)}.';
+              }
+            }
+
+            final bool isValid = (validationError == null);
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(Icons.payment_rounded,
+                        color: Colors.amber.shade800, size: 22),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Payment Adjustment Confirmation',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'This entry was included in daily collection. Adjust how the deleted amount should be deducted from Cash and UPI payments:',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _detailRow('Party', item.partyName),
+                            if (item.referenceNo.isNotEmpty)
+                              _detailRow('Reference', item.referenceNo),
+                            _detailRow('Product',
+                                '${item.productName} (${item.quantity.toStringAsFixed(0)} bottles)'),
+                            _detailRow('Deleted Amount',
+                                currencyFormat.format(targetTotal)),
+                            const Divider(height: 16),
+                            _detailRow('Available Cash',
+                                currencyFormat.format(availCash)),
+                            _detailRow('Available UPI',
+                                currencyFormat.format(availUpi)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Adjustment Allocation',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Cash Deduction (₹)',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                TextField(
+                                  controller: cashController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    prefixText: '₹ ',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8)),
+                                  ),
+                                  onChanged: (_) => setDialogState(() {}),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'UPI Deduction (₹)',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                TextField(
+                                  controller: upiController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    prefixText: '₹ ',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8)),
+                                  ),
+                                  onChanged: (_) => setDialogState(() {}),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      if (validationError != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.red.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error_outline,
+                                  size: 16, color: Colors.red.shade700),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  validationError,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.red.shade800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.green.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.check_circle_outline,
+                                  size: 16, color: Colors.green.shade700),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Valid allocation: ₹${enteredCash?.toStringAsFixed(2)} Cash + ₹${enteredUpi?.toStringAsFixed(2)} UPI = ${currencyFormat.format(targetTotal)}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.green.shade800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'This will deduct the adjusted amounts from Daily Collection and Statement of Account.\nThis action cannot be undone.',
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                OutlinedButton(
+                  onPressed: () => Navigator.of(ctx).pop(null),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: isValid
+                      ? () {
+                          Navigator.of(ctx).pop({
+                            'cash': enteredCash!,
+                            'upi': enteredUpi!,
+                          });
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade700,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: Colors.grey.shade300,
+                    disabledForegroundColor: Colors.grey.shade600,
+                  ),
+                  child: const Text('Confirm & Delete'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _detailRow(String label, String value) {

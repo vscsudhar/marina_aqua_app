@@ -123,7 +123,7 @@ void main() {
     });
 
     test('Backend API overrides are respected if provided', () {
-      final user = UserModel(
+      const user = UserModel(
         id: 7,
         name: 'API Synced User',
         email: 'user@example.com',

@@ -397,3 +397,65 @@ class BottleOthersStatementModel {
     );
   }
 }
+
+class BottleLedgerDeleteBreakdownModel {
+  final int id;
+  final int? supplyId;
+  final String entryType;
+  final String partyName;
+  final String referenceNo;
+  final String productName;
+  final double quantity;
+  final double amount;
+  final double totalAmount;
+  final bool requiresPaymentAdjustment;
+  final bool isOutstanding;
+  final double paymentToDeduct;
+  final double availableCash;
+  final double availableUpi;
+  final double defaultCashDeduction;
+  final double defaultUpiDeduction;
+  final double outstandingAdjustment;
+
+  const BottleLedgerDeleteBreakdownModel({
+    required this.id,
+    this.supplyId,
+    required this.entryType,
+    required this.partyName,
+    required this.referenceNo,
+    required this.productName,
+    required this.quantity,
+    required this.amount,
+    required this.totalAmount,
+    required this.requiresPaymentAdjustment,
+    required this.isOutstanding,
+    required this.paymentToDeduct,
+    required this.availableCash,
+    required this.availableUpi,
+    required this.defaultCashDeduction,
+    required this.defaultUpiDeduction,
+    required this.outstandingAdjustment,
+  });
+
+  factory BottleLedgerDeleteBreakdownModel.fromJson(Map<String, dynamic> json) {
+    return BottleLedgerDeleteBreakdownModel(
+      id: _toInt(json['id']),
+      supplyId: json['supply_id'] != null ? _toInt(json['supply_id']) : null,
+      entryType: json['entry_type']?.toString() ?? 'dealer_supply_item',
+      partyName: json['party_name']?.toString() ?? '',
+      referenceNo: json['reference_no']?.toString() ?? '',
+      productName: json['product_name']?.toString() ?? '',
+      quantity: _toDouble(json['quantity']),
+      amount: _toDouble(json['amount']),
+      totalAmount: _toDouble(json['total_amount']),
+      requiresPaymentAdjustment: json['requires_payment_adjustment'] == true,
+      isOutstanding: json['is_outstanding'] == true,
+      paymentToDeduct: _toDouble(json['payment_to_deduct']),
+      availableCash: _toDouble(json['available_cash']),
+      availableUpi: _toDouble(json['available_upi']),
+      defaultCashDeduction: _toDouble(json['default_cash_deduction']),
+      defaultUpiDeduction: _toDouble(json['default_upi_deduction']),
+      outstandingAdjustment: _toDouble(json['outstanding_adjustment']),
+    );
+  }
+}
