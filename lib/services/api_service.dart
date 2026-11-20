@@ -125,7 +125,7 @@ class ApiService {
   /// Resolves an image URL (relative or absolute) against the active server host.
   static String? resolveImageUrl(String? rawUrl) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
-    final trimmed = rawUrl.trim();
+    var trimmed = rawUrl.trim();
 
     String baseOrigin = ApiConfig.baseOrigin;
     try {
@@ -134,6 +134,10 @@ class ApiService {
         baseOrigin = clientUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
       }
     } catch (_) {}
+
+    if (baseOrigin.startsWith('https://') && trimmed.startsWith('http://aqua-api.ethiodeploy.app')) {
+      trimmed = trimmed.replaceFirst('http://aqua-api.ethiodeploy.app', 'https://aqua-api.ethiodeploy.app');
+    }
 
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
       final urlUri = Uri.tryParse(trimmed);
@@ -151,6 +155,9 @@ class ApiService {
               .toString();
         }
       }
+      if (baseOrigin.startsWith('https://') && trimmed.startsWith('http://')) {
+        trimmed = trimmed.replaceFirst('http://', 'https://');
+      }
       return trimmed;
     }
 
@@ -163,7 +170,7 @@ class ApiService {
   /// Resolves logo URL with cache invalidation support and automatic CORS endpoint mapping.
   static String? resolveLogoUrl(String? rawUrl) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
-    final trimmed = rawUrl.trim();
+    var trimmed = rawUrl.trim();
     // Strictly ignore base64 byte code / data URIs - only valid HTTP/storage URLs are used
     if (trimmed.startsWith('data:')) return null;
 
@@ -174,6 +181,10 @@ class ApiService {
         baseOrigin = clientUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
       }
     } catch (_) {}
+
+    if (baseOrigin.startsWith('https://') && trimmed.startsWith('http://aqua-api.ethiodeploy.app')) {
+      trimmed = trimmed.replaceFirst('http://aqua-api.ethiodeploy.app', 'https://aqua-api.ethiodeploy.app');
+    }
 
     // Extract filename if it contains logos/ or company_logo
     String filename = trimmed;
@@ -188,19 +199,34 @@ class ApiService {
     if (filename.startsWith('company_logo') ||
         trimmed.contains('logos/') ||
         trimmed.contains('/logo-file/')) {
-      return '$baseOrigin/api/v1/public/logo-file/$filename';
+      String resolved = '$baseOrigin/api/v1/public/logo-file/$filename';
+      if (baseOrigin.startsWith('https://') && resolved.startsWith('http://')) {
+        resolved = resolved.replaceFirst('http://', 'https://');
+      }
+      return resolved;
     }
 
     if (trimmed.contains('/public/company-logo/')) {
       final compId = filename;
-      return '$baseOrigin/api/v1/public/company-logo/$compId';
+      String resolved = '$baseOrigin/api/v1/public/company-logo/$compId';
+      if (baseOrigin.startsWith('https://') && resolved.startsWith('http://')) {
+        resolved = resolved.replaceFirst('http://', 'https://');
+      }
+      return resolved;
     }
 
     final resolved = resolveImageUrl(rawUrl);
     if (resolved == null) return null;
     if (resolved.contains('/storage/logos/')) {
       final file = resolved.split('/storage/logos/').last;
-      return '$baseOrigin/api/v1/public/logo-file/$file';
+      String out = '$baseOrigin/api/v1/public/logo-file/$file';
+      if (baseOrigin.startsWith('https://') && out.startsWith('http://')) {
+        out = out.replaceFirst('http://', 'https://');
+      }
+      return out;
+    }
+    if (baseOrigin.startsWith('https://') && resolved.startsWith('http://')) {
+      return resolved.replaceFirst('http://', 'https://');
     }
     return resolved;
   }

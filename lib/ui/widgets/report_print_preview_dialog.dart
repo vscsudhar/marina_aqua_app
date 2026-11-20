@@ -211,7 +211,9 @@ class _ReportPrintPreviewDialogState extends State<ReportPrintPreviewDialog> {
     final address = settings?.address ??
         'No. 42 Water Works Road, Guindy, Chennai - 600032';
     final gstin = settings?.gstin ?? '33AABCM9876C1Z8';
-    final phone = settings?.phone ?? '+91 44 2233 4455';
+    final phone = (settings?.hasContactNumber == true)
+        ? settings!.effectiveContactNumber
+        : '';
     final media = MediaQuery.of(context).size;
     final dialogWidth = widget.isLandscape
         ? min(media.width - 24, (media.width * 0.92).clamp(320.0, 1200.0))

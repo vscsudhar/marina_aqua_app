@@ -7,6 +7,7 @@ import '../models/billing_models.dart';
 import '../models/paginated_response.dart';
 import '../models/tax_rate_model.dart';
 import 'api_service.dart';
+import 'auth_service.dart';
 import 'storage_service.dart';
 
 class SettingsService with ListenableServiceMixin {
@@ -64,6 +65,15 @@ class SettingsService with ListenableServiceMixin {
         notifyListeners();
       }
     } catch (_) {}
+  }
+
+  /// Reset settings and purge cached settings on logout
+  Future<void> clearSettings() async {
+    _settings = const CompanySettingModel(id: 1);
+    _isInitialized = false;
+    _errorMessage = null;
+    await _storageService.removeCompanySettings();
+    notifyListeners();
   }
 
   // ===================== COMPANY SETTINGS & LOGO =====================
@@ -152,6 +162,12 @@ class SettingsService with ListenableServiceMixin {
         PaintingBinding.instance.imageCache.clearLiveImages();
       } catch (_) {}
 
+      try {
+        if (locator.isRegistered<AuthService>()) {
+          await locator<AuthService>().refreshProfile();
+        }
+      } catch (_) {}
+
       notifyListeners();
       return _settings;
     } catch (e) {
@@ -180,6 +196,12 @@ class SettingsService with ListenableServiceMixin {
       try {
         PaintingBinding.instance.imageCache.clear();
         PaintingBinding.instance.imageCache.clearLiveImages();
+      } catch (_) {}
+
+      try {
+        if (locator.isRegistered<AuthService>()) {
+          await locator<AuthService>().refreshProfile();
+        }
       } catch (_) {}
 
       notifyListeners();

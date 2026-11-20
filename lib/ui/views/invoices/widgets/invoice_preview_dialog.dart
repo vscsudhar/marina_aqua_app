@@ -351,8 +351,8 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              if (companySettings.phone.isNotEmpty)
-                                _metaRow('Phone:', companySettings.phone),
+                              if (companySettings.hasContactNumber)
+                                _metaRow('Phone:', companySettings.effectiveContactNumber),
                               if (companySettings.email.isNotEmpty)
                                 _metaRow('Email:', companySettings.email),
                               if (invoice.dueDate != null &&

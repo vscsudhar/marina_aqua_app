@@ -18,9 +18,9 @@ class StartupViewModel extends BaseViewModel {
     final hasValidSession = await _authService.initializeSession();
 
     if (hasValidSession) {
-      // 3. Sync latest settings from database API
+      // 3. Sync latest company profile and settings from database API
       try {
-        await _settingsService.loadCompanySettings();
+        await _settingsService.loadCompanySettings(forceRefresh: true);
       } catch (_) {}
     }
 

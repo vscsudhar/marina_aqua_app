@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:marina_aqua/app/app.locator.dart';
 import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/services/api_service.dart';
+import 'package:marina_aqua/services/auth_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
 
@@ -111,6 +112,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         'company_name': _companyNameController.text.trim(),
         'tagline': _taglineController.text.trim(),
         'phone': _phoneController.text.trim(),
+        'company_contact_number': _phoneController.text.trim(),
         'email': _emailController.text.trim(),
         'website': _websiteController.text.trim(),
         'address': _addressController.text.trim(),
@@ -149,6 +151,11 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         setState(() => _isUploadingLogo = true);
         final updated = await locator<SettingsService>()
             .uploadCompanyLogo(file.bytes, file.name);
+        try {
+          if (locator.isRegistered<AuthService>()) {
+            await locator<AuthService>().refreshProfile();
+          }
+        } catch (_) {}
         if (mounted) {
           setState(() {
             _logoUrl = updated.logoUrl ?? updated.logoPath;
@@ -170,6 +177,11 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     try {
       setState(() => _isUploadingLogo = true);
       final updated = await locator<SettingsService>().deleteCompanyLogo();
+      try {
+        if (locator.isRegistered<AuthService>()) {
+          await locator<AuthService>().refreshProfile();
+        }
+      } catch (_) {}
       if (mounted) {
         setState(() {
           _logoUrl = updated.logoUrl;
@@ -393,9 +405,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           final isNarrow = constraints.maxWidth < 600;
                           final phoneField = _buildTextField(
                             controller: _phoneController,
-                            label: 'Phone *',
-                            validator: (v) =>
-                                v?.trim().isEmpty ?? true ? 'Required' : null,
+                            label: 'Company Contact Number',
+                            hintText: 'e.g. +91 98765 43210 (Optional)',
                           );
                           final emailField = _buildTextField(
                             controller: _emailController,

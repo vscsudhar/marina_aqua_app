@@ -401,8 +401,8 @@ class ExportPrintService {
                         [
                           if (_companySettings.gstin.isNotEmpty)
                             'GSTIN: ${_companySettings.gstin}',
-                          if (_companySettings.phone.isNotEmpty)
-                            'Contact: ${_companySettings.phone}',
+                          if (_companySettings.hasContactNumber)
+                            'Contact: ${_companySettings.effectiveContactNumber}',
                         ].join(' | '),
                         style: const pw.TextStyle(
                             fontSize: 8, color: PdfColors.grey700),
@@ -1046,8 +1046,8 @@ class ExportPrintService {
                         _pdfMetaRow('Invoice No:', invoice.invoiceNo,
                             isBold: true),
                         _pdfMetaRow('Date:', invoice.invoiceDate),
-                        if (settings.phone.isNotEmpty)
-                          _pdfMetaRow('Phone:', settings.phone),
+                        if (settings.hasContactNumber)
+                          _pdfMetaRow('Phone:', settings.effectiveContactNumber),
                         if (settings.email.isNotEmpty)
                           _pdfMetaRow('Email:', settings.email),
                         if (invoice.dueDate != null &&

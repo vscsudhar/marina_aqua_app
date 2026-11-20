@@ -88,6 +88,7 @@ class StorageService {
     await prefs.remove(_keyToken);
     await prefs.remove(_keyUser);
     await prefs.remove(_keyActiveCompanyId);
+    await prefs.remove(_keyCompanySettings);
   }
 
   // Active Company Context

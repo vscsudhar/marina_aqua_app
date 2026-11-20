@@ -3,6 +3,7 @@ class CompanySettingModel {
   final String companyName;
   final String tagline;
   final String phone;
+  final String? companyContactNumber;
   final String email;
   final String website;
   final String address;
@@ -30,7 +31,8 @@ class CompanySettingModel {
     required this.id,
     this.companyName = 'SS AquaFlow',
     this.tagline = 'Pure & Mineral Rich Packaged Drinking Water',
-    this.phone = '+91 94441 23456',
+    this.phone = '',
+    this.companyContactNumber,
     this.email = 'billing@marinaaqua.com',
     this.website = 'www.marinaaqua.com',
     this.address =
@@ -57,6 +59,15 @@ class CompanySettingModel {
         'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
   });
 
+  String get effectiveContactNumber =>
+      (companyContactNumber != null && companyContactNumber!.trim().isNotEmpty)
+          ? companyContactNumber!.trim()
+          : phone.trim();
+
+  bool get hasContactNumber =>
+      effectiveContactNumber.isNotEmpty &&
+      effectiveContactNumber.toLowerCase() != 'null';
+
   factory CompanySettingModel.fromJson(Map<String, dynamic> json) {
     return CompanySettingModel(
       id: json['id'] is int
@@ -65,7 +76,11 @@ class CompanySettingModel {
       companyName:
           json['company_name'] as String? ?? 'SS AquaFlow',
       tagline: json['tagline'] as String? ?? '',
-      phone: json['phone'] as String? ?? '',
+      phone: json['company_contact_number'] as String? ??
+          json['phone'] as String? ??
+          '',
+      companyContactNumber: json['company_contact_number'] as String? ??
+          json['phone'] as String?,
       email: json['email'] as String? ?? '',
       website: json['website'] as String? ?? '',
       address: json['address'] as String? ?? '',
@@ -102,6 +117,7 @@ class CompanySettingModel {
     String? companyName,
     String? tagline,
     String? phone,
+    String? companyContactNumber,
     String? email,
     String? website,
     String? address,
@@ -130,6 +146,7 @@ class CompanySettingModel {
       companyName: companyName ?? this.companyName,
       tagline: tagline ?? this.tagline,
       phone: phone ?? this.phone,
+      companyContactNumber: companyContactNumber ?? this.companyContactNumber,
       email: email ?? this.email,
       website: website ?? this.website,
       address: address ?? this.address,
@@ -160,6 +177,7 @@ class CompanySettingModel {
         'company_name': companyName,
         'tagline': tagline,
         'phone': phone,
+        'company_contact_number': phone,
         'email': email,
         'website': website,
         'address': address,

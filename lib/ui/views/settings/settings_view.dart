@@ -361,7 +361,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
             children: [
               Expanded(
                   child: _buildTextField(
-                      controller: phoneController, label: 'Phone Number *')),
+                      controller: phoneController,
+                      label: 'Company Contact Number',
+                      hint: 'e.g. +91 98765 43210 (Optional)')),
               const SizedBox(width: 16),
               Expanded(
                   child: _buildTextField(
@@ -462,6 +464,7 @@ class SettingsView extends StackedView<SettingsViewModel> {
                   'company_name': nameController.text.trim(),
                   'tagline': taglineController.text.trim(),
                   'phone': phoneController.text.trim(),
+                  'company_contact_number': phoneController.text.trim(),
                   'email': emailController.text.trim(),
                   'website': websiteController.text.trim(),
                   'address': addressController.text.trim(),
@@ -1403,7 +1406,8 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
               Expanded(
                 child: SettingsView._buildTextField(
                     controller: _phoneController,
-                    label: 'Primary Contact Phone *'),
+                    label: 'Company Contact Number',
+                    hint: 'e.g. +91 98765 43210 (Optional)'),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1517,6 +1521,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                   'company_name': _nameController.text.trim(),
                   'tagline': _taglineController.text.trim(),
                   'phone': _phoneController.text.trim(),
+                  'company_contact_number': _phoneController.text.trim(),
                   'email': _emailController.text.trim(),
                   'website': _websiteController.text.trim(),
                   'address': _addressController.text.trim(),

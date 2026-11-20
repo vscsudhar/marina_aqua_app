@@ -7,6 +7,7 @@ import '../app/app.router.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
+import 'settings_service.dart';
 import 'storage_service.dart';
 import 'subscription_guard.dart';
 
@@ -171,6 +172,11 @@ class AuthService with ListenableServiceMixin {
       // Ignore network errors during logout
     } finally {
       await _storageService.clearAuthSession();
+      try {
+        if (locator.isRegistered<SettingsService>()) {
+          await locator<SettingsService>().clearSettings();
+        }
+      } catch (_) {}
       _currentUser = null;
       SubscriptionGuard.resetSession();
       notifyListeners();

@@ -41,9 +41,9 @@ void main() {
         ),
       );
 
-      // Verify MARINA and AQUA are present, NOT Custom Company Name Ltd
-      expect(find.text('MARINA'), findsOneWidget);
-      expect(find.text('AQUA'), findsOneWidget);
+      // Verify application brand name is present, NOT Custom Company Name Ltd
+      expect(find.text('SS'), findsOneWidget);
+      expect(find.text('AQUAFLOW'), findsOneWidget);
       expect(find.text('CUSTOM'), findsNothing);
       expect(find.text('ENTERPRISE DISTRIBUTION'), findsOneWidget);
 
@@ -106,10 +106,10 @@ void main() {
       expect(find.text('CUSTOM'), findsNothing);
       expect(find.text('BOTTLING'), findsNothing);
 
-      // Application brand name MARINA AQUA must appear
-      expect(find.text('MARINA'), findsWidgets);
-      expect(find.text('AQUA'), findsWidgets);
-      expect(find.text('ENTERPRISE DISTRIBUTION'), findsOneWidget);
+      // Application brand name SS AQUAFLOW must appear
+      expect(find.text('SS'), findsWidgets);
+      expect(find.text('AQUAFLOW'), findsWidgets);
+      expect(find.text('Dealer Management System'), findsWidgets);
     });
   });
 }

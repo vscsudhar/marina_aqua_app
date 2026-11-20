@@ -2535,6 +2535,8 @@ class MockDealerService extends _i1.Mock implements _i28.DealerService {
     int? dealerId, {
     String? startDate,
     String? endDate,
+    int? month,
+    int? year,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2543,6 +2545,8 @@ class MockDealerService extends _i1.Mock implements _i28.DealerService {
           {
             #startDate: startDate,
             #endDate: endDate,
+            #month: month,
+            #year: year,
           },
         ),
         returnValue:
