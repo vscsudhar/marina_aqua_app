@@ -29,6 +29,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
   late TextEditingController _companyNameController;
   late TextEditingController _taglineController;
   late TextEditingController _phoneController;
+  late TextEditingController _optionalPhoneController;
   late TextEditingController _emailController;
   late TextEditingController _websiteController;
   late TextEditingController _addressController;
@@ -47,6 +48,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
 
   bool _isSaving = false;
   bool _isUploadingLogo = false;
+  bool _showPhoneOnInvoice = true;
   String? _logoUrl;
   String? _errorMessage;
 
@@ -55,9 +57,11 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     super.initState();
     final s = widget.settings;
     _logoUrl = s.logoUrl ?? s.logoPath;
+    _showPhoneOnInvoice = s.showPhoneOnInvoice;
     _companyNameController = TextEditingController(text: s.companyName);
     _taglineController = TextEditingController(text: s.tagline);
     _phoneController = TextEditingController(text: s.phone);
+    _optionalPhoneController = TextEditingController(text: s.optionalPhone);
     _emailController = TextEditingController(text: s.email);
     _websiteController = TextEditingController(text: s.website);
     _addressController = TextEditingController(text: s.address);
@@ -81,6 +85,7 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     _companyNameController.dispose();
     _taglineController.dispose();
     _phoneController.dispose();
+    _optionalPhoneController.dispose();
     _emailController.dispose();
     _websiteController.dispose();
     _addressController.dispose();
@@ -112,7 +117,9 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
         'company_name': _companyNameController.text.trim(),
         'tagline': _taglineController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'company_contact_number': _phoneController.text.trim(),
+        'optional_phone': _optionalPhoneController.text.trim(),
+        'company_contact_number': _optionalPhoneController.text.trim(),
+        'show_phone_on_invoice': _showPhoneOnInvoice,
         'email': _emailController.text.trim(),
         'website': _websiteController.text.trim(),
         'address': _addressController.text.trim(),
@@ -405,8 +412,21 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                           final isNarrow = constraints.maxWidth < 600;
                           final phoneField = _buildTextField(
                             controller: _phoneController,
-                            label: 'Company Contact Number',
+                            label: 'Primary Contact Phone *',
+                            hintText: 'e.g. +91 94441 23456',
+                            prefixIcon: const Icon(Icons.phone_outlined,
+                                size: 20, color: kcPrimaryColor),
+                            keyboardType: TextInputType.phone,
+                          );
+                          final optionalPhoneField = _buildTextField(
+                            controller: _optionalPhoneController,
+                            label: 'Optional Mobile Number',
                             hintText: 'e.g. +91 98765 43210 (Optional)',
+                            helperText:
+                                'Optional • Displayed on invoice header if enabled',
+                            prefixIcon: const Icon(Icons.phone_android_outlined,
+                                size: 20, color: kcPrimaryColor),
+                            keyboardType: TextInputType.phone,
                           );
                           final emailField = _buildTextField(
                             controller: _emailController,
@@ -424,6 +444,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                               children: [
                                 phoneField,
                                 const SizedBox(height: 12),
+                                optionalPhoneField,
+                                const SizedBox(height: 12),
                                 emailField,
                                 const SizedBox(height: 12),
                                 webField,
@@ -431,16 +453,80 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                             );
                           }
 
-                          return Row(
+                          return Column(
                             children: [
-                              Expanded(child: phoneField),
-                              const SizedBox(width: 16),
-                              Expanded(child: emailField),
-                              const SizedBox(width: 16),
-                              Expanded(child: webField),
+                              Row(
+                                children: [
+                                  Expanded(child: phoneField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: optionalPhoneField),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(child: emailField),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: webField),
+                                ],
+                              ),
                             ],
                           );
                         },
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: kcVeryLightGrey,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: kcBorderColor),
+                        ),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: _showPhoneOnInvoice,
+                              onChanged: (val) {
+                                setState(() {
+                                  _showPhoneOnInvoice = val ?? true;
+                                });
+                              },
+                              activeColor: kcPrimaryColor,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _showPhoneOnInvoice = !_showPhoneOnInvoice;
+                                  });
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Show Mobile / Contact Number in Invoices',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: kcDeepNavy,
+                                      ),
+                                    ),
+                                    Text(
+                                      'When checked, this contact number will be printed in the invoice header.',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: kcMediumGrey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                       _buildTextField(
@@ -724,19 +810,27 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
     required TextEditingController controller,
     required String label,
     String? hintText,
+    String? helperText,
+    Widget? prefixIcon,
     int maxLines = 1,
     String? Function(String?)? validator,
+    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       validator: validator,
+      keyboardType: keyboardType,
       style: GoogleFonts.inter(fontSize: 14, color: kcTextPrimary),
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
+        helperText: helperText,
+        helperMaxLines: 2,
+        prefixIcon: prefixIcon,
         labelStyle: GoogleFonts.inter(fontSize: 13, color: kcMediumGrey),
         hintStyle: GoogleFonts.inter(fontSize: 13, color: kcLightGrey),
+        helperStyle: GoogleFonts.inter(fontSize: 11, color: kcMediumGrey),
         isDense: true,
         filled: true,
         fillColor: Colors.white,

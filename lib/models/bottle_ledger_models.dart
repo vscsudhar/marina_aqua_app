@@ -40,7 +40,7 @@ class BottleLedgerMetaModel {
 
   factory BottleLedgerMetaModel.fromJson(Map<String, dynamic> json) {
     return BottleLedgerMetaModel(
-      companyName: json['company_name'] ?? 'SS AquaFlow',
+      companyName: json['company_name'] ?? 'DockRent',
       companyLogo: json['company_logo'],
       year: _toInt(json['year'], DateTime.now().year),
       month: _toInt(json['month'], DateTime.now().month),
@@ -379,7 +379,7 @@ class BottleOthersStatementModel {
     final rawEntries = json['entries'] as List? ?? [];
 
     return BottleOthersStatementModel(
-      companyName: json['company_name']?.toString() ?? 'SS AquaFlow',
+      companyName: json['company_name']?.toString() ?? 'DockRent',
       companyLogo: json['company_logo']?.toString(),
       year: _toInt(json['year']),
       month: _toInt(json['month']),

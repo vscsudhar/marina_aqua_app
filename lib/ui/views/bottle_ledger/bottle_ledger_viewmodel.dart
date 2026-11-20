@@ -50,7 +50,7 @@ class BottleLedgerViewModel extends BaseViewModel {
         _report!.meta.companyName.isNotEmpty) {
       return _report!.meta.companyName;
     }
-    return _settingsService?.settings.companyName ?? 'SS AquaFlow';
+    return _settingsService?.settings.companyName ?? 'DockRent';
   }
 
   String? get companyLogo {

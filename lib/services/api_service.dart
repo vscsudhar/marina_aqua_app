@@ -375,7 +375,7 @@ class ApiService {
       case DioExceptionType.connectionError:
         return ApiException(
           message:
-              'Unable to connect to SS AquaFlow server. Ensure the API is running.',
+              'Unable to connect to DockRent server. Ensure the API is running.',
           statusCode: 503,
         );
       default:

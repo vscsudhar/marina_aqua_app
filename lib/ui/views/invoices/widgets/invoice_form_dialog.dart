@@ -230,6 +230,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   bool _enableAdditionalTax = false;
   List<AdditionalTaxEntry> _additionalTaxes = [];
   bool _showBankDetails = false;
+  bool _showContactNumber = true;
 
   late String _gstMode; // 'with_gst' | 'without_gst'
   late String _invoiceType;
@@ -400,6 +401,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               ? inv.terms!
               : widget.companySettings.invoiceFooterNotes;
       _showBankDetails = inv.showBankDetails;
+      _showContactNumber = inv.showContactNumber;
 
       _rows = inv.items.map((it) {
         final prod = widget.products.cast<ProductModel?>().firstWhere(
@@ -444,6 +446,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
       _enableAdditionalTax = false;
       _additionalTaxes = [];
       _showBankDetails = false;
+      _showContactNumber = widget.companySettings.showPhoneOnInvoice;
       _termsController.text = widget.companySettings.invoiceFooterNotes;
       _loadNextInvoiceNo();
 
@@ -961,6 +964,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                 ? widget.companySettings.invoiceFooterNotes.trim()
                 : null),
         'show_bank_details': _isWithoutGst ? _showBankDetails : false,
+        'show_contact_number': _showContactNumber,
         'status': isFinal ? 'finalized' : 'draft',
         'is_final': isFinal,
         'items': itemsPayload,
@@ -1557,6 +1561,47 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               ),
             ),
           ],
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: kcVeryLightGrey,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: kcBorderColor),
+            ),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: _showContactNumber,
+                  onChanged: (val) {
+                    setState(() {
+                      _showContactNumber = val ?? true;
+                    });
+                  },
+                  activeColor: kcPrimaryColor,
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _showContactNumber = !_showContactNumber;
+                      });
+                    },
+                    child: Text(
+                      'Show Company Contact / Mobile Number in Invoice',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: kcDeepNavy,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const Divider(height: 24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

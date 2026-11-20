@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marina_aqua/ui/common/app_title_helper.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:marina_aqua/app/app.locator.dart';
@@ -27,6 +28,7 @@ class LoginViewModel extends BaseViewModel {
   String? get errorMessage => _errorMessage;
 
   Future<void> init() async {
+    setAppTitle('Sign In');
     setBusy(true);
     try {
       final isRemembered = await _storageService.getRememberMe();

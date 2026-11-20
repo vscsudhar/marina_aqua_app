@@ -1024,15 +1024,18 @@ class SettingsView extends StackedView<SettingsViewModel> {
     required TextEditingController controller,
     required String label,
     String? hint,
+    String? helperText,
     String? suffix,
     Widget? prefixIcon,
     int maxLines = 1,
     bool readOnly = false,
+    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       readOnly: readOnly,
+      keyboardType: keyboardType,
       style: GoogleFonts.inter(
         fontSize: 14,
         color: readOnly ? kcTextSecondary : kcTextPrimary,
@@ -1041,10 +1044,13 @@ class SettingsView extends StackedView<SettingsViewModel> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
+        helperText: helperText,
+        helperMaxLines: 2,
         suffixText: suffix,
         prefixIcon: prefixIcon,
         labelStyle: GoogleFonts.inter(fontSize: 13, color: kcMediumGrey),
         hintStyle: GoogleFonts.inter(fontSize: 13, color: kcLightGrey),
+        helperStyle: GoogleFonts.inter(fontSize: 11, color: kcMediumGrey),
         isDense: true,
         filled: true,
         fillColor: readOnly ? const Color(0xFFF1F5F9) : Colors.white,
@@ -1132,6 +1138,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
   late final TextEditingController _nameController;
   late final TextEditingController _taglineController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _optionalPhoneController;
   late final TextEditingController _emailController;
   late final TextEditingController _websiteController;
   late final TextEditingController _addressController;
@@ -1140,6 +1147,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
   late final TextEditingController _gstinController;
   late final TextEditingController _panController;
   late final TextEditingController _fssaiController;
+  late bool _showPhoneOnInvoice;
 
   @override
   void initState() {
@@ -1148,6 +1156,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
     _nameController = TextEditingController(text: s.companyName);
     _taglineController = TextEditingController(text: s.tagline);
     _phoneController = TextEditingController(text: s.phone);
+    _optionalPhoneController = TextEditingController(text: s.optionalPhone);
     _emailController = TextEditingController(text: s.email);
     _websiteController = TextEditingController(text: s.website);
     _addressController = TextEditingController(text: s.address);
@@ -1156,6 +1165,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
     _gstinController = TextEditingController(text: s.gstin);
     _panController = TextEditingController(text: s.pan);
     _fssaiController = TextEditingController(text: s.fssaiNo ?? '');
+    _showPhoneOnInvoice = s.showPhoneOnInvoice;
   }
 
   @override
@@ -1165,6 +1175,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
       _syncIfChanged(_nameController, widget.settings.companyName);
       _syncIfChanged(_taglineController, widget.settings.tagline);
       _syncIfChanged(_phoneController, widget.settings.phone);
+      _syncIfChanged(_optionalPhoneController, widget.settings.optionalPhone);
       _syncIfChanged(_emailController, widget.settings.email);
       _syncIfChanged(_websiteController, widget.settings.website);
       _syncIfChanged(_addressController, widget.settings.address);
@@ -1173,6 +1184,9 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
       _syncIfChanged(_gstinController, widget.settings.gstin);
       _syncIfChanged(_panController, widget.settings.pan);
       _syncIfChanged(_fssaiController, widget.settings.fssaiNo);
+      setState(() {
+        _showPhoneOnInvoice = widget.settings.showPhoneOnInvoice;
+      });
     }
   }
 
@@ -1188,6 +1202,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
     _nameController.dispose();
     _taglineController.dispose();
     _phoneController.dispose();
+    _optionalPhoneController.dispose();
     _emailController.dispose();
     _websiteController.dispose();
     _addressController.dispose();
@@ -1358,71 +1373,220 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           SettingsView._sectionHeader(
               'Legal & Contact Credentials', Icons.badge_outlined),
           const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsView._buildTextField(
-                      controller: _nameController,
-                      label: 'Company Legal Name (Aqua User)',
-                      readOnly: true,
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          size: 18, color: kcMediumGrey),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
+          if (widget.isDesktop) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SettingsView._buildTextField(
+                        controller: _nameController,
+                        label: 'Company Legal Name (Aqua User)',
+                        readOnly: true,
+                        prefixIcon: const Icon(Icons.lock_outline,
+                            size: 18, color: kcMediumGrey),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.info_outline,
+                              size: 12, color: kcMediumGrey),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Registered via Aqua User Super Admin (read-only)',
+                            style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: kcMediumGrey,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SettingsView._buildTextField(
+                      controller: _taglineController,
+                      label: 'Tagline / Slogan',
+                      hint: 'Pure & Hygienic Water'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SettingsView._buildTextField(
+                    controller: _phoneController,
+                    label: 'Primary Contact Phone *',
+                    hint: 'e.g. +91 94441 23456',
+                    prefixIcon: const Icon(Icons.phone_outlined,
+                        size: 20, color: kcPrimaryColor),
+                    keyboardType: TextInputType.phone,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SettingsView._buildTextField(
+                    controller: _optionalPhoneController,
+                    label: 'Optional Mobile Number',
+                    hint: 'e.g. +91 98765 43210 (Optional)',
+                    helperText:
+                        'Optional • Displayed on invoice header if enabled',
+                    prefixIcon: const Icon(Icons.phone_android_outlined,
+                        size: 20, color: kcPrimaryColor),
+                    keyboardType: TextInputType.phone,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SettingsView._buildTextField(
+                    controller: _emailController,
+                    label: 'Billing Support Email *',
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        size: 20, color: kcPrimaryColor),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SettingsView._buildTextField(
+                    controller: _websiteController,
+                    label: 'Website URL (Optional)',
+                    hint: 'https://marinaaqua.com',
+                    prefixIcon: const Icon(Icons.language_outlined,
+                        size: 20, color: kcPrimaryColor),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            SettingsView._buildTextField(
+              controller: _nameController,
+              label: 'Company Legal Name (Aqua User)',
+              readOnly: true,
+              prefixIcon:
+                  const Icon(Icons.lock_outline, size: 18, color: kcMediumGrey),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.info_outline, size: 12, color: kcMediumGrey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Registered via Aqua User Super Admin (read-only)',
+                    style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: kcMediumGrey,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            SettingsView._buildTextField(
+              controller: _taglineController,
+              label: 'Tagline / Slogan',
+              hint: 'Pure & Hygienic Water',
+            ),
+            const SizedBox(height: 14),
+            SettingsView._buildTextField(
+              controller: _phoneController,
+              label: 'Primary Contact Phone *',
+              hint: 'e.g. +91 94441 23456',
+              prefixIcon: const Icon(Icons.phone_outlined,
+                  size: 20, color: kcPrimaryColor),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 14),
+            SettingsView._buildTextField(
+              controller: _optionalPhoneController,
+              label: 'Optional Mobile Number',
+              hint: 'e.g. +91 98765 43210 (Optional)',
+              helperText:
+                  'Optional • Displayed on invoice header if enabled',
+              prefixIcon: const Icon(Icons.phone_android_outlined,
+                  size: 20, color: kcPrimaryColor),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 14),
+            SettingsView._buildTextField(
+              controller: _emailController,
+              label: 'Billing Support Email *',
+              prefixIcon: const Icon(Icons.email_outlined,
+                  size: 20, color: kcPrimaryColor),
+            ),
+            const SizedBox(height: 14),
+            SettingsView._buildTextField(
+              controller: _websiteController,
+              label: 'Website URL (Optional)',
+              hint: 'https://marinaaqua.com',
+              prefixIcon: const Icon(Icons.language_outlined,
+                  size: 20, color: kcPrimaryColor),
+            ),
+          ],
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: kcVeryLightGrey,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: kcBorderColor),
+            ),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: _showPhoneOnInvoice,
+                  onChanged: (val) {
+                    setState(() {
+                      _showPhoneOnInvoice = val ?? true;
+                    });
+                  },
+                  activeColor: kcPrimaryColor,
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _showPhoneOnInvoice = !_showPhoneOnInvoice;
+                      });
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.info_outline,
-                            size: 12, color: kcMediumGrey),
-                        const SizedBox(width: 4),
                         Text(
-                          'Registered via Aqua User Super Admin (read-only)',
+                          'Show Mobile / Contact Number in Invoices',
                           style: GoogleFonts.inter(
-                              fontSize: 11,
-                              color: kcMediumGrey,
-                              fontWeight: FontWeight.w500),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: kcDeepNavy,
+                          ),
+                        ),
+                        Text(
+                          'When checked, this contact number will be printed in the invoice header.',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: kcMediumGrey,
+                          ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SettingsView._buildTextField(
-                    controller: _taglineController,
-                    label: 'Tagline / Slogan',
-                    hint: 'Pure & Hygienic Water'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: SettingsView._buildTextField(
-                    controller: _phoneController,
-                    label: 'Company Contact Number',
-                    hint: 'e.g. +91 98765 43210 (Optional)'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SettingsView._buildTextField(
-                    controller: _emailController,
-                    label: 'Billing Support Email *'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SettingsView._buildTextField(
-                    controller: _websiteController,
-                    label: 'Website URL',
-                    hint: 'https://marinaaqua.com'),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 14),
           SettingsView._buildTextField(
@@ -1521,7 +1685,9 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                   'company_name': _nameController.text.trim(),
                   'tagline': _taglineController.text.trim(),
                   'phone': _phoneController.text.trim(),
-                  'company_contact_number': _phoneController.text.trim(),
+                  'optional_phone': _optionalPhoneController.text.trim(),
+                  'company_contact_number': _optionalPhoneController.text.trim(),
+                  'show_phone_on_invoice': _showPhoneOnInvoice,
                   'email': _emailController.text.trim(),
                   'website': _websiteController.text.trim(),
                   'address': _addressController.text.trim(),

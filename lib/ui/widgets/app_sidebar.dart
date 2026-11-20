@@ -199,11 +199,13 @@ class AppSidebar extends StatelessWidget {
               settingsService.settings.companyName !=
                   'Marina Aqua Pure Water Co.' &&
               settingsService.settings.companyName !=
-                  'SS AquaFlow')
+                  'SS AquaFlow' &&
+              settingsService.settings.companyName !=
+                  'DockRent')
           ? settingsService.settings.companyName
           : (effectiveUser?.companyName ??
               settingsService?.settings.companyName ??
-              'SS AQUAFLOW');
+              'DockRent');
 
       final width = isPermanent ? 280.0 : 320.0;
 

@@ -3,6 +3,8 @@ class CompanySettingModel {
   final String companyName;
   final String tagline;
   final String phone;
+  final String optionalPhone;
+  final bool showPhoneOnInvoice;
   final String? companyContactNumber;
   final String email;
   final String website;
@@ -29,12 +31,14 @@ class CompanySettingModel {
 
   const CompanySettingModel({
     required this.id,
-    this.companyName = 'SS AquaFlow',
+    this.companyName = 'DockRent',
     this.tagline = 'Pure & Mineral Rich Packaged Drinking Water',
     this.phone = '',
+    this.optionalPhone = '',
+    this.showPhoneOnInvoice = true,
     this.companyContactNumber,
-    this.email = 'billing@marinaaqua.com',
-    this.website = 'www.marinaaqua.com',
+    this.email = 'billing@dockrent.com',
+    this.website = 'www.dockrent.com',
     this.address =
         'Plot No. 14, OMR IT Highway, Thoraipakkam, Chennai - 600097',
     this.stateName = 'Tamil Nadu',
@@ -46,7 +50,7 @@ class CompanySettingModel {
     this.bankBranch = 'Thoraipakkam, Chennai',
     this.accountNumber = '38992010045',
     this.ifscCode = 'SBIN0004567',
-    this.upiId = 'marinaaqua@sbi',
+    this.upiId = 'dockrent@sbi',
     this.currencySymbol = '₹',
     this.currencyCode = 'INR',
     this.defaultTaxRate = 18.0,
@@ -60,13 +64,16 @@ class CompanySettingModel {
   });
 
   String get effectiveContactNumber =>
-      (companyContactNumber != null && companyContactNumber!.trim().isNotEmpty)
-          ? companyContactNumber!.trim()
-          : phone.trim();
+      optionalPhone.trim().isNotEmpty
+          ? optionalPhone.trim()
+          : (companyContactNumber != null && companyContactNumber!.trim().isNotEmpty)
+              ? companyContactNumber!.trim()
+              : phone.trim();
 
   bool get hasContactNumber =>
-      effectiveContactNumber.isNotEmpty &&
-      effectiveContactNumber.toLowerCase() != 'null';
+      showPhoneOnInvoice &&
+      (effectiveContactNumber.isNotEmpty &&
+          effectiveContactNumber.toLowerCase() != 'null');
 
   factory CompanySettingModel.fromJson(Map<String, dynamic> json) {
     return CompanySettingModel(
@@ -74,12 +81,18 @@ class CompanySettingModel {
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 1,
       companyName:
-          json['company_name'] as String? ?? 'SS AquaFlow',
+          json['company_name'] as String? ?? 'DockRent',
       tagline: json['tagline'] as String? ?? '',
-      phone: json['company_contact_number'] as String? ??
-          json['phone'] as String? ??
+      phone: json['phone'] as String? ?? '',
+      optionalPhone: json['optional_phone'] as String? ??
+          json['company_contact_number'] as String? ??
           '',
-      companyContactNumber: json['company_contact_number'] as String? ??
+      showPhoneOnInvoice: json['show_phone_on_invoice'] == null ||
+          json['show_phone_on_invoice'] == true ||
+          json['show_phone_on_invoice'] == 1 ||
+          json['show_phone_on_invoice'] == '1',
+      companyContactNumber: json['optional_phone'] as String? ??
+          json['company_contact_number'] as String? ??
           json['phone'] as String?,
       email: json['email'] as String? ?? '',
       website: json['website'] as String? ?? '',
@@ -117,6 +130,8 @@ class CompanySettingModel {
     String? companyName,
     String? tagline,
     String? phone,
+    String? optionalPhone,
+    bool? showPhoneOnInvoice,
     String? companyContactNumber,
     String? email,
     String? website,
@@ -146,6 +161,8 @@ class CompanySettingModel {
       companyName: companyName ?? this.companyName,
       tagline: tagline ?? this.tagline,
       phone: phone ?? this.phone,
+      optionalPhone: optionalPhone ?? this.optionalPhone,
+      showPhoneOnInvoice: showPhoneOnInvoice ?? this.showPhoneOnInvoice,
       companyContactNumber: companyContactNumber ?? this.companyContactNumber,
       email: email ?? this.email,
       website: website ?? this.website,
@@ -177,7 +194,9 @@ class CompanySettingModel {
         'company_name': companyName,
         'tagline': tagline,
         'phone': phone,
-        'company_contact_number': phone,
+        'optional_phone': optionalPhone,
+        'show_phone_on_invoice': showPhoneOnInvoice,
+        'company_contact_number': optionalPhone.isNotEmpty ? optionalPhone : phone,
         'email': email,
         'website': website,
         'address': address,
@@ -456,6 +475,7 @@ class InvoiceModel {
   final String? notes;
   final String? terms;
   final bool showBankDetails;
+  final bool showContactNumber;
   final int itemsCount;
   final List<InvoiceItemModel> items;
   final List<InvoicePaymentModel> payments;
@@ -511,6 +531,7 @@ class InvoiceModel {
     this.notes,
     this.terms,
     this.showBankDetails = false,
+    this.showContactNumber = true,
     this.itemsCount = 0,
     this.items = const [],
     this.payments = const [],
@@ -616,6 +637,10 @@ class InvoiceModel {
       showBankDetails: json['show_bank_details'] == true ||
           json['show_bank_details'] == 1 ||
           json['show_bank_details'] == '1',
+      showContactNumber: json['show_contact_number'] == null ||
+          json['show_contact_number'] == true ||
+          json['show_contact_number'] == 1 ||
+          json['show_contact_number'] == '1',
       itemsCount: json['items_count'] is int ? json['items_count'] : 0,
       items: (json['items'] as List?)
               ?.map((item) =>

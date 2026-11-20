@@ -11,6 +11,7 @@ import 'package:marina_aqua/models/billing_models.dart';
 import 'package:marina_aqua/services/dashboard_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/services/subscription_guard.dart';
+import 'package:marina_aqua/ui/common/app_title_helper.dart';
 import 'package:marina_aqua/ui/widgets/date_filter_selector.dart';
 
 class HomeViewModel extends ReactiveViewModel {
@@ -28,13 +29,14 @@ class HomeViewModel extends ReactiveViewModel {
     if (_settingsService.isInitialized &&
         _settingsService.settings.companyName.trim().isNotEmpty &&
         _settingsService.settings.companyName != 'Marina Aqua Pure Water Co.' &&
-        _settingsService.settings.companyName != 'SS AquaFlow') {
+        _settingsService.settings.companyName != 'SS AquaFlow' &&
+        _settingsService.settings.companyName != 'DockRent') {
       return _settingsService.settings.companyName;
     }
     return currentUser?.companyName ??
         (_settingsService.settings.companyName.isNotEmpty
             ? _settingsService.settings.companyName
-            : 'SS AquaFlow');
+            : 'DockRent');
   }
 
   String? get companyLogo {
@@ -79,6 +81,7 @@ class HomeViewModel extends ReactiveViewModel {
   }
 
   Future<void> init() async {
+    _updatePageTitle();
     // Initially call profile and settings APIs to populate sidebar company name and logo immediately
     await _loadInitialProfileAndSettings();
     SubscriptionGuard.checkAndShowNearExpiryOnce();
@@ -200,10 +203,52 @@ class HomeViewModel extends ReactiveViewModel {
     }
 
     _activeModule = moduleId;
+    _updatePageTitle();
     if (moduleId == 'dashboard') {
       fetchDashboardData();
     }
     notifyListeners();
+  }
+
+  void _updatePageTitle() {
+    String pageName;
+    switch (_activeModule) {
+      case 'dealers':
+        pageName = 'Dealers & Rates';
+        break;
+      case 'products':
+        pageName = 'Products Catalog';
+        break;
+      case 'damaged_products':
+        pageName = 'Damaged Products';
+        break;
+      case 'purchases':
+        pageName = 'Purchases & Stock';
+        break;
+      case 'invoices':
+        pageName = 'Invoices & Billing';
+        break;
+      case 'collections':
+        pageName = 'Daily Collection';
+        break;
+      case 'ledger':
+        pageName = 'Dealer Ledger';
+        break;
+      case 'bottle_ledger':
+        pageName = 'Bottle Ledger';
+        break;
+      case 'users':
+        pageName = 'Staff & Team';
+        break;
+      case 'settings':
+        pageName = 'Settings & Taxes';
+        break;
+      case 'dashboard':
+      default:
+        pageName = 'Dashboard';
+        break;
+    }
+    setAppTitle(pageName);
   }
 
   void navigateToModule(String moduleId) {

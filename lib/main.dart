@@ -25,7 +25,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SS AquaFlow — Dealer Management System',
+      title: 'DockRent',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

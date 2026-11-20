@@ -43,7 +43,7 @@ class MarinaLogo extends StatelessWidget {
           ? companyName!.trim()
           : ((effectiveName != null && effectiveName.trim().isNotEmpty)
               ? effectiveName.trim()
-              : 'SS AQUAFLOW');
+              : 'DOCKRENT');
 
       final Widget emblem;
       if (finalLogo != null && finalLogo.isNotEmpty) {
@@ -77,11 +77,11 @@ class MarinaLogo extends StatelessWidget {
                 finalLogo,
                 key: ValueKey(finalLogo),
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Center(
-                  child: CustomPaint(
-                    size: Size(size * 0.6, size * 0.6),
-                    painter: _WaterDropletPainter(),
-                  ),
+                errorBuilder: (_, __, ___) => Image.asset(
+                  'assets/images/app_badge.png',
+                  width: size * 0.8,
+                  height: size * 0.8,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -92,22 +92,22 @@ class MarinaLogo extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: kcOceanGradient,
+            borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: kcPrimaryColor.withValues(alpha: 0.35),
-                blurRadius: size * 0.3,
-                offset: Offset(0, size * 0.1),
+                color: kcDeepNavy.withValues(alpha: 0.18),
+                blurRadius: size * 0.25,
+                offset: Offset(0, size * 0.08),
               ),
             ],
           ),
-          child: ClipOval(
-            child: Center(
-              child: CustomPaint(
-                size: Size(size * 0.6, size * 0.6),
-                painter: _WaterDropletPainter(),
-              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/app_badge.png',
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
             ),
           ),
         );
@@ -116,8 +116,13 @@ class MarinaLogo extends StatelessWidget {
       if (!showText) return emblem;
 
       final words = rawName.split(RegExp(r'\s+'));
-      final firstPart = words.isNotEmpty ? words[0] : 'SS';
-      final secondPart = words.length > 1 ? words[1] : 'AQUAFLOW';
+      String firstPart = words.isNotEmpty ? words[0] : 'DOCK';
+      String secondPart = words.length > 1 ? words[1] : '';
+      if (rawName.toUpperCase() == 'DOCKRENT' ||
+          rawName.toUpperCase() == 'DOCK RENT') {
+        firstPart = 'DOCK';
+        secondPart = 'RENT';
+      }
       final defaultSubtitle = words.length > 2
           ? (subtitle ?? words.sublist(2).join(' ').toUpperCase())
           : (subtitle ?? 'DEALER MANAGEMENT SYSTEM');
@@ -232,9 +237,9 @@ class MarinaLogo extends StatelessWidget {
     }
 
     // If company logo is explicitly disabled (e.g. on application login screen),
-    // strictly use the SS AquaFlow application brand emblem without listening to settings.
+    // strictly use the DockRent application brand emblem without listening to settings.
     if (!useCompanyLogo) {
-      return buildContent(null, 'SS AQUAFLOW');
+      return buildContent(null, 'DOCKRENT');
     }
 
     // If explicit companyName and logoUrl are provided by parent (e.g. sidebar or home view),
@@ -278,9 +283,11 @@ class MarinaLogo extends StatelessWidget {
           : ((settingsService?.isInitialized == true &&
                   settings?.companyName != null &&
                   settings!.companyName.trim().isNotEmpty &&
-                  settings.companyName != 'Marina Aqua Pure Water Co.')
+                  settings.companyName != 'Marina Aqua Pure Water Co.' &&
+                  settings.companyName != 'SS AquaFlow' &&
+                  settings.companyName != 'DockRent')
               ? settings.companyName
-              : (user?.companyName ?? settings?.companyName ?? 'SS AQUAFLOW'));
+              : (user?.companyName ?? settings?.companyName ?? 'DOCKRENT'));
 
       return buildContent(effectiveLogo, effectiveName);
     }
@@ -301,62 +308,3 @@ class MarinaLogo extends StatelessWidget {
   }
 }
 
-class _WaterDropletPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    final w = size.width;
-    final h = size.height;
-
-    // Water droplet silhouette
-    path.moveTo(w * 0.5, 0);
-    path.cubicTo(w * 0.1, h * 0.6, 0, h * 0.75, 0, h * 0.85);
-    path.arcToPoint(
-      Offset(w, h * 0.85),
-      radius: Radius.circular(w * 0.5),
-      clockwise: false,
-    );
-    path.cubicTo(w, h * 0.75, w * 0.9, h * 0.6, w * 0.5, 0);
-    path.close();
-
-    canvas.drawPath(path, paint);
-
-    // Inner wave cut
-    final wavePaint = Paint()
-      ..color = kcPrimaryDark.withValues(alpha: 0.35)
-      ..style = PaintingStyle.fill;
-
-    final wavePath = Path();
-    wavePath.moveTo(w * 0.15, h * 0.8);
-    wavePath.quadraticBezierTo(w * 0.5, h * 0.65, w * 0.85, h * 0.8);
-    wavePath.arcToPoint(
-      Offset(w * 0.15, h * 0.8),
-      radius: Radius.circular(w * 0.45),
-      clockwise: false,
-    );
-    wavePath.close();
-
-    canvas.drawPath(wavePath, wavePaint);
-
-    // Light reflection gloss
-    final glossPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.7)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(w * 0.38, h * 0.4),
-        width: w * 0.16,
-        height: h * 0.28,
-      ),
-      glossPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

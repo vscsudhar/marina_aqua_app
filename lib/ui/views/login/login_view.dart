@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
 import '../../common/app_colors.dart';
 import '../../common/app_strings.dart';
+import '../../widgets/app_footer.dart';
 import '../../widgets/marina_logo.dart';
 import 'login_viewmodel.dart';
 
@@ -108,7 +109,7 @@ class LoginView extends StackedView<LoginViewModel> {
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
-                                      'TRUSTED WATER DISTRIBUTION PLATFORM',
+                                      'INTELLIGENT ASSET & DEALER MANAGEMENT',
                                       style: GoogleFonts.inter(
                                         color: kcAquaCyan,
                                         fontSize: 11,
@@ -123,7 +124,7 @@ class LoginView extends StackedView<LoginViewModel> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Pure Mineral Hydration,\nPrecision Dealer Operations.',
+                              'Precision Operations,\nSeamless Distribution.',
                               style: GoogleFonts.outfit(
                                 color: Colors.white,
                                 fontSize: 38,
@@ -134,7 +135,7 @@ class LoginView extends StackedView<LoginViewModel> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Seamlessly manage 20L water jars, dealer credit ledgers, daily cash collections, automated GST invoices, and 15-day settlement statements.',
+                              'Seamlessly manage inventory, dealer credit ledgers, daily cash collections, automated GST invoices, and 15-day settlement statements.',
                               style: GoogleFonts.inter(
                                 color: kcLightGrey,
                                 fontSize: 15,
@@ -159,9 +160,9 @@ class LoginView extends StackedView<LoginViewModel> {
                             const SizedBox(height: 16),
                             _buildFeatureBadge(
                               icon: Icons.inventory_2_outlined,
-                              title: 'Inventory & Empty Can Tracking',
+                              title: 'Inventory & Asset Tracking',
                               subtitle:
-                                  'Real-time monitoring of filled 20L jars, deposits, and returns.',
+                                  'Real-time monitoring of inventory, assets, deposits, and returns.',
                             ),
                           ],
                         ),
@@ -201,7 +202,14 @@ class LoginView extends StackedView<LoginViewModel> {
               padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 460),
-                child: _buildFormCard(context, viewModel, isCompact: false),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildFormCard(context, viewModel, isCompact: false),
+                    const SizedBox(height: 16),
+                    const AppFooter(showBorder: false),
+                  ],
+                ),
               ),
             ),
           ),
@@ -239,14 +247,7 @@ class LoginView extends StackedView<LoginViewModel> {
               const SizedBox(height: 28),
               _buildFormCard(context, viewModel, isCompact: !isTablet),
               const SizedBox(height: 20),
-              Text(
-                AppStrings.copyrightNotice,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: kcTextMuted,
-                  fontSize: 11,
-                ),
-              ),
+              const AppFooter(showBorder: false),
               const SizedBox(height: 16),
             ],
           ),

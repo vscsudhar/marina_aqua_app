@@ -41,12 +41,14 @@ void main() {
       final json1 = {
         'id': 10,
         'company_name': 'Aqua Test',
-        'company_contact_number': '+91 99999 88888',
+        'phone': '+91 94441 23456',
+        'optional_phone': '+91 99999 88888',
       };
       final model1 = CompanySettingModel.fromJson(json1);
-      expect(model1.phone, '+91 99999 88888');
-      expect(model1.companyContactNumber, '+91 99999 88888');
+      expect(model1.phone, '+91 94441 23456');
+      expect(model1.optionalPhone, '+91 99999 88888');
       expect(model1.hasContactNumber, true);
+      expect(model1.effectiveContactNumber, '+91 99999 88888');
 
       final json2 = {
         'id': 11,
@@ -55,8 +57,9 @@ void main() {
       };
       final model2 = CompanySettingModel.fromJson(json2);
       expect(model2.phone, '+91 77777 66666');
-      expect(model2.companyContactNumber, '+91 77777 66666');
+      expect(model2.optionalPhone, '');
       expect(model2.hasContactNumber, true);
+      expect(model2.effectiveContactNumber, '+91 77777 66666');
     });
 
     test('toJson outputs both phone and company_contact_number keys', () {
@@ -67,6 +70,40 @@ void main() {
       final json = model.toJson();
       expect(json['phone'], '+91 91234 56789');
       expect(json['company_contact_number'], '+91 91234 56789');
+      expect(json['show_phone_on_invoice'], true);
+    });
+
+    test('When showPhoneOnInvoice is false, hasContactNumber is false even if phone exists', () {
+      const model = CompanySettingModel(
+        id: 1,
+        phone: '+91 98765 43210',
+        showPhoneOnInvoice: false,
+      );
+      expect(model.hasContactNumber, false);
+      expect(model.effectiveContactNumber, '+91 98765 43210');
+    });
+
+    test('InvoiceModel parses show_contact_number correctly', () {
+      final invJson1 = {
+        'id': 1,
+        'invoice_no': 'INV-001',
+        'invoice_date': '2026-11-20',
+        'customer_name': 'Test Dealer',
+        'grand_total': 500.0,
+        'show_contact_number': false,
+      };
+      final inv1 = InvoiceModel.fromJson(invJson1);
+      expect(inv1.showContactNumber, false);
+
+      final invJson2 = {
+        'id': 2,
+        'invoice_no': 'INV-002',
+        'invoice_date': '2026-11-20',
+        'customer_name': 'Test Dealer 2',
+        'grand_total': 300.0,
+      };
+      final inv2 = InvoiceModel.fromJson(invJson2);
+      expect(inv2.showContactNumber, true);
     });
   });
 }

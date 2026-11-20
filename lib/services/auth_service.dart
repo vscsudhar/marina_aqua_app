@@ -137,7 +137,7 @@ class AuthService with ListenableServiceMixin {
       data: {
         'login': login.trim(),
         'password': password,
-        'device_name': 'SSAquaFlowApp',
+        'device_name': 'DockRentApp',
         'remember_me': rememberMe,
       },
       fromData: (data) => AuthResponse.fromJson(data as Map<String, dynamic>),

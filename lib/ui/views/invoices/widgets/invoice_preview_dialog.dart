@@ -151,7 +151,9 @@ class InvoicePreviewDialog extends StatelessWidget {
                                       companySettings.companyName !=
                                           'Marina Aqua Pure Water Co.' &&
                                       companySettings.companyName !=
-                                          'SS AquaFlow')
+                                          'SS AquaFlow' &&
+                                      companySettings.companyName !=
+                                          'DockRent')
                                   ? companySettings.companyName
                                   : (locator.isRegistered<AuthService>()
                                       ? (locator<AuthService>()
@@ -159,10 +161,10 @@ class InvoicePreviewDialog extends StatelessWidget {
                                               ?.companyName ??
                                           (companySettings.companyName.isNotEmpty
                                               ? companySettings.companyName
-                                              : 'SS AquaFlow'))
+                                              : 'DockRent'))
                                       : (companySettings.companyName.isNotEmpty
                                           ? companySettings.companyName
-                                          : 'SS AquaFlow'));
+                                          : 'DockRent'));
 
                           final companyWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,8 +353,16 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              if (companySettings.hasContactNumber)
-                                _metaRow('Phone:', companySettings.effectiveContactNumber),
+                              if (companySettings.hasContactNumber && invoice.showContactNumber) ...[
+                                if (companySettings.phone.trim().isNotEmpty &&
+                                    companySettings.phone.toLowerCase() != 'null')
+                                  _metaRow('Phone:', companySettings.phone),
+                                if (companySettings.optionalPhone.trim().isNotEmpty &&
+                                    companySettings.optionalPhone.toLowerCase() != 'null' &&
+                                    companySettings.optionalPhone.trim() !=
+                                        companySettings.phone.trim())
+                                  _metaRow('Mobile:', companySettings.optionalPhone),
+                              ],
                               if (companySettings.email.isNotEmpty)
                                 _metaRow('Email:', companySettings.email),
                               if (invoice.dueDate != null &&

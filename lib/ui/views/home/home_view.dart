@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:marina_aqua/ui/common/app_colors.dart';
+import 'package:marina_aqua/ui/widgets/app_footer.dart';
 import 'package:marina_aqua/ui/widgets/collection_bar_chart.dart';
 import 'package:marina_aqua/ui/widgets/dashboard_shortcut_bar.dart';
 import 'package:marina_aqua/ui/widgets/date_filter_selector.dart';
@@ -65,8 +66,15 @@ class HomeView extends StackedView<HomeViewModel> {
           Expanded(
             child: PlanExpiredGuard(
               user: user,
-              child: _buildRightSideContent(
-                  context, viewModel, isDesktop, isTablet),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: _buildRightSideContent(
+                        context, viewModel, isDesktop, isTablet),
+                  ),
+                  const AppFooter(),
+                ],
+              ),
             ),
           ),
         ],

@@ -87,7 +87,7 @@ class ExportPrintService {
   Future<void> printFromApi({
     required String endpoint,
     Map<String, dynamic>? queryParams,
-    String title = 'SS AquaFlow Document',
+    String title = 'DockRent Document',
   }) async {
     final response = await _apiService.client.get(
       endpoint,
@@ -894,7 +894,7 @@ class ExportPrintService {
                                 mainAxisAlignment: pw.MainAxisAlignment.center,
                                 children: [
                                   pw.Text(
-                                    'SS',
+                                    'DOCK',
                                     style: pw.TextStyle(
                                       color: brandDarkNavy,
                                       fontSize: 9.5,
@@ -903,7 +903,7 @@ class ExportPrintService {
                                   ),
                                   pw.SizedBox(height: 1),
                                   pw.Text(
-                                    'AQUAFLOW',
+                                    'RENT',
                                     style: pw.TextStyle(
                                       color: brandAccent,
                                       fontSize: 8.0,
@@ -1046,8 +1046,16 @@ class ExportPrintService {
                         _pdfMetaRow('Invoice No:', invoice.invoiceNo,
                             isBold: true),
                         _pdfMetaRow('Date:', invoice.invoiceDate),
-                        if (settings.hasContactNumber)
-                          _pdfMetaRow('Phone:', settings.effectiveContactNumber),
+                        if (settings.hasContactNumber && invoice.showContactNumber) ...[
+                          if (settings.phone.trim().isNotEmpty &&
+                              settings.phone.toLowerCase() != 'null')
+                            _pdfMetaRow('Phone:', settings.phone),
+                          if (settings.optionalPhone.trim().isNotEmpty &&
+                              settings.optionalPhone.toLowerCase() != 'null' &&
+                              settings.optionalPhone.trim() !=
+                                  settings.phone.trim())
+                            _pdfMetaRow('Mobile:', settings.optionalPhone),
+                        ],
                         if (settings.email.isNotEmpty)
                           _pdfMetaRow('Email:', settings.email),
                         if (invoice.dueDate != null &&

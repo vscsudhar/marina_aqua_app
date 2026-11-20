@@ -1,11 +1,11 @@
 {
-    "name": "SS AquaFlow",
-    "short_name": "SS AquaFlow",
+    "name": "DockRent",
+    "short_name": "DockRent",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "SS AquaFlow — Dealer Management System",
+    "description": "DockRent",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
