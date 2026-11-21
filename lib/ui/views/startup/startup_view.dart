@@ -74,13 +74,37 @@ class StartupView extends StackedView<StartupViewModel> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'DEALER MANAGEMENT SYSTEM',
+                      'UNIFIED OPERATIONS CLOUD',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 2.0,
                         color: const Color(0xFF94A3B8),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Powered by ',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF64748B),
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        Text(
+                          'Dharvicloud',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF38BDF8),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 36),
                     const SizedBox(

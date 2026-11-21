@@ -11,7 +11,8 @@ class AppFooter extends StatelessWidget {
     this.showBorder = true,
   });
 
-  static const String copyrightText = '© 2026 DockRent. All Rights Reserved.';
+  static const String copyrightText =
+      '© 2026 DockRent. Powered by Dharvicloud. All Rights Reserved.';
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +28,53 @@ class AppFooter extends StatelessWidget {
             : null,
       ),
       child: Center(
-        child: Text(
-          copyrightText,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            fontSize: 11.5,
-            fontWeight: FontWeight.w400,
-            color: const Color(0xFF94A3B8),
-            letterSpacing: 0.2,
-          ),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            Text(
+              '© 2026 DockRent. All Rights Reserved.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF94A3B8),
+                letterSpacing: 0.2,
+              ),
+            ),
+            Text(
+              '•',
+              style: GoogleFonts.inter(
+                fontSize: 11.5,
+                color: const Color(0xFFCBD5E1),
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Powered by ',
+                  style: GoogleFonts.inter(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF94A3B8),
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                Text(
+                  'Dharvicloud',
+                  style: GoogleFonts.inter(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF0284C7),
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

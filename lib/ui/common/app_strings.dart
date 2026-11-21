@@ -1,7 +1,7 @@
 class AppStrings {
   static const String appName = 'DockRent';
-  static const String companyTagline = 'Dealer Management System';
-  static const String portalTitle = 'Dealer Management System';
+  static const String companyTagline = 'Unified Operations Cloud';
+  static const String portalTitle = 'Unified Operations Cloud';
   static const String loginTitle = 'Sign in to your account';
   static const String loginSubtitle =
       'Enter your email or username to access your dashboard';
@@ -23,5 +23,5 @@ class AppStrings {
   static const String supportContact =
       'Need assistance? Contact IT Operations at support@dockrent.com';
   static const String copyrightNotice =
-      '© 2026 DockRent. All Rights Reserved.';
+      '© 2026 DockRent. Powered by Dharvicloud. All Rights Reserved.';
 }

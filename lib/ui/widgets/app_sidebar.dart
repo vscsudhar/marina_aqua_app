@@ -478,6 +478,30 @@ class AppSidebar extends StatelessWidget {
                         ],
                       ),
                     ],
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Powered by ',
+                          style: GoogleFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w400,
+                            color: kcTextSecondary,
+                          ),
+                        ),
+                        Text(
+                          'Dharvicloud',
+                          style: GoogleFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: kcPrimaryDark,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

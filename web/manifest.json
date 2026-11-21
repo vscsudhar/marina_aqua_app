@@ -1,11 +1,11 @@
 {
-    "name": "DockRent",
+    "name": "DockRent - Unified Operations Cloud",
     "short_name": "DockRent",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "DockRent",
+    "description": "DockRent - Unified Operations Cloud | Powered by Dharvicloud",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -86,7 +86,7 @@ class LoginView extends StackedView<LoginViewModel> {
                           size: 52,
                           isDark: true,
                           useCompanyLogo: false,
-                          subtitle: 'Dealer Management System',
+                          subtitle: 'Unified Operations Cloud',
                         ),
                         const SizedBox(height: 32),
                         Column(
@@ -109,7 +109,7 @@ class LoginView extends StackedView<LoginViewModel> {
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
-                                      'INTELLIGENT ASSET & DEALER MANAGEMENT',
+                                      'UNIFIED OPERATIONS CLOUD',
                                       style: GoogleFonts.inter(
                                         color: kcAquaCyan,
                                         fontSize: 11,
@@ -241,7 +241,7 @@ class LoginView extends StackedView<LoginViewModel> {
                   size: 48,
                   isDark: false,
                   useCompanyLogo: false,
-                  subtitle: 'Dealer Management System',
+                  subtitle: 'Unified Operations Cloud',
                 ),
               ),
               const SizedBox(height: 28),

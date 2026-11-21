@@ -125,7 +125,7 @@ class MarinaLogo extends StatelessWidget {
       }
       final defaultSubtitle = words.length > 2
           ? (subtitle ?? words.sublist(2).join(' ').toUpperCase())
-          : (subtitle ?? 'DEALER MANAGEMENT SYSTEM');
+          : (subtitle ?? 'UNIFIED OPERATIONS CLOUD');
 
       if (isVertical) {
         return Column(
