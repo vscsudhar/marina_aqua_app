@@ -8,7 +8,7 @@ class AppStrings {
 
   static const String labelEmailOrUsername = 'Email or Username';
   static const String hintEmailOrUsername =
-      'e.g., admin@dockrent.com or admin';
+      'e.g., admin@dockrent.in or admin';
   static const String labelPassword = 'Password';
   static const String hintPassword = '••••••••';
   static const String labelRememberMe = 'Remember session on this device';
@@ -21,7 +21,7 @@ class AppStrings {
       'Password must be at least 6 characters';
 
   static const String supportContact =
-      'Need assistance? Contact IT Operations at support@dockrent.com';
+      'Need assistance? Contact IT Operations at support@dockrent.in';
   static const String copyrightNotice =
-      '© 2026 DockRent. Powered by Dharvicloud. All Rights Reserved.';
+      '© 2026 DockRent. Powered by DharviCloud. All Rights Reserved.';
 }

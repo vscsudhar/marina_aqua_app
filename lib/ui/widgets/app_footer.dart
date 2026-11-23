@@ -12,7 +12,7 @@ class AppFooter extends StatelessWidget {
   });
 
   static const String copyrightText =
-      '© 2026 DockRent. Powered by Dharvicloud. All Rights Reserved.';
+      '© 2026 DockRent. Powered by DharviCloud. All Rights Reserved.';
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class AppFooter extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Dharvicloud',
+                  'DharviCloud',
                   style: GoogleFonts.inter(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,

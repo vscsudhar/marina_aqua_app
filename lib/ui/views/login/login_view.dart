@@ -92,29 +92,30 @@ class LoginView extends StackedView<LoginViewModel> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Streamlined operations card (replacing verified pill)
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 6),
+                                  horizontal: 14, vertical: 8),
                               decoration: BoxDecoration(
-                                color: kcAquaCyan.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.white.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                    color: kcAquaCyan.withValues(alpha: 0.3)),
+                                    color: Colors.white.withValues(alpha: 0.14)),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.verified_rounded,
+                                  const Icon(Icons.format_quote_rounded,
                                       color: kcAquaCyan, size: 16),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
-                                      'UNIFIED OPERATIONS CLOUD',
+                                      'Streamlined operations for modern businesses.',
                                       style: GoogleFonts.inter(
-                                        color: kcAquaCyan,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1.0,
+                                        color: Colors.white.withValues(alpha: 0.95),
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 0.2,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -124,61 +125,63 @@ class LoginView extends StackedView<LoginViewModel> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Precision Operations,\nSeamless Distribution.',
+                              'The Smarter Way to Run Your Business.',
                               style: GoogleFonts.outfit(
                                 color: Colors.white,
-                                fontSize: 38,
+                                fontSize: 36,
                                 fontWeight: FontWeight.w800,
                                 height: 1.2,
                                 letterSpacing: -0.5,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 14),
                             Text(
-                              'Seamlessly manage inventory, dealer credit ledgers, daily cash collections, automated GST invoices, and 15-day settlement statements.',
+                              'Manage your everyday operations in one secure workspace designed for accuracy, control and simplicity.',
                               style: GoogleFonts.inter(
                                 color: kcLightGrey,
-                                fontSize: 15,
-                                height: 1.6,
+                                fontSize: 14.5,
+                                height: 1.55,
                               ),
                             ),
-                            const SizedBox(height: 36),
+                            const SizedBox(height: 30),
                             // Feature Highlights Cards
                             _buildFeatureBadge(
-                              icon: Icons.account_balance_wallet_outlined,
-                              title: 'Single Source of Truth Ledgers',
+                              icon: Icons.hub_outlined,
+                              title: 'Unified Workspace',
                               subtitle:
-                                  'Strict debit/credit tracking with immutable transaction histories.',
+                                  'Manage every core process from one centralized dashboard.',
                             ),
                             const SizedBox(height: 16),
                             _buildFeatureBadge(
-                              icon: Icons.receipt_long_outlined,
-                              title: 'Automated GST Tax Invoicing',
+                              icon: Icons.auto_mode_rounded,
+                              title: 'Reliable Automation',
                               subtitle:
-                                  'Instant manual tax invoices with A4 landscape print support.',
+                                  'Reduce manual effort and keep operations running accurately.',
                             ),
                             const SizedBox(height: 16),
                             _buildFeatureBadge(
-                              icon: Icons.inventory_2_outlined,
-                              title: 'Inventory & Asset Tracking',
+                              icon: Icons.security_rounded,
+                              title: 'Enterprise Security',
                               subtitle:
-                                  'Real-time monitoring of inventory, assets, deposits, and returns.',
+                                  'Protected by encrypted cloud storage and role-based access.',
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32),
-                        // Footer info
+                        const SizedBox(height: 28),
+                        // Bottom Trust Line: 256-Bit SSL Encrypted • Cloud Backed • Powered by DharviCloud
                         Row(
                           children: [
-                            const Icon(Icons.shield_outlined,
-                                color: kcPrimaryLight, size: 16),
+                            const Icon(Icons.lock_outline_rounded,
+                                color: kcAquaCyan, size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '256-Bit SSL Encrypted • Role-Based Access • FSSAI Certified',
+                                '256-Bit SSL Encrypted • Cloud Backed • Powered by DharviCloud',
                                 style: GoogleFonts.inter(
-                                  color: kcLightGrey.withValues(alpha: 0.7),
+                                  color: kcLightGrey.withValues(alpha: 0.8),
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.2,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -244,7 +247,27 @@ class LoginView extends StackedView<LoginViewModel> {
                   subtitle: 'Unified Operations Cloud',
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 14),
+              Text(
+                'The Smarter Way to Run Your Business.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  fontSize: isTablet ? 20 : 17,
+                  fontWeight: FontWeight.w700,
+                  color: kcDeepNavy,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '"Streamlined operations for modern businesses."',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: kcTextSecondary,
+                ),
+              ),
+              const SizedBox(height: 24),
               _buildFormCard(context, viewModel, isCompact: !isTablet),
               const SizedBox(height: 20),
               const AppFooter(showBorder: false),
@@ -511,6 +534,26 @@ class LoginView extends StackedView<LoginViewModel> {
                         letterSpacing: 0.3,
                       ),
                     ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.support_agent_rounded,
+                    size: 16, color: kcTextSecondary),
+                const SizedBox(width: 6),
+                Text(
+                  'Support: support@dockrent.in',
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    color: kcTextSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
