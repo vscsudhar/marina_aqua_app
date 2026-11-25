@@ -91,6 +91,15 @@ class AppSidebar extends StatelessWidget {
       badge: 'BOTTLE',
     ),
     AppSidebarItem(
+      id: 'public_sales',
+      title: 'Public Sales',
+      subtitle: 'Direct party sales & statements',
+      icon: Icons.point_of_sale_rounded,
+      color: Color(0xFF2563EB),
+      route: '/public-sales',
+      badge: 'SALES',
+    ),
+    AppSidebarItem(
       id: 'purchases',
       title: 'Purchases & Stock',
       subtitle: 'Cans, caps & raw stock',

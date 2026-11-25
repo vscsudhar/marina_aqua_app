@@ -237,6 +237,9 @@ class HomeViewModel extends ReactiveViewModel {
       case 'bottle_ledger':
         pageName = 'Bottle Ledger';
         break;
+      case 'public_sales':
+        pageName = 'Public Sales';
+        break;
       case 'users':
         pageName = 'Staff & Team';
         break;
