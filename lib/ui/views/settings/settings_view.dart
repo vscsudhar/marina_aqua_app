@@ -265,7 +265,9 @@ class SettingsView extends StackedView<SettingsViewModel> {
                             fit: BoxFit.contain)
                         : (s.logoUrl != null || s.logoPath != null)
                             ? Image.network(
-                                ApiService.resolveLogoUrl(s.logoUrl ?? s.logoPath) ?? (s.logoUrl ?? s.logoPath)!,
+                                ApiService.resolveLogoUrl(
+                                        s.logoUrl ?? s.logoPath) ??
+                                    (s.logoUrl ?? s.logoPath)!,
                                 key: ValueKey(s.logoUrl ?? s.logoPath),
                                 fit: BoxFit.contain,
                                 errorBuilder: (_, __, ___) => const Center(
@@ -1513,8 +1515,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
               controller: _optionalPhoneController,
               label: 'Optional Mobile Number',
               hint: 'e.g. +91 98765 43210 (Optional)',
-              helperText:
-                  'Optional • Displayed on invoice header if enabled',
+              helperText: 'Optional • Displayed on invoice header if enabled',
               prefixIcon: const Icon(Icons.phone_android_outlined,
                   size: 20, color: kcPrimaryColor),
               keyboardType: TextInputType.phone,
@@ -1686,7 +1687,8 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                   'tagline': _taglineController.text.trim(),
                   'phone': _phoneController.text.trim(),
                   'optional_phone': _optionalPhoneController.text.trim(),
-                  'company_contact_number': _optionalPhoneController.text.trim(),
+                  'company_contact_number':
+                      _optionalPhoneController.text.trim(),
                   'show_phone_on_invoice': _showPhoneOnInvoice,
                   'email': _emailController.text.trim(),
                   'website': _websiteController.text.trim(),

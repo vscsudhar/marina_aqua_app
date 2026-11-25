@@ -135,14 +135,18 @@ class ApiService {
       }
     } catch (_) {}
 
-    if (baseOrigin.startsWith('https://') && trimmed.startsWith('http://api.dockrent.in')) {
-      trimmed = trimmed.replaceFirst('http://api.dockrent.in', 'https://api.dockrent.in');
+    if (baseOrigin.startsWith('https://') &&
+        trimmed.startsWith('http://api.dockrent.in')) {
+      trimmed = trimmed.replaceFirst(
+          'http://api.dockrent.in', 'https://api.dockrent.in');
     }
     if (trimmed.startsWith('https://aqua-api.ethiodeploy.app')) {
-      trimmed = trimmed.replaceFirst('https://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
+      trimmed = trimmed.replaceFirst(
+          'https://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
     }
     if (trimmed.startsWith('http://aqua-api.ethiodeploy.app')) {
-      trimmed = trimmed.replaceFirst('http://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
+      trimmed = trimmed.replaceFirst(
+          'http://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
     }
 
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
@@ -188,14 +192,18 @@ class ApiService {
       }
     } catch (_) {}
 
-    if (baseOrigin.startsWith('https://') && trimmed.startsWith('http://api.dockrent.in')) {
-      trimmed = trimmed.replaceFirst('http://api.dockrent.in', 'https://api.dockrent.in');
+    if (baseOrigin.startsWith('https://') &&
+        trimmed.startsWith('http://api.dockrent.in')) {
+      trimmed = trimmed.replaceFirst(
+          'http://api.dockrent.in', 'https://api.dockrent.in');
     }
     if (trimmed.startsWith('https://aqua-api.ethiodeploy.app')) {
-      trimmed = trimmed.replaceFirst('https://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
+      trimmed = trimmed.replaceFirst(
+          'https://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
     }
     if (trimmed.startsWith('http://aqua-api.ethiodeploy.app')) {
-      trimmed = trimmed.replaceFirst('http://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
+      trimmed = trimmed.replaceFirst(
+          'http://aqua-api.ethiodeploy.app', 'https://api.dockrent.in');
     }
 
     // Extract filename if it contains logos/ or company_logo

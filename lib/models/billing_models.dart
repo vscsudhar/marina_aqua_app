@@ -63,12 +63,12 @@ class CompanySettingModel {
         'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
   });
 
-  String get effectiveContactNumber =>
-      optionalPhone.trim().isNotEmpty
-          ? optionalPhone.trim()
-          : (companyContactNumber != null && companyContactNumber!.trim().isNotEmpty)
-              ? companyContactNumber!.trim()
-              : phone.trim();
+  String get effectiveContactNumber => optionalPhone.trim().isNotEmpty
+      ? optionalPhone.trim()
+      : (companyContactNumber != null &&
+              companyContactNumber!.trim().isNotEmpty)
+          ? companyContactNumber!.trim()
+          : phone.trim();
 
   bool get hasContactNumber =>
       showPhoneOnInvoice &&
@@ -80,8 +80,7 @@ class CompanySettingModel {
       id: json['id'] is int
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 1,
-      companyName:
-          json['company_name'] as String? ?? 'DockRent',
+      companyName: json['company_name'] as String? ?? 'DockRent',
       tagline: json['tagline'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       optionalPhone: json['optional_phone'] as String? ??
@@ -196,7 +195,8 @@ class CompanySettingModel {
         'phone': phone,
         'optional_phone': optionalPhone,
         'show_phone_on_invoice': showPhoneOnInvoice,
-        'company_contact_number': optionalPhone.isNotEmpty ? optionalPhone : phone,
+        'company_contact_number':
+            optionalPhone.isNotEmpty ? optionalPhone : phone,
         'email': email,
         'website': website,
         'address': address,

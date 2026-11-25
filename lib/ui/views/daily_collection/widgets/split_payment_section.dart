@@ -240,8 +240,7 @@ class SplitPaymentSection extends StatelessWidget {
           icon: const Icon(Icons.add_rounded, size: 18),
           label: Text(
             'Add Payment Row',
-            style:
-                GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
           ),
           style: OutlinedButton.styleFrom(
             foregroundColor: kcPrimaryDark,

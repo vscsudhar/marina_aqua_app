@@ -105,7 +105,8 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                     child: IndexedStack(
                       index: viewModel.selectedTabIndex,
                       children: [
-                        _buildSalesEntriesTab(context, viewModel, currencyFormat),
+                        _buildSalesEntriesTab(
+                            context, viewModel, currencyFormat),
                         _buildPartiesTab(context, viewModel, currencyFormat),
                         PublicSalesStatementView(
                           parties: viewModel.parties,
@@ -131,7 +132,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -242,7 +243,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -272,7 +273,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withValues(alpha: 0.1)
                       : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -332,7 +333,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
               SizedBox(
                 width: 200,
                 child: DropdownButtonFormField<int?>(
-                  value: viewModel.selectedPartyFilter,
+                  initialValue: viewModel.selectedPartyFilter,
                   isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'Filter by Party',
@@ -394,8 +395,8 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                         const SizedBox(height: 12),
                         Text(
                           'No public sales entries found.',
-                          style: GoogleFonts.inter(
-                              color: AppColors.textSecondary),
+                          style:
+                              GoogleFonts.inter(color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton(
@@ -464,10 +465,10 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                                       .format(entry.createdAt!)
                                   : '');
                           final itemsStr = entry.items.map((it) {
-                            final qtyStr = it.quantity.truncateToDouble() ==
-                                    it.quantity
-                                ? it.quantity.toInt().toString()
-                                : it.quantity.toStringAsFixed(1);
+                            final qtyStr =
+                                it.quantity.truncateToDouble() == it.quantity
+                                    ? it.quantity.toInt().toString()
+                                    : it.quantity.toStringAsFixed(1);
                             return '${it.productName} × $qtyStr';
                           }).join(', ');
 
@@ -478,7 +479,8 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.08),
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
@@ -610,8 +612,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                   const SizedBox(height: 12),
                   Text(
                     'No public parties created yet.',
-                    style:
-                        GoogleFonts.inter(color: AppColors.textSecondary),
+                    style: GoogleFonts.inter(color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
@@ -665,7 +666,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                               CircleAvatar(
                                 radius: 14,
                                 backgroundColor:
-                                    AppColors.primary.withOpacity(0.1),
+                                    AppColors.primary.withValues(alpha: 0.1),
                                 child: Text(
                                   p.partyName.isNotEmpty
                                       ? p.partyName[0].toUpperCase()
@@ -747,15 +748,15 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                                 icon: const Icon(Icons.edit_note_rounded,
                                     color: AppColors.primary, size: 20),
                                 tooltip: 'Edit Party',
-                                onPressed: () => _openEditPartyDialog(
-                                    context, viewModel, p),
+                                onPressed: () =>
+                                    _openEditPartyDialog(context, viewModel, p),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete_outline_rounded,
                                     color: Colors.redAccent, size: 20),
                                 tooltip: 'Delete Party',
-                                onPressed: () => _confirmDeleteParty(
-                                    context, viewModel, p),
+                                onPressed: () =>
+                                    _confirmDeleteParty(context, viewModel, p),
                               ),
                             ],
                           ),
@@ -796,8 +797,8 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
     }
   }
 
-  void _confirmDeleteParty(BuildContext context,
-      PublicSalesViewModel viewModel, PublicPartyModel party) async {
+  void _confirmDeleteParty(BuildContext context, PublicSalesViewModel viewModel,
+      PublicPartyModel party) async {
     if (party.salesCount > 0) {
       showDialog(
         context: context,
@@ -822,8 +823,7 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete Party?'),
         content: Text(
           'Are you sure you want to delete "${party.partyName}"? This action cannot be undone.',
@@ -892,13 +892,12 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
     }
   }
 
-  void _confirmDeleteEntry(BuildContext context,
-      PublicSalesViewModel viewModel, PublicSaleModel sale) async {
+  void _confirmDeleteEntry(BuildContext context, PublicSalesViewModel viewModel,
+      PublicSaleModel sale) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete Sales Entry?'),
         content: Text(
           'Are you sure you want to delete entry ${sale.entryNo} (${sale.partyName})? Associated inventory deductions will be safely restored.',

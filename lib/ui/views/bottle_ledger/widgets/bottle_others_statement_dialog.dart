@@ -27,9 +27,10 @@ class BottleOthersStatementDialog extends StatefulWidget {
 
 class _BottleOthersStatementDialogState
     extends State<BottleOthersStatementDialog> {
-  final BottleLedgerService _ledgerService = locator.isRegistered<BottleLedgerService>()
-      ? locator<BottleLedgerService>()
-      : BottleLedgerService();
+  final BottleLedgerService _ledgerService =
+      locator.isRegistered<BottleLedgerService>()
+          ? locator<BottleLedgerService>()
+          : BottleLedgerService();
 
   late int _selectedYear;
   late int _selectedMonth;
@@ -141,7 +142,8 @@ class _BottleOthersStatementDialogState
       await _ledgerService.printOthersStatementPdf(
         year: _selectedYear,
         month: _selectedMonth,
-        title: 'Others Statement - ${_months[_selectedMonth - 1]} $_selectedYear',
+        title:
+            'Others Statement - ${_months[_selectedMonth - 1]} $_selectedYear',
       );
     } catch (e) {
       if (mounted) {
@@ -320,7 +322,8 @@ class _BottleOthersStatementDialogState
 
               // Filter & Export Controls Bar
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(8),
@@ -337,7 +340,8 @@ class _BottleOthersStatementDialogState
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton.outlined(
-                          icon: const Icon(Icons.chevron_left_rounded, size: 18),
+                          icon:
+                              const Icon(Icons.chevron_left_rounded, size: 18),
                           visualDensity: VisualDensity.compact,
                           tooltip: 'Previous Month',
                           onPressed: _isLoading ? null : _previousMonth,
@@ -416,7 +420,8 @@ class _BottleOthersStatementDialogState
                         ),
                         const SizedBox(width: 6),
                         IconButton.outlined(
-                          icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                          icon:
+                              const Icon(Icons.chevron_right_rounded, size: 18),
                           visualDensity: VisualDensity.compact,
                           tooltip: 'Next Month',
                           onPressed: _isLoading ? null : _nextMonth,
@@ -538,7 +543,8 @@ class _BottleOthersStatementDialogState
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              _currencyFormat.format(_statement!.grandTotalAmount),
+                              _currencyFormat
+                                  .format(_statement!.grandTotalAmount),
                               style: GoogleFonts.outfit(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -602,8 +608,8 @@ class _BottleOthersStatementDialogState
               Expanded(
                 child: _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(
-                            color: Color(0xFF0F3460)),
+                        child:
+                            CircularProgressIndicator(color: Color(0xFF0F3460)),
                       )
                     : (_statement == null ||
                             (_activeTab == 0
@@ -700,8 +706,8 @@ class _BottleOthersStatementDialogState
             Expanded(
               child: ListView.separated(
                 itemCount: list.length,
-                separatorBuilder: (_, __) =>
-                    Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+                separatorBuilder: (_, __) => Divider(
+                    height: 1, thickness: 1, color: Colors.grey.shade200),
                 itemBuilder: (context, index) {
                   final row = list[index];
                   return Padding(
@@ -756,7 +762,8 @@ class _BottleOthersStatementDialogState
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
                 color: const Color(0xFFF1F5F9),
-                border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1.5)),
+                border: Border(
+                    top: BorderSide(color: Colors.grey.shade300, width: 1.5)),
               ),
               child: Row(
                 children: [
@@ -838,8 +845,8 @@ class _BottleOthersStatementDialogState
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),

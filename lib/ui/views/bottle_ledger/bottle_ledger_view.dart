@@ -278,9 +278,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                 ),
                                 const SizedBox(width: 8),
                                 OutlinedButton.icon(
-                                  onPressed: () =>
-                                      _openOthersStatementDialog(
-                                          context, viewModel),
+                                  onPressed: () => _openOthersStatementDialog(
+                                      context, viewModel),
                                   icon: const Icon(Icons.receipt_long_rounded,
                                       size: 16),
                                   label: const Text('Others Statement'),
@@ -352,8 +351,8 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                     .report!.supplierTable.monthlyQtyTotals,
                                 grandTotal:
                                     viewModel.report!.supplierTable.grandTotal,
-                                grandQtyTotal:
-                                    viewModel.report!.supplierTable.grandQtyTotal,
+                                grandQtyTotal: viewModel
+                                    .report!.supplierTable.grandQtyTotal,
                                 showCountColumn: true,
                                 onCellTap: (date, productKey) => _onCellTap(
                                   context,

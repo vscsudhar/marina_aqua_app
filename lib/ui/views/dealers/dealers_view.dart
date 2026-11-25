@@ -1385,8 +1385,8 @@ class DealersView extends StackedView<DealersViewModel> {
                 style: const TextStyle(fontSize: 12)),
           if (company.gstin != null && company.gstin!.isNotEmpty)
             Text('GSTIN: ${company.gstin!}',
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w600)),
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -1400,8 +1400,7 @@ class DealersView extends StackedView<DealersViewModel> {
       barrierDismissible: false,
       builder: (ctx) => CompanyFormDialog(
         company: company,
-        onSave: (data) =>
-            viewModel.saveCompany(data, companyId: company?.id),
+        onSave: (data) => viewModel.saveCompany(data, companyId: company?.id),
       ),
     );
   }

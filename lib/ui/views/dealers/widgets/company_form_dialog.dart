@@ -137,7 +137,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.06),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
                 border: Border(
                   bottom: BorderSide(
                     color: AppColors.border.withValues(alpha: 0.5),
@@ -177,7 +178,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
                               : 'Register a corporate/business client for direct company billing',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary.withValues(alpha: 0.8),
+                            color:
+                                AppColors.textSecondary.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -185,7 +187,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon:
+                        const Icon(Icons.close, color: AppColors.textSecondary),
                     tooltip: 'Close',
                   ),
                 ],
@@ -333,7 +336,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
                         maxLines: 3,
                         decoration: const InputDecoration(
                           labelText: 'Address',
-                          hintText: 'Full company address with city and pincode',
+                          hintText:
+                              'Full company address with city and pincode',
                           prefixIcon: Icon(Icons.location_on_outlined),
                           alignLabelWithHint: true,
                           border: OutlineInputBorder(),
@@ -392,7 +396,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
                             ),
                             Switch(
                               value: _isActive,
-                              onChanged: (val) => setState(() => _isActive = val),
+                              onChanged: (val) =>
+                                  setState(() => _isActive = val),
                               activeTrackColor: AppColors.primary,
                             ),
                           ],
@@ -409,7 +414,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16)),
                 border: const Border(
                   top: BorderSide(
                     color: AppColors.border,
@@ -420,7 +426,8 @@ class _CompanyFormDialogState extends State<CompanyFormDialog> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton(
-                    onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isSaving ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 12),

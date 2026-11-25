@@ -146,25 +146,24 @@ class InvoicePreviewDialog extends StatelessWidget {
                           final resolvedLogo =
                               ApiService.resolveLogoUrl(rawLogo);
 
-                          final effectiveCompanyName =
-                              (companySettings.companyName.isNotEmpty &&
-                                      companySettings.companyName !=
-                                          'Marina Aqua Pure Water Co.' &&
-                                      companySettings.companyName !=
-                                          'SS AquaFlow' &&
-                                      companySettings.companyName !=
-                                          'DockRent')
-                                  ? companySettings.companyName
-                                  : (locator.isRegistered<AuthService>()
-                                      ? (locator<AuthService>()
-                                              .currentUser
-                                              ?.companyName ??
-                                          (companySettings.companyName.isNotEmpty
-                                              ? companySettings.companyName
-                                              : 'DockRent'))
-                                      : (companySettings.companyName.isNotEmpty
+                          final effectiveCompanyName = (companySettings
+                                      .companyName.isNotEmpty &&
+                                  companySettings.companyName !=
+                                      'Marina Aqua Pure Water Co.' &&
+                                  companySettings.companyName !=
+                                      'SS AquaFlow' &&
+                                  companySettings.companyName != 'DockRent')
+                              ? companySettings.companyName
+                              : (locator.isRegistered<AuthService>()
+                                  ? (locator<AuthService>()
+                                          .currentUser
+                                          ?.companyName ??
+                                      (companySettings.companyName.isNotEmpty
                                           ? companySettings.companyName
-                                          : 'DockRent'));
+                                          : 'DockRent'))
+                                  : (companySettings.companyName.isNotEmpty
+                                      ? companySettings.companyName
+                                      : 'DockRent'));
 
                           final companyWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +286,10 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ),
                               if (companySettings.fssaiNo != null &&
                                   companySettings.fssaiNo!.trim().isNotEmpty &&
-                                  companySettings.fssaiNo!.trim().toLowerCase() != 'null')
+                                  companySettings.fssaiNo!
+                                          .trim()
+                                          .toLowerCase() !=
+                                      'null')
                                 Text(
                                   'FSSAI Lic. No: ${companySettings.fssaiNo}',
                                   style: GoogleFonts.inter(
@@ -353,15 +355,22 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   invoice.invoiceNo,
                                   isBold: true),
                               _metaRow('Date:', invoice.invoiceDate),
-                              if (companySettings.hasContactNumber && invoice.showContactNumber) ...[
+                              if (companySettings.hasContactNumber &&
+                                  invoice.showContactNumber) ...[
                                 if (companySettings.phone.trim().isNotEmpty &&
-                                    companySettings.phone.toLowerCase() != 'null')
+                                    companySettings.phone.toLowerCase() !=
+                                        'null')
                                   _metaRow('Phone:', companySettings.phone),
-                                if (companySettings.optionalPhone.trim().isNotEmpty &&
-                                    companySettings.optionalPhone.toLowerCase() != 'null' &&
+                                if (companySettings.optionalPhone
+                                        .trim()
+                                        .isNotEmpty &&
+                                    companySettings.optionalPhone
+                                            .toLowerCase() !=
+                                        'null' &&
                                     companySettings.optionalPhone.trim() !=
                                         companySettings.phone.trim())
-                                  _metaRow('Mobile:', companySettings.optionalPhone),
+                                  _metaRow(
+                                      'Mobile:', companySettings.optionalPhone),
                               ],
                               if (companySettings.email.isNotEmpty)
                                 _metaRow('Email:', companySettings.email),
@@ -426,7 +435,11 @@ class InvoicePreviewDialog extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  invoice.customerName.replaceAll(RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)', caseSensitive: false), ''),
+                                  invoice.customerName.replaceAll(
+                                      RegExp(
+                                          r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)',
+                                          caseSensitive: false),
+                                      ''),
                                   style: GoogleFonts.inter(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
@@ -534,10 +547,14 @@ class InvoicePreviewDialog extends StatelessWidget {
                                         2: FlexColumnWidth(1.45), // HSN
                                         3: FlexColumnWidth(1.2), // Qty & Unit
                                         4: FlexColumnWidth(1.1), // Rate
-                                        5: FlexColumnWidth(1.2), // Amount (Taxable)
-                                        6: FlexColumnWidth(1.25), // SGST (% / ₹)
-                                        7: FlexColumnWidth(1.25), // CGST (% / ₹)
-                                        8: FlexColumnWidth(1.25), // IGST (% / ₹)
+                                        5: FlexColumnWidth(
+                                            1.2), // Amount (Taxable)
+                                        6: FlexColumnWidth(
+                                            1.25), // SGST (% / ₹)
+                                        7: FlexColumnWidth(
+                                            1.25), // CGST (% / ₹)
+                                        8: FlexColumnWidth(
+                                            1.25), // IGST (% / ₹)
                                         9: FlexColumnWidth(1.4), // Total
                                       },
                                 children: [
@@ -585,19 +602,32 @@ class InvoicePreviewDialog extends StatelessWidget {
                                   ...invoice.items.asMap().entries.map((entry) {
                                     final idx = entry.key + 1;
                                     final it = entry.value;
-                                    final isIgst = invoice.isInterstate || it.igstRate > 0;
-                                    final sgstRateStr = !isIgst && it.sgstRate > 0
-                                        ? (it.sgstRate % 1 == 0 ? it.sgstRate.toInt().toString() : it.sgstRate.toStringAsFixed(1))
+                                    final isIgst =
+                                        invoice.isInterstate || it.igstRate > 0;
+                                    final sgstRateStr = !isIgst &&
+                                            it.sgstRate > 0
+                                        ? (it.sgstRate % 1 == 0
+                                            ? it.sgstRate.toInt().toString()
+                                            : it.sgstRate.toStringAsFixed(1))
                                         : '0';
-                                    final cgstRateStr = !isIgst && it.cgstRate > 0
-                                        ? (it.cgstRate % 1 == 0 ? it.cgstRate.toInt().toString() : it.cgstRate.toStringAsFixed(1))
+                                    final cgstRateStr = !isIgst &&
+                                            it.cgstRate > 0
+                                        ? (it.cgstRate % 1 == 0
+                                            ? it.cgstRate.toInt().toString()
+                                            : it.cgstRate.toStringAsFixed(1))
                                         : '0';
-                                    final igstRateStr = isIgst && it.igstRate > 0
-                                        ? (it.igstRate % 1 == 0 ? it.igstRate.toInt().toString() : it.igstRate.toStringAsFixed(1))
+                                    final igstRateStr = isIgst &&
+                                            it.igstRate > 0
+                                        ? (it.igstRate % 1 == 0
+                                            ? it.igstRate.toInt().toString()
+                                            : it.igstRate.toStringAsFixed(1))
                                         : '0';
-                                    final sgstAmt = !isIgst ? it.sgstAmount : 0.0;
-                                    final cgstAmt = !isIgst ? it.cgstAmount : 0.0;
-                                    final igstAmt = isIgst ? it.igstAmount : 0.0;
+                                    final sgstAmt =
+                                        !isIgst ? it.sgstAmount : 0.0;
+                                    final cgstAmt =
+                                        !isIgst ? it.cgstAmount : 0.0;
+                                    final igstAmt =
+                                        isIgst ? it.igstAmount : 0.0;
 
                                     return TableRow(
                                       children: [
@@ -645,13 +675,14 @@ class InvoicePreviewDialog extends StatelessWidget {
                       LayoutBuilder(
                         builder: (context, totalsConstraints) {
                           final isNarrow = totalsConstraints.maxWidth < 620;
-                          final hasBankDetails =
-                              companySettings.bankName.trim().isNotEmpty ||
-                                  companySettings.accountNumber.trim().isNotEmpty ||
-                                  companySettings.ifscCode.trim().isNotEmpty;
-                          final shouldShowBank =
-                              (!invoice.isWithoutGst || invoice.showBankDetails) &&
-                                  hasBankDetails;
+                          final hasBankDetails = companySettings.bankName
+                                  .trim()
+                                  .isNotEmpty ||
+                              companySettings.accountNumber.trim().isNotEmpty ||
+                              companySettings.ifscCode.trim().isNotEmpty;
+                          final shouldShowBank = (!invoice.isWithoutGst ||
+                                  invoice.showBankDetails) &&
+                              hasBankDetails;
                           final bankWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -664,7 +695,8 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     border: Border.all(color: kcBorderColor),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Bank & Remittance Details:',
@@ -765,40 +797,74 @@ class InvoicePreviewDialog extends StatelessWidget {
                                     formatAmount(invoice.taxableAmount),
                                     isBold: true),
                                 () {
-                                  final isIgst = invoice.isInterstate || invoice.igstAmount > 0;
-                                  final double sgstPct = !isIgst && invoice.taxableAmount > 0
-                                      ? (invoice.sgstAmount / invoice.taxableAmount * 100)
-                                      : 0.0;
-                                  final double cgstPct = !isIgst && invoice.taxableAmount > 0
-                                      ? (invoice.cgstAmount / invoice.taxableAmount * 100)
-                                      : 0.0;
-                                  final double igstPct = isIgst && invoice.taxableAmount > 0
-                                      ? (invoice.igstAmount / invoice.taxableAmount * 100)
-                                      : 0.0;
-                                  final sgstStr = sgstPct % 1 == 0 ? sgstPct.toInt().toString() : sgstPct.toStringAsFixed(1);
-                                  final cgstStr = cgstPct % 1 == 0 ? cgstPct.toInt().toString() : cgstPct.toStringAsFixed(1);
-                                  final igstStr = igstPct % 1 == 0 ? igstPct.toInt().toString() : igstPct.toStringAsFixed(1);
-                                  final sgstAmt = !isIgst ? invoice.sgstAmount : 0.0;
-                                  final cgstAmt = !isIgst ? invoice.cgstAmount : 0.0;
-                                  final igstAmt = isIgst ? invoice.igstAmount : 0.0;
+                                  final isIgst = invoice.isInterstate ||
+                                      invoice.igstAmount > 0;
+                                  final double sgstPct =
+                                      !isIgst && invoice.taxableAmount > 0
+                                          ? (invoice.sgstAmount /
+                                              invoice.taxableAmount *
+                                              100)
+                                          : 0.0;
+                                  final double cgstPct =
+                                      !isIgst && invoice.taxableAmount > 0
+                                          ? (invoice.cgstAmount /
+                                              invoice.taxableAmount *
+                                              100)
+                                          : 0.0;
+                                  final double igstPct =
+                                      isIgst && invoice.taxableAmount > 0
+                                          ? (invoice.igstAmount /
+                                              invoice.taxableAmount *
+                                              100)
+                                          : 0.0;
+                                  final sgstStr = sgstPct % 1 == 0
+                                      ? sgstPct.toInt().toString()
+                                      : sgstPct.toStringAsFixed(1);
+                                  final cgstStr = cgstPct % 1 == 0
+                                      ? cgstPct.toInt().toString()
+                                      : cgstPct.toStringAsFixed(1);
+                                  final igstStr = igstPct % 1 == 0
+                                      ? igstPct.toInt().toString()
+                                      : igstPct.toStringAsFixed(1);
+                                  final sgstAmt =
+                                      !isIgst ? invoice.sgstAmount : 0.0;
+                                  final cgstAmt =
+                                      !isIgst ? invoice.cgstAmount : 0.0;
+                                  final igstAmt =
+                                      isIgst ? invoice.igstAmount : 0.0;
 
                                   return Column(
                                     children: [
-                                      _sumRow('SGST ($sgstStr%):', formatAmount(sgstAmt)),
-                                      _sumRow('CGST ($cgstStr%):', formatAmount(cgstAmt)),
-                                      _sumRow('IGST ($igstStr%):', formatAmount(igstAmt)),
+                                      _sumRow('SGST ($sgstStr%):',
+                                          formatAmount(sgstAmt)),
+                                      _sumRow('CGST ($cgstStr%):',
+                                          formatAmount(cgstAmt)),
+                                      _sumRow('IGST ($igstStr%):',
+                                          formatAmount(igstAmt)),
                                       if (invoice.additionalTaxes != null &&
                                           invoice.additionalTaxes!.isNotEmpty)
                                         ...invoice.additionalTaxes!.map((t) {
-                                          final name = t['name']?.toString() ?? 'Additional Tax';
+                                          final name = t['name']?.toString() ??
+                                              'Additional Tax';
                                           final rate = t['rate'] != null
-                                              ? double.tryParse(t['rate'].toString()) ?? 0.0
+                                              ? double.tryParse(
+                                                      t['rate'].toString()) ??
+                                                  0.0
                                               : 0.0;
                                           final amt = t['amount'] != null
-                                              ? double.tryParse(t['amount'].toString()) ?? 0.0
-                                              : ((invoice.taxableAmount * (rate / 100)) * 100).round() / 100;
-                                          final rStr = rate % 1 == 0 ? rate.toInt().toString() : rate.toStringAsFixed(1);
-                                          return _sumRow('$name ($rStr%):', formatAmount(amt));
+                                              ? double.tryParse(
+                                                      t['amount'].toString()) ??
+                                                  0.0
+                                              : ((invoice.taxableAmount *
+                                                              (rate / 100)) *
+                                                          100)
+                                                      .round() /
+                                                  100;
+                                          final rStr = rate % 1 == 0
+                                              ? rate.toInt().toString()
+                                              : rate.toStringAsFixed(1);
+                                          return _sumRow('$name ($rStr%):',
+                                              formatAmount(amt));
                                         }),
                                     ],
                                   );

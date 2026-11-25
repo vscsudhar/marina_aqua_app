@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -160,10 +161,11 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
         if (widget.existingSale != null &&
             widget.existingSale!.items.isNotEmpty) {
           for (final item in widget.existingSale!.items) {
-            final matchingProd = products.cast<PublicSaleProductModel?>().firstWhere(
-                  (p) => p?.id == item.productId,
-                  orElse: () => null,
-                );
+            final matchingProd =
+                products.cast<PublicSaleProductModel?>().firstWhere(
+                      (p) => p?.id == item.productId,
+                      orElse: () => null,
+                    );
             final row = _ProductRowState(
               selectedProduct: matchingProd,
               initialRate: item.rate,
@@ -191,10 +193,10 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
     if (_eligibleProducts.isNotEmpty) {
       final firstProd = _eligibleProducts.first;
       row.selectedProduct = firstProd;
-      row.rateController.text = firstProd.defaultPrice.truncateToDouble() ==
-              firstProd.defaultPrice
-          ? firstProd.defaultPrice.toInt().toString()
-          : firstProd.defaultPrice.toStringAsFixed(2);
+      row.rateController.text =
+          firstProd.defaultPrice.truncateToDouble() == firstProd.defaultPrice
+              ? firstProd.defaultPrice.toInt().toString()
+              : firstProd.defaultPrice.toStringAsFixed(2);
       row.recalculateAmountIfNeeded();
     }
     setState(() {
@@ -246,6 +248,8 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
   }
 
   Future<void> _saveEntry({bool confirmInsufficientStock = false}) async {
+    if (_isSaving) return;
+
     if (!_formKey.currentState!.validate()) return;
     if (_selectedPartyId == null) {
       setState(() => _errorMessage = 'Please select a party');
@@ -260,11 +264,13 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
     for (int i = 0; i < _productRows.length; i++) {
       final row = _productRows[i];
       if (row.selectedProduct == null) {
-        setState(() => _errorMessage = 'Please select a product for row #${i + 1}');
+        setState(
+            () => _errorMessage = 'Please select a product for row #${i + 1}');
         return;
       }
       if (row.quantity <= 0) {
-        setState(() => _errorMessage = 'Quantity must be greater than 0 for row #${i + 1}');
+        setState(() => _errorMessage =
+            'Quantity must be greater than 0 for row #${i + 1}');
         return;
       }
     }
@@ -318,30 +324,56 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
       if (mounted) {
         Navigator.of(context).pop(true);
       }
+    } on InsufficientStockException catch (e) {
+      setState(() => _isSaving = false);
+      if (mounted) {
+        final confirm = await _showInsufficientStockDialog(e.insufficientItems);
+        if (confirm == true) {
+          _saveEntry(confirmInsufficientStock: true);
+        }
+      }
     } catch (e) {
       setState(() => _isSaving = false);
 
-      // Check if insufficient stock exception
-      final errStr = e.toString();
-      if (errStr.contains('is_stock_insufficient') ||
-          errStr.contains('Stock Not Available') ||
-          errStr.contains('Stock illa')) {
-        // Show confirmation dialog: "Stock Not Available. Stock illa. Public Sales-la add pannalama?"
-        if (mounted) {
-          final confirm = await _showInsufficientStockDialog();
-          if (confirm == true) {
-            _saveEntry(confirmInsufficientStock: true);
+      // Handle DioException fallback in case raw DioException bubbles up
+      if (e is DioException && e.response?.data is Map<String, dynamic>) {
+        final data = e.response!.data as Map<String, dynamic>;
+        final isInsufficient = data['is_stock_insufficient'] == true ||
+            (data['errors'] is Map &&
+                data['errors']['stock_insufficient'] != null);
+
+        if (isInsufficient) {
+          final rawItems = (data['insufficient_items'] as List?) ??
+              (data['errors'] is Map &&
+                      data['errors']['insufficient_items'] is List
+                  ? data['errors']['insufficient_items'] as List
+                  : []);
+          final items = rawItems
+              .map((item) => InsufficientStockItem.fromJson(
+                  item is Map<String, dynamic>
+                      ? item
+                      : Map<String, dynamic>.from(item as Map)))
+              .toList();
+
+          if (mounted) {
+            final confirm = await _showInsufficientStockDialog(items);
+            if (confirm == true) {
+              _saveEntry(confirmInsufficientStock: true);
+            }
           }
+          return;
         }
-      } else {
-        setState(() {
-          _errorMessage = errStr.replaceFirst('Exception: ', '');
-        });
       }
+
+      final errStr = e.toString();
+      setState(() {
+        _errorMessage = errStr.replaceFirst('Exception: ', '');
+      });
     }
   }
 
-  Future<bool?> _showInsufficientStockDialog() {
+  Future<bool?> _showInsufficientStockDialog(
+      List<InsufficientStockItem> items) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -370,27 +402,150 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Stock Not Available. Stock illa. Public Sales-la add pannalama?',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Stock illa. Public Sales-la add pannalama?',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Available inventory will be deducted up to 0 without resulting in negative stock.',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+              const SizedBox(height: 12),
+              if (items.isNotEmpty) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Table(
+                      columnWidths: const {
+                        0: FlexColumnWidth(4),
+                        1: FlexColumnWidth(2.5),
+                        2: FlexColumnWidth(2.5),
+                      },
+                      children: [
+                        TableRow(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF1F5F9),
+                          ),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              child: Text(
+                                'Product',
+                                style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textSecondary),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              child: Text(
+                                'Available',
+                                textAlign: TextAlign.right,
+                                style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red.shade700),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              child: Text(
+                                'Requested',
+                                textAlign: TextAlign.right,
+                                style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary),
+                              ),
+                            ),
+                          ],
+                        ),
+                        ...items.map((it) {
+                          final availStr =
+                              it.availableStock.truncateToDouble() ==
+                                      it.availableStock
+                                  ? it.availableStock.toInt().toString()
+                                  : it.availableStock.toStringAsFixed(1);
+                          final reqStr =
+                              it.requestedQuantity.truncateToDouble() ==
+                                      it.requestedQuantity
+                                  ? it.requestedQuantity.toInt().toString()
+                                  : it.requestedQuantity.toStringAsFixed(1);
+
+                          return TableRow(
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                  top: BorderSide(color: Color(0xFFE2E8F0))),
+                            ),
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                                child: Text(
+                                  it.productName,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                                child: Text(
+                                  availStr,
+                                  textAlign: TextAlign.right,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red.shade700),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                                child: Text(
+                                  reqStr,
+                                  textAlign: TextAlign.right,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              Text(
+                'Available stock will be deducted up to 0 without resulting in negative stock.',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -437,7 +592,7 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -522,7 +677,7 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<int>(
-                                value: _selectedPartyId,
+                                initialValue: _selectedPartyId,
                                 decoration: const InputDecoration(
                                   labelText: 'Party / Customer *',
                                   prefixIcon:
@@ -558,8 +713,9 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
                                 child: InputDecorator(
                                   decoration: const InputDecoration(
                                     labelText: 'Sale Date *',
-                                    prefixIcon:
-                                        Icon(Icons.calendar_today_rounded, size: 20),
+                                    prefixIcon: Icon(
+                                        Icons.calendar_today_rounded,
+                                        size: 20),
                                     border: OutlineInputBorder(),
                                     contentPadding: EdgeInsets.symmetric(
                                         horizontal: 12, vertical: 12),
@@ -839,13 +995,13 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
               Expanded(
                 flex: 4,
                 child: DropdownButtonFormField<int>(
-                  value: row.selectedProduct?.id,
+                  initialValue: row.selectedProduct?.id,
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Product #${index + 1}',
                     border: const OutlineInputBorder(),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                   ),
                   items: _eligibleProducts.map((p) {
                     final stockInfo = p.currentStock != null
@@ -911,8 +1067,8 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
                   decoration: InputDecoration(
                     labelText: 'Qty (${row.selectedProduct?.unit ?? 'Unit'})',
                     border: const OutlineInputBorder(),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                   ),
                   onChanged: (_) {
                     setState(() {
@@ -950,9 +1106,8 @@ class _PublicSalesEntryDialogState extends State<PublicSalesEntryDialog> {
                 icon: const Icon(Icons.delete_outline_rounded,
                     color: Colors.redAccent, size: 20),
                 tooltip: 'Remove Row',
-                onPressed: _productRows.length > 1
-                    ? () => _removeRow(index)
-                    : null,
+                onPressed:
+                    _productRows.length > 1 ? () => _removeRow(index) : null,
               ),
             ],
           ),

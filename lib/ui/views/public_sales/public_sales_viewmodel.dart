@@ -120,7 +120,8 @@ class PublicSalesViewModel extends BaseViewModel {
     return _salesEntries.where((s) {
       final matchNo = s.entryNo.toLowerCase().contains(q);
       final matchParty = (s.partyName ?? '').toLowerCase().contains(q);
-      final matchItems = s.items.any((it) => it.productName.toLowerCase().contains(q));
+      final matchItems =
+          s.items.any((it) => it.productName.toLowerCase().contains(q));
       return matchNo || matchParty || matchItems;
     }).toList();
   }
@@ -136,6 +137,40 @@ class PublicSalesViewModel extends BaseViewModel {
       final matchAddress = (p.address ?? '').toLowerCase().contains(q);
       return matchName || matchContact || matchAddress;
     }).toList();
+  }
+
+  Future<PublicSaleModel> createOrUpdateSaleEntry({
+    int? id,
+    required int partyId,
+    required String saleDate,
+    required List<Map<String, dynamic>> items,
+    double cashAmount = 0.0,
+    double upiAmount = 0.0,
+    String? notes,
+    bool confirmInsufficientStock = false,
+  }) async {
+    if (id == null) {
+      return await _salesService.createEntry(
+        partyId: partyId,
+        saleDate: saleDate,
+        items: items,
+        cashAmount: cashAmount,
+        upiAmount: upiAmount,
+        notes: notes,
+        confirmInsufficientStock: confirmInsufficientStock,
+      );
+    } else {
+      return await _salesService.updateEntry(
+        id: id,
+        partyId: partyId,
+        saleDate: saleDate,
+        items: items,
+        cashAmount: cashAmount,
+        upiAmount: upiAmount,
+        notes: notes,
+        confirmInsufficientStock: confirmInsufficientStock,
+      );
+    }
   }
 
   Future<bool> deleteEntry(int id) async {

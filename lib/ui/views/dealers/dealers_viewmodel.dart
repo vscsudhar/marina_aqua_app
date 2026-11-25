@@ -180,13 +180,15 @@ class DealersViewModel extends BaseViewModel {
       await _companyService.updateCompany(companyId, data);
       await _dialogService.showDialog(
         title: 'Company Updated',
-        description: 'Corporate client "${data['name']}" details updated successfully.',
+        description:
+            'Corporate client "${data['name']}" details updated successfully.',
       );
     } else {
       await _companyService.createCompany(data);
       await _dialogService.showDialog(
         title: 'Company Onboarded',
-        description: 'Corporate client "${data['name']}" has been onboarded successfully and is now ready for invoicing.',
+        description:
+            'Corporate client "${data['name']}" has been onboarded successfully and is now ready for invoicing.',
       );
     }
     await fetchCompanies();

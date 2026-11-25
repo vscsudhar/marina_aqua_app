@@ -100,7 +100,8 @@ class LoginView extends StackedView<LoginViewModel> {
                                 color: Colors.white.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.14)),
+                                    color:
+                                        Colors.white.withValues(alpha: 0.14)),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -112,7 +113,8 @@ class LoginView extends StackedView<LoginViewModel> {
                                     child: Text(
                                       'Streamlined operations for modern businesses.',
                                       style: GoogleFonts.inter(
-                                        color: Colors.white.withValues(alpha: 0.95),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.95),
                                         fontSize: 12.5,
                                         fontWeight: FontWeight.w500,
                                         letterSpacing: 0.2,

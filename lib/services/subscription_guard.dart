@@ -65,7 +65,8 @@ class SubscriptionGuard {
 
   /// Show the subscription expired alert dialog
   static void showExpiredDialog([BuildContext? context]) {
-    final targetContext = context ?? StackedService.navigatorKey?.currentContext;
+    final targetContext =
+        context ?? StackedService.navigatorKey?.currentContext;
     if (targetContext == null) return;
 
     if (_isShowingDialog) return;
@@ -152,7 +153,8 @@ class SubscriptionGuard {
 
   /// Show the 2-day or less near-expiry warning dialog
   static void showNearExpiryDialog([BuildContext? context]) {
-    final targetContext = context ?? StackedService.navigatorKey?.currentContext;
+    final targetContext =
+        context ?? StackedService.navigatorKey?.currentContext;
     if (targetContext == null) return;
 
     if (_isShowingDialog) return;
@@ -204,7 +206,8 @@ class SubscriptionGuard {
             if (daysText.isNotEmpty) ...[
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFEF3C7),
                   borderRadius: BorderRadius.circular(6),

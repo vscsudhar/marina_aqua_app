@@ -1196,7 +1196,8 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                                   builder: (_) => SupplyDetailsDialog(
                                     supply: details,
                                     onEdit: () {
-                                      if (!SubscriptionGuard.checkAccess(context)) return;
+                                      if (!SubscriptionGuard.checkAccess(
+                                          context)) return;
                                       showDialog(
                                         context: context,
                                         builder: (_) => SupplyEntryDialog(
@@ -2532,8 +2533,8 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
                             return;
                           }
                         }
-                        final totalSplit = _splitRows.fold(
-                            0.0, (sum, r) => sum + r.amount);
+                        final totalSplit =
+                            _splitRows.fold(0.0, (sum, r) => sum + r.amount);
                         if ((totalSplit - widget.payment.amount).abs() > 0.01) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -2554,11 +2555,10 @@ class _EditPaymentEntryDialogState extends State<EditPaymentEntryDialog> {
                               .map((r) => {
                                     'payment_mode': r.mode,
                                     'amount': r.amount,
-                                    'reference_no': r.refController.text
-                                            .trim()
-                                            .isNotEmpty
-                                        ? r.refController.text.trim()
-                                        : null,
+                                    'reference_no':
+                                        r.refController.text.trim().isNotEmpty
+                                            ? r.refController.text.trim()
+                                            : null,
                                   })
                               .toList(),
                           'reference_no': null,

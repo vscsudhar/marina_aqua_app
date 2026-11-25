@@ -107,8 +107,8 @@ class _DualHorizontalScrollableState extends State<DualHorizontalScrollable> {
     _isSyncing = true;
     final offset = _mainController.offset;
     if (_topController.hasClients && _topController.offset != offset) {
-      _topController.jumpTo(
-          offset.clamp(0.0, _topController.position.maxScrollExtent));
+      _topController
+          .jumpTo(offset.clamp(0.0, _topController.position.maxScrollExtent));
     }
     if (_bottomController.hasClients && _bottomController.offset != offset) {
       _bottomController.jumpTo(
@@ -123,8 +123,8 @@ class _DualHorizontalScrollableState extends State<DualHorizontalScrollable> {
     _isSyncing = true;
     final offset = _topController.offset;
     if (_mainController.hasClients && _mainController.offset != offset) {
-      _mainController.jumpTo(
-          offset.clamp(0.0, _mainController.position.maxScrollExtent));
+      _mainController
+          .jumpTo(offset.clamp(0.0, _mainController.position.maxScrollExtent));
     }
     if (_bottomController.hasClients && _bottomController.offset != offset) {
       _bottomController.jumpTo(
@@ -139,12 +139,12 @@ class _DualHorizontalScrollableState extends State<DualHorizontalScrollable> {
     _isSyncing = true;
     final offset = _bottomController.offset;
     if (_mainController.hasClients && _mainController.offset != offset) {
-      _mainController.jumpTo(
-          offset.clamp(0.0, _mainController.position.maxScrollExtent));
+      _mainController
+          .jumpTo(offset.clamp(0.0, _mainController.position.maxScrollExtent));
     }
     if (_topController.hasClients && _topController.offset != offset) {
-      _topController.jumpTo(
-          offset.clamp(0.0, _topController.position.maxScrollExtent));
+      _topController
+          .jumpTo(offset.clamp(0.0, _topController.position.maxScrollExtent));
     }
     _updateButtonStates();
     _isSyncing = false;
@@ -190,7 +190,9 @@ class _DualHorizontalScrollableState extends State<DualHorizontalScrollable> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(6),
-              onTap: _canScrollLeft ? () => _scrollRelative(-widget.scrollStep) : null,
+              onTap: _canScrollLeft
+                  ? () => _scrollRelative(-widget.scrollStep)
+                  : null,
               child: Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
@@ -264,7 +266,9 @@ class _DualHorizontalScrollableState extends State<DualHorizontalScrollable> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(6),
-              onTap: _canScrollRight ? () => _scrollRelative(widget.scrollStep) : null,
+              onTap: _canScrollRight
+                  ? () => _scrollRelative(widget.scrollStep)
+                  : null,
               child: Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(

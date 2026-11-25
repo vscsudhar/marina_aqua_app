@@ -58,7 +58,8 @@ class PlanExpiredGuard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+          const Icon(Icons.error_outline_rounded,
+              color: Colors.white, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -77,11 +78,13 @@ class PlanExpiredGuard extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFFDC2626),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
             ),
             child: Text(
               'Details',
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
+              style:
+                  GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -99,7 +102,8 @@ class PlanExpiredGuard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
+          const Icon(Icons.warning_amber_rounded,
+              color: Colors.white, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -118,11 +122,13 @@ class PlanExpiredGuard extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFFD97706),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
             ),
             child: Text(
               'Details',
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
+              style:
+                  GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
             ),
           ),
         ],

@@ -95,7 +95,8 @@ class LoginViewModel extends BaseViewModel {
       );
 
       try {
-        await locator<SettingsService>().loadCompanySettings(forceRefresh: true);
+        await locator<SettingsService>()
+            .loadCompanySettings(forceRefresh: true);
         await _authService.refreshProfile();
       } catch (_) {}
 

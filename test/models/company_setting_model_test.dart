@@ -10,7 +10,9 @@ void main() {
       expect(model.effectiveContactNumber, '');
     });
 
-    test('When phone is set, hasContactNumber is true and effectiveContactNumber returns it', () {
+    test(
+        'When phone is set, hasContactNumber is true and effectiveContactNumber returns it',
+        () {
       const model = CompanySettingModel(
         id: 1,
         phone: '+91 98765 43210',
@@ -19,7 +21,8 @@ void main() {
       expect(model.effectiveContactNumber, '+91 98765 43210');
     });
 
-    test('When companyContactNumber is explicitly provided, it takes priority', () {
+    test('When companyContactNumber is explicitly provided, it takes priority',
+        () {
       const model = CompanySettingModel(
         id: 1,
         phone: '+91 98765 00000',
@@ -29,7 +32,8 @@ void main() {
       expect(model.effectiveContactNumber, '+91 98765 11111');
     });
 
-    test('When phone is null-like or empty string, hasContactNumber is false', () {
+    test('When phone is null-like or empty string, hasContactNumber is false',
+        () {
       const model1 = CompanySettingModel(id: 1, phone: '   ');
       expect(model1.hasContactNumber, false);
 
@@ -37,7 +41,8 @@ void main() {
       expect(model2.hasContactNumber, false);
     });
 
-    test('fromJson parses company_contact_number and phone interchangeably', () {
+    test('fromJson parses company_contact_number and phone interchangeably',
+        () {
       final json1 = {
         'id': 10,
         'company_name': 'Aqua Test',
@@ -73,7 +78,9 @@ void main() {
       expect(json['show_phone_on_invoice'], true);
     });
 
-    test('When showPhoneOnInvoice is false, hasContactNumber is false even if phone exists', () {
+    test(
+        'When showPhoneOnInvoice is false, hasContactNumber is false even if phone exists',
+        () {
       const model = CompanySettingModel(
         id: 1,
         phone: '+91 98765 43210',

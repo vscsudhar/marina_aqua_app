@@ -277,17 +277,17 @@ class MarinaLogo extends StatelessWidget {
                   ? settings.logoPath
                   : user?.companyLogo));
 
-      final effectiveName = (companyName != null &&
-              companyName!.trim().isNotEmpty)
-          ? companyName
-          : ((settingsService?.isInitialized == true &&
-                  settings?.companyName != null &&
-                  settings!.companyName.trim().isNotEmpty &&
-                  settings.companyName != 'Marina Aqua Pure Water Co.' &&
-                  settings.companyName != 'SS AquaFlow' &&
-                  settings.companyName != 'DockRent')
-              ? settings.companyName
-              : (user?.companyName ?? settings?.companyName ?? 'DOCKRENT'));
+      final effectiveName =
+          (companyName != null && companyName!.trim().isNotEmpty)
+              ? companyName
+              : ((settingsService?.isInitialized == true &&
+                      settings?.companyName != null &&
+                      settings!.companyName.trim().isNotEmpty &&
+                      settings.companyName != 'Marina Aqua Pure Water Co.' &&
+                      settings.companyName != 'SS AquaFlow' &&
+                      settings.companyName != 'DockRent')
+                  ? settings.companyName
+                  : (user?.companyName ?? settings?.companyName ?? 'DOCKRENT'));
 
       return buildContent(effectiveLogo, effectiveName);
     }
@@ -307,4 +307,3 @@ class MarinaLogo extends StatelessWidget {
     return buildWithDynamicData();
   }
 }
-

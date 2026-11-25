@@ -1308,7 +1308,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               setState(() {
                 _userManuallySetAllocation = true;
                 _paymentAllocation = val.first;
-                if (_paymentAllocation == 'bottle' && _selectedBottleProduct == null) {
+                if (_paymentAllocation == 'bottle' &&
+                    _selectedBottleProduct == null) {
                   final bottles = _bottleProducts;
                   if (bottles.isNotEmpty) {
                     _selectedBottleProduct = bottles.first;
@@ -1333,12 +1334,16 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle_outline, size: 16, color: kcPrimaryDark),
+                  const Icon(Icons.check_circle_outline,
+                      size: 16, color: kcPrimaryDark),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Payment will be allocated to Dealer Ledger P1/P2 filling payments and reduces dealer outstanding.',
-                      style: GoogleFonts.inter(fontSize: 11, color: kcPrimaryDark, fontWeight: FontWeight.w500),
+                      style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: kcPrimaryDark,
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -1355,7 +1360,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 16, color: Color(0xFF92400E)),
+                  const Icon(Icons.info_outline,
+                      size: 16, color: Color(0xFF92400E)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -1420,7 +1426,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                 flex: 1,
                 child: TextFormField(
                   controller: _bottleQtyController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Bottle Qty *',
                     isDense: true,
@@ -1454,7 +1461,10 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
           const SizedBox(height: 4),
           Text(
             'This bottle product and count will be recorded in the Bottle Ledger.',
-            style: GoogleFonts.inter(fontSize: 10.5, color: kcSuccessColor, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(
+                fontSize: 10.5,
+                color: kcSuccessColor,
+                fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -1792,20 +1802,24 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                       children: [
                         ChoiceChip(
                           label: const Text('Refill'),
-                          avatar: const Icon(Icons.water_drop_outlined, size: 16),
+                          avatar:
+                              const Icon(Icons.water_drop_outlined, size: 16),
                           selected: tempAllocation == 'refill',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val) setDialogState(() => tempAllocation = 'refill');
+                            if (val)
+                              setDialogState(() => tempAllocation = 'refill');
                           },
                         ),
                         ChoiceChip(
                           label: const Text('Bottle'),
-                          avatar: const Icon(Icons.local_drink_outlined, size: 16),
+                          avatar:
+                              const Icon(Icons.local_drink_outlined, size: 16),
                           selected: tempAllocation == 'bottle',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val) setDialogState(() => tempAllocation = 'bottle');
+                            if (val)
+                              setDialogState(() => tempAllocation = 'bottle');
                           },
                         ),
                         ChoiceChip(
@@ -1814,7 +1828,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                           selected: tempAllocation == 'others',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val) setDialogState(() => tempAllocation = 'others');
+                            if (val)
+                              setDialogState(() => tempAllocation = 'others');
                           },
                         ),
                       ],
@@ -1883,8 +1898,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: tempQtyController,
-                        keyboardType:
-                            const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Bottle Quantity *',
                           isDense: true,
@@ -1894,7 +1909,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                         ),
                         onChanged: (_) => setDialogState(() {}),
                       ),
-                      if (bottleTotal != remainingAmount && bottleTotal > 0) ...[
+                      if (bottleTotal != remainingAmount &&
+                          bottleTotal > 0) ...[
                         const SizedBox(height: 6),
                         Text(
                           'Note: Bottle total (${currencyFormat.format(bottleTotal)}) will be recorded into Bottle Ledger.',
@@ -2071,8 +2087,8 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
         }
       }
       if (_selectedBottleProduct != null && _bottleQty > 0) {
-        final existingIndex =
-            _items.indexWhere((it) => it.product?.id == _selectedBottleProduct!.id);
+        final existingIndex = _items
+            .indexWhere((it) => it.product?.id == _selectedBottleProduct!.id);
         if (existingIndex >= 0) {
           _items[existingIndex].quantity += _bottleQty;
         } else {

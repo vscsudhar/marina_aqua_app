@@ -172,9 +172,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
           rawEntries.map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
       final rawProducts = data['products'] as List? ?? [];
-      _products = rawProducts
-          .map((p) => Map<String, dynamic>.from(p as Map))
-          .toList();
+      _products =
+          rawProducts.map((p) => Map<String, dynamic>.from(p as Map)).toList();
 
       final rawMonthlyLedger = data['monthly_ledger'] as List? ?? [];
       _monthlyLedger = rawMonthlyLedger
@@ -945,8 +944,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
             const SizedBox(height: 4),
             Text(
               'Try navigating to another month using the controls above.',
-              style:
-                  GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8)),
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: const Color(0xFF94A3B8)),
             ),
           ],
         ),
@@ -955,8 +954,7 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
 
     final currencyNoSymbol = NumberFormat('#,##,##0', 'en_IN');
     final numProducts = _products.length;
-    final minTableWidth =
-        110.0 + 95.0 + (numProducts * 100.0) + 115.0 + 115.0;
+    final minTableWidth = 110.0 + 95.0 + (numProducts * 100.0) + 115.0 + 115.0;
 
     final columnWidths = <int, TableColumnWidth>{
       0: const FixedColumnWidth(110), // Date
@@ -1006,26 +1004,25 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                     final isZebra = idx % 2 == 1;
 
                     final dateVal = row['date']?.toString() ?? '';
-                    final filling = (row['filling'] != null && row['filling'] > 0)
-                        ? '${row['filling']}'
-                        : '-';
+                    final filling =
+                        (row['filling'] != null && row['filling'] > 0)
+                            ? '${row['filling']}'
+                            : '-';
 
                     final cash = (row['cash'] as num?)?.toDouble();
                     final upi = (row['upi'] as num?)?.toDouble();
 
                     return TableRow(
                       decoration: BoxDecoration(
-                        color:
-                            isZebra ? const Color(0xFFF8FAFC) : Colors.white,
+                        color: isZebra ? const Color(0xFFF8FAFC) : Colors.white,
                       ),
                       children: [
                         _tableDataCell(dateVal, isBold: true),
                         _tableDataCell(
                           filling,
                           align: TextAlign.right,
-                          color: filling != '-'
-                              ? const Color(0xFF0284C7)
-                              : null,
+                          color:
+                              filling != '-' ? const Color(0xFF0284C7) : null,
                           isBold: filling != '-',
                         ),
                         for (final p in _products)
@@ -1078,8 +1075,7 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                       ),
                       _tableDataCell(
                         currencyNoSymbol.format(
-                            (_monthlyTotals['upi'] as num?)?.toDouble() ??
-                                0.0),
+                            (_monthlyTotals['upi'] as num?)?.toDouble() ?? 0.0),
                         align: TextAlign.right,
                         isBold: true,
                         color: const Color(0xFF7E22CE),
@@ -1142,8 +1138,7 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                 },
                 children: [
                   TableRow(
-                    decoration:
-                        const BoxDecoration(color: Color(0xFF003366)),
+                    decoration: const BoxDecoration(color: Color(0xFF003366)),
                     children: [
                       _tableHeaderCell('Date'),
                       _tableHeaderCell('Ref No'),
@@ -1160,8 +1155,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                     final isZebra = idx % 2 == 1;
 
                     final dateVal = e['entry_date'] != null
-                        ? DateFormat('dd-MM-yyyy').format(
-                            DateTime.parse(e['entry_date'].toString()))
+                        ? DateFormat('dd-MM-yyyy')
+                            .format(DateTime.parse(e['entry_date'].toString()))
                         : '';
                     final refNo = e['reference_no']?.toString() ?? '-';
                     final type =
@@ -1179,9 +1174,8 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
 
                     return TableRow(
                       decoration: BoxDecoration(
-                          color: isZebra
-                              ? const Color(0xFFF8FAFC)
-                              : Colors.white),
+                          color:
+                              isZebra ? const Color(0xFFF8FAFC) : Colors.white),
                       children: [
                         _tableDataCell(dateVal),
                         _tableDataCell(refNo, isBold: true),
@@ -1206,12 +1200,10 @@ class _DealerStatementDialogState extends State<DealerStatementDialog> {
                     );
                   }),
                   TableRow(
-                    decoration:
-                        const BoxDecoration(color: Color(0xFFE6F0FA)),
+                    decoration: const BoxDecoration(color: Color(0xFFE6F0FA)),
                     children: [
                       _tableDataCell('TOTAL', isBold: true),
-                      _tableDataCell('${_entries.length} items',
-                          isBold: true),
+                      _tableDataCell('${_entries.length} items', isBold: true),
                       _tableDataCell(''),
                       _tableDataCell(''),
                       _tableDataCell(

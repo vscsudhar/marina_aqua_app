@@ -25,7 +25,9 @@ class PublicPartyModel {
 
   factory PublicPartyModel.fromJson(Map<String, dynamic> json) {
     return PublicPartyModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       partyName: json['party_name']?.toString() ?? '',
       contactNumber: json['contact_number']?.toString(),
       address: json['address']?.toString(),
@@ -36,18 +38,22 @@ class PublicPartyModel {
       totalSalesAmount: json['total_sales_amount'] != null
           ? double.tryParse(json['total_sales_amount'].toString()) ?? 0.0
           : 0.0,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString())
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'party_name': partyName,
-    'contact_number': contactNumber,
-    'address': address,
-    'status': status,
-  };
+        'id': id,
+        'party_name': partyName,
+        'contact_number': contactNumber,
+        'address': address,
+        'status': status,
+      };
 }
 
 class PublicSaleProductModel {
@@ -73,11 +79,15 @@ class PublicSaleProductModel {
     this.inventoryStartDate,
   });
 
-  bool get isRefill => productType.toLowerCase() == 'refill' || name.toLowerCase().contains('refill');
+  bool get isRefill =>
+      productType.toLowerCase() == 'refill' ||
+      name.toLowerCase().contains('refill');
 
   factory PublicSaleProductModel.fromJson(Map<String, dynamic> json) {
     return PublicSaleProductModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name']?.toString() ?? '',
       sku: json['sku']?.toString() ?? '',
       productType: json['product_type']?.toString() ?? 'normal',
@@ -119,7 +129,9 @@ class PublicSaleItemModel {
 
   factory PublicSaleItemModel.fromJson(Map<String, dynamic> json) {
     return PublicSaleItemModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id']?.toString() ?? ''),
       productId: json['product_id'] is int
           ? json['product_id']
           : int.tryParse(json['product_id'].toString()) ?? 0,
@@ -131,9 +143,15 @@ class PublicSaleItemModel {
           json['unit']?.toString() ??
           json['product']?['unit']?.toString() ??
           'Unit',
-      rate: json['rate'] != null ? double.tryParse(json['rate'].toString()) ?? 0.0 : 0.0,
-      quantity: json['quantity'] != null ? double.tryParse(json['quantity'].toString()) ?? 1.0 : 1.0,
-      amount: json['amount'] != null ? double.tryParse(json['amount'].toString()) ?? 0.0 : 0.0,
+      rate: json['rate'] != null
+          ? double.tryParse(json['rate'].toString()) ?? 0.0
+          : 0.0,
+      quantity: json['quantity'] != null
+          ? double.tryParse(json['quantity'].toString()) ?? 1.0
+          : 1.0,
+      amount: json['amount'] != null
+          ? double.tryParse(json['amount'].toString()) ?? 0.0
+          : 0.0,
       stockDeducted: json['stock_deducted'] != null
           ? double.tryParse(json['stock_deducted'].toString()) ?? 0.0
           : 0.0,
@@ -142,13 +160,13 @@ class PublicSaleItemModel {
   }
 
   Map<String, dynamic> toJson() => {
-    if (id != null) 'id': id,
-    'product_id': productId,
-    'rate': rate,
-    'quantity': quantity,
-    'amount': amount,
-    if (notes != null) 'notes': notes,
-  };
+        if (id != null) 'id': id,
+        'product_id': productId,
+        'rate': rate,
+        'quantity': quantity,
+        'amount': amount,
+        if (notes != null) 'notes': notes,
+      };
 }
 
 class PublicSaleModel {
@@ -185,20 +203,36 @@ class PublicSaleModel {
   factory PublicSaleModel.fromJson(Map<String, dynamic> json) {
     final rawItems = json['items'] as List? ?? [];
     return PublicSaleModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
       entryNo: json['entry_no']?.toString() ?? 'PS-${json['id']}',
-      partyId: json['party_id'] is int ? json['party_id'] : int.tryParse(json['party_id'].toString()) ?? 0,
-      partyName: json['party']?['party_name']?.toString() ?? json['party_name']?.toString(),
-      saleDate: DateTime.tryParse(json['sale_date'].toString()) ?? DateTime.now(),
+      partyId: json['party_id'] is int
+          ? json['party_id']
+          : int.tryParse(json['party_id'].toString()) ?? 0,
+      partyName: json['party']?['party_name']?.toString() ??
+          json['party_name']?.toString(),
+      saleDate:
+          DateTime.tryParse(json['sale_date'].toString()) ?? DateTime.now(),
       saleTime: json['sale_time']?.toString() ?? json['exact_time']?.toString(),
-      cashAmount: json['cash_amount'] != null ? double.tryParse(json['cash_amount'].toString()) ?? 0.0 : 0.0,
-      upiAmount: json['upi_amount'] != null ? double.tryParse(json['upi_amount'].toString()) ?? 0.0 : 0.0,
-      totalAmount: json['total_amount'] != null ? double.tryParse(json['total_amount'].toString()) ?? 0.0 : 0.0,
+      cashAmount: json['cash_amount'] != null
+          ? double.tryParse(json['cash_amount'].toString()) ?? 0.0
+          : 0.0,
+      upiAmount: json['upi_amount'] != null
+          ? double.tryParse(json['upi_amount'].toString()) ?? 0.0
+          : 0.0,
+      totalAmount: json['total_amount'] != null
+          ? double.tryParse(json['total_amount'].toString()) ?? 0.0
+          : 0.0,
       notes: json['notes']?.toString(),
-      createdByName: json['created_by_name']?.toString() ?? json['creator']?['name']?.toString(),
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      createdByName: json['created_by_name']?.toString() ??
+          json['creator']?['name']?.toString(),
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
       items: rawItems
-          .map((e) => PublicSaleItemModel.fromJson(e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
+          .map((e) => PublicSaleItemModel.fromJson(
+              e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
           .toList(),
     );
   }
@@ -236,14 +270,24 @@ class PublicSalesDailyRecordModel {
 
     return PublicSalesDailyRecordModel(
       date: json['date']?.toString() ?? '',
-      day: json['day'] is int ? json['day'] : int.tryParse(json['day'].toString()) ?? 1,
+      day: json['day'] is int
+          ? json['day']
+          : int.tryParse(json['day'].toString()) ?? 1,
       dayName: json['day_name']?.toString() ?? '',
       formattedDate: json['formatted_date']?.toString() ?? '',
-      entriesCount: json['entries_count'] is int ? json['entries_count'] : int.tryParse(json['entries_count'].toString()) ?? 0,
+      entriesCount: json['entries_count'] is int
+          ? json['entries_count']
+          : int.tryParse(json['entries_count'].toString()) ?? 0,
       productQuantities: qtys,
-      cashAmount: json['cash_amount'] != null ? double.tryParse(json['cash_amount'].toString()) ?? 0.0 : 0.0,
-      upiAmount: json['upi_amount'] != null ? double.tryParse(json['upi_amount'].toString()) ?? 0.0 : 0.0,
-      dailyTotal: json['daily_total'] != null ? double.tryParse(json['daily_total'].toString()) ?? 0.0 : 0.0,
+      cashAmount: json['cash_amount'] != null
+          ? double.tryParse(json['cash_amount'].toString()) ?? 0.0
+          : 0.0,
+      upiAmount: json['upi_amount'] != null
+          ? double.tryParse(json['upi_amount'].toString()) ?? 0.0
+          : 0.0,
+      dailyTotal: json['daily_total'] != null
+          ? double.tryParse(json['daily_total'].toString()) ?? 0.0
+          : 0.0,
     );
   }
 }
@@ -276,10 +320,18 @@ class PublicSalesMonthlyTotalsModel {
 
     return PublicSalesMonthlyTotalsModel(
       productQuantities: qtys,
-      totalCash: json['total_cash'] != null ? double.tryParse(json['total_cash'].toString()) ?? 0.0 : 0.0,
-      totalUpi: json['total_upi'] != null ? double.tryParse(json['total_upi'].toString()) ?? 0.0 : 0.0,
-      grandTotal: json['grand_total'] != null ? double.tryParse(json['grand_total'].toString()) ?? 0.0 : 0.0,
-      totalEntries: json['total_entries'] is int ? json['total_entries'] : int.tryParse(json['total_entries'].toString()) ?? 0,
+      totalCash: json['total_cash'] != null
+          ? double.tryParse(json['total_cash'].toString()) ?? 0.0
+          : 0.0,
+      totalUpi: json['total_upi'] != null
+          ? double.tryParse(json['total_upi'].toString()) ?? 0.0
+          : 0.0,
+      grandTotal: json['grand_total'] != null
+          ? double.tryParse(json['grand_total'].toString()) ?? 0.0
+          : 0.0,
+      totalEntries: json['total_entries'] is int
+          ? json['total_entries']
+          : int.tryParse(json['total_entries'].toString()) ?? 0,
     );
   }
 }
@@ -316,15 +368,33 @@ class PublicSalesMonthlyStatementModel {
     final rawRecords = json['daily_records'] as List? ?? [];
 
     return PublicSalesMonthlyStatementModel(
-      company: json['company'] is Map ? Map<String, dynamic>.from(json['company']) : {},
-      party: PublicPartyModel.fromJson(json['party'] is Map ? Map<String, dynamic>.from(json['party']) : {}),
-      year: json['period']?['year'] is int ? json['period']['year'] : int.tryParse(json['period']?['year']?.toString() ?? '') ?? DateTime.now().year,
-      month: json['period']?['month'] is int ? json['period']['month'] : int.tryParse(json['period']?['month']?.toString() ?? '') ?? DateTime.now().month,
+      company: json['company'] is Map
+          ? Map<String, dynamic>.from(json['company'])
+          : {},
+      party: PublicPartyModel.fromJson(
+          json['party'] is Map ? Map<String, dynamic>.from(json['party']) : {}),
+      year: json['period']?['year'] is int
+          ? json['period']['year']
+          : int.tryParse(json['period']?['year']?.toString() ?? '') ??
+              DateTime.now().year,
+      month: json['period']?['month'] is int
+          ? json['period']['month']
+          : int.tryParse(json['period']?['month']?.toString() ?? '') ??
+              DateTime.now().month,
       monthName: json['period']?['month_name']?.toString() ?? '',
-      daysInMonth: json['period']?['days_in_month'] is int ? json['period']['days_in_month'] : int.tryParse(json['period']?['days_in_month']?.toString() ?? '') ?? 30,
+      daysInMonth: json['period']?['days_in_month'] is int
+          ? json['period']['days_in_month']
+          : int.tryParse(json['period']?['days_in_month']?.toString() ?? '') ??
+              30,
       productColumns: rawCols.map((c) => c.toString()).toList(),
-      dailyRecords: rawRecords.map((r) => PublicSalesDailyRecordModel.fromJson(r is Map<String, dynamic> ? r : Map<String, dynamic>.from(r))).toList(),
-      monthlyTotals: PublicSalesMonthlyTotalsModel.fromJson(json['monthly_totals'] is Map ? Map<String, dynamic>.from(json['monthly_totals']) : {}),
+      dailyRecords: rawRecords
+          .map((r) => PublicSalesDailyRecordModel.fromJson(
+              r is Map<String, dynamic> ? r : Map<String, dynamic>.from(r)))
+          .toList(),
+      monthlyTotals: PublicSalesMonthlyTotalsModel.fromJson(
+          json['monthly_totals'] is Map
+              ? Map<String, dynamic>.from(json['monthly_totals'])
+              : {}),
     );
   }
 }
@@ -370,16 +440,76 @@ class PublicSalesDailyDetailsModel {
     });
 
     return PublicSalesDailyDetailsModel(
-      company: json['company'] is Map ? Map<String, dynamic>.from(json['company']) : {},
-      party: PublicPartyModel.fromJson(json['party'] is Map ? Map<String, dynamic>.from(json['party']) : {}),
+      company: json['company'] is Map
+          ? Map<String, dynamic>.from(json['company'])
+          : {},
+      party: PublicPartyModel.fromJson(
+          json['party'] is Map ? Map<String, dynamic>.from(json['party']) : {}),
       date: json['date']?.toString() ?? '',
       formattedDate: json['formatted_date']?.toString() ?? '',
-      entries: rawEntries.map((e) => PublicSaleModel.fromJson(e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e))).toList(),
-      totalEntries: json['day_summary']?['total_entries'] is int ? json['day_summary']['total_entries'] : int.tryParse(json['day_summary']?['total_entries']?.toString() ?? '') ?? rawEntries.length,
+      entries: rawEntries
+          .map((e) => PublicSaleModel.fromJson(
+              e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
+          .toList(),
+      totalEntries: json['day_summary']?['total_entries'] is int
+          ? json['day_summary']['total_entries']
+          : int.tryParse(
+                  json['day_summary']?['total_entries']?.toString() ?? '') ??
+              rawEntries.length,
       productTotals: prodTotals,
-      totalCash: json['day_summary']?['total_cash'] != null ? double.tryParse(json['day_summary']['total_cash'].toString()) ?? 0.0 : 0.0,
-      totalUpi: json['day_summary']?['total_upi'] != null ? double.tryParse(json['day_summary']['total_upi'].toString()) ?? 0.0 : 0.0,
-      dailyGrandTotal: json['day_summary']?['daily_grand_total'] != null ? double.tryParse(json['day_summary']['daily_grand_total'].toString()) ?? 0.0 : 0.0,
+      totalCash: json['day_summary']?['total_cash'] != null
+          ? double.tryParse(json['day_summary']['total_cash'].toString()) ?? 0.0
+          : 0.0,
+      totalUpi: json['day_summary']?['total_upi'] != null
+          ? double.tryParse(json['day_summary']['total_upi'].toString()) ?? 0.0
+          : 0.0,
+      dailyGrandTotal: json['day_summary']?['daily_grand_total'] != null
+          ? double.tryParse(
+                  json['day_summary']['daily_grand_total'].toString()) ??
+              0.0
+          : 0.0,
     );
   }
+}
+
+class InsufficientStockItem {
+  final int productId;
+  final String productName;
+  final double availableStock;
+  final double requestedQuantity;
+
+  const InsufficientStockItem({
+    required this.productId,
+    required this.productName,
+    required this.availableStock,
+    required this.requestedQuantity,
+  });
+
+  factory InsufficientStockItem.fromJson(Map<String, dynamic> json) {
+    return InsufficientStockItem(
+      productId: json['product_id'] is int
+          ? json['product_id']
+          : int.tryParse(json['product_id']?.toString() ?? '') ?? 0,
+      productName: json['product_name']?.toString() ?? 'Product',
+      availableStock: json['available_stock'] != null
+          ? double.tryParse(json['available_stock'].toString()) ?? 0.0
+          : 0.0,
+      requestedQuantity: json['requested_quantity'] != null
+          ? double.tryParse(json['requested_quantity'].toString()) ?? 0.0
+          : 0.0,
+    );
+  }
+}
+
+class InsufficientStockException implements Exception {
+  final String message;
+  final List<InsufficientStockItem> insufficientItems;
+
+  const InsufficientStockException({
+    required this.message,
+    required this.insufficientItems,
+  });
+
+  @override
+  String toString() => message;
 }

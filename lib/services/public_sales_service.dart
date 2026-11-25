@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../app/app.locator.dart';
 import '../models/public_sales_models.dart';
 import 'api_service.dart';
@@ -18,7 +19,8 @@ class PublicSalesService {
   // Parties
   // ==========================================
 
-  Future<List<PublicPartyModel>> getParties({String? search, String? status}) async {
+  Future<List<PublicPartyModel>> getParties(
+      {String? search, String? status}) async {
     final response = await _apiService.client.get(
       '/public-sales/parties',
       queryParameters: {
@@ -34,7 +36,8 @@ class PublicSalesService {
         .toList();
   }
 
-  Future<PublicPartyModel> createParty(dynamic dataOrName, {
+  Future<PublicPartyModel> createParty(
+    dynamic dataOrName, {
     String? contactNumber,
     String? address,
     String status = 'active',
@@ -60,7 +63,9 @@ class PublicSalesService {
     return PublicPartyModel.fromJson(data);
   }
 
-  Future<PublicPartyModel> updateParty(int id, dynamic dataOrName, {
+  Future<PublicPartyModel> updateParty(
+    int id,
+    dynamic dataOrName, {
     String? contactNumber,
     String? address,
     String status = 'active',
@@ -143,13 +148,17 @@ class PublicSalesService {
   }
 
   Future<PublicSaleModel> createSale(Map<String, dynamic> payload) async {
-    final response = await _apiService.client.post(
-      '/public-sales',
-      data: payload,
-    );
+    try {
+      final response = await _apiService.client.post(
+        '/public-sales',
+        data: payload,
+      );
 
-    final data = response.data['data'] as Map<String, dynamic>;
-    return PublicSaleModel.fromJson(data);
+      final data = response.data['data'] as Map<String, dynamic>;
+      return PublicSaleModel.fromJson(data);
+    } on DioException catch (e) {
+      _handlePublicSalesError(e);
+    }
   }
 
   Future<PublicSaleModel> createEntry({
@@ -172,14 +181,62 @@ class PublicSalesService {
     });
   }
 
-  Future<PublicSaleModel> updateSale(int id, Map<String, dynamic> payload) async {
-    final response = await _apiService.client.put(
-      '/public-sales/$id',
-      data: payload,
-    );
+  Future<PublicSaleModel> updateSale(
+      int id, Map<String, dynamic> payload) async {
+    try {
+      final response = await _apiService.client.put(
+        '/public-sales/$id',
+        data: payload,
+      );
 
-    final data = response.data['data'] as Map<String, dynamic>;
-    return PublicSaleModel.fromJson(data);
+      final data = response.data['data'] as Map<String, dynamic>;
+      return PublicSaleModel.fromJson(data);
+    } on DioException catch (e) {
+      _handlePublicSalesError(e);
+    }
+  }
+
+  Never _handlePublicSalesError(DioException e) {
+    if (e.response != null && e.response?.data is Map<String, dynamic>) {
+      final data = e.response!.data as Map<String, dynamic>;
+      final isInsufficient = data['is_stock_insufficient'] == true ||
+          (data['errors'] is Map &&
+              data['errors']['stock_insufficient'] != null);
+
+      if (isInsufficient) {
+        final rawItems = (data['insufficient_items'] as List?) ??
+            (data['errors'] is Map &&
+                    data['errors']['insufficient_items'] is List
+                ? data['errors']['insufficient_items'] as List
+                : []);
+
+        final items = rawItems
+            .map((item) => InsufficientStockItem.fromJson(
+                item is Map<String, dynamic>
+                    ? item
+                    : Map<String, dynamic>.from(item as Map)))
+            .toList();
+
+        final msg = data['message']?.toString() ??
+            'Stock Not Available. Stock illa. Public Sales-la add pannalama?';
+
+        throw InsufficientStockException(
+          message: msg,
+          insufficientItems: items,
+        );
+      }
+
+      final message = data['message'] as String? ?? 'An error occurred';
+      final errors = data['errors'];
+      if (errors is Map<String, dynamic>) {
+        final firstError = errors.values.first;
+        if (firstError is List && firstError.isNotEmpty) {
+          throw Exception(firstError.first.toString());
+        }
+      }
+      throw Exception(message);
+    }
+    throw Exception(e.message ?? 'An unknown network error occurred');
   }
 
   Future<PublicSaleModel> updateEntry({
@@ -270,8 +327,8 @@ class PublicSalesService {
     required int month,
     String? fileName,
   }) async {
-    final effectiveFileName =
-        fileName ?? 'public_sales_monthly_statement_${partyId}_${year}_$month.pdf';
+    final effectiveFileName = fileName ??
+        'public_sales_monthly_statement_${partyId}_${year}_$month.pdf';
     await _exportPrintService.downloadFromApi(
       endpoint: '/public-sales/parties/$partyId/statement/pdf',
       queryParams: {

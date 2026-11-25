@@ -57,7 +57,11 @@ class InvoiceItemRow {
                 : (discount % 1 == 0
                     ? discount.toInt().toString()
                     : discount.toStringAsFixed(2))) {
-    if (taxRate != null && taxRate > 0 && sgstRate == 0 && cgstRate == 0 && igstRate == 0) {
+    if (taxRate != null &&
+        taxRate > 0 &&
+        sgstRate == 0 &&
+        cgstRate == 0 &&
+        igstRate == 0) {
       cgstRate = taxRate / 2.0;
       sgstRate = taxRate / 2.0;
     }
@@ -234,7 +238,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
 
   late String _gstMode; // 'with_gst' | 'without_gst'
   late String _invoiceType;
-  String _activeTaxTreatment = 'gst'; // 'gst' (Intra-State) | 'igst' (Inter-State)
+  String _activeTaxTreatment =
+      'gst'; // 'gst' (Intra-State) | 'igst' (Inter-State)
   double _selectedGstRate = 5.0;
   double _selectedIgstRate = 0.0;
   final TextEditingController _igstRateController =
@@ -595,7 +600,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
             if (cid != null) {
               _selectedCompany = _companies.cast<CompanyModel?>().firstWhere(
                     (c) => c?.id == cid,
-                    orElse: () => _companies.isNotEmpty ? _companies.first : null,
+                    orElse: () =>
+                        _companies.isNotEmpty ? _companies.first : null,
                   );
             } else if (_selectedCompany == null && _companies.isNotEmpty) {
               _selectedCompany = _companies.first;
@@ -663,12 +669,19 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
   }
 
   List<double> _taxOptions(double currentVal) {
-    final Set<double> rates = {0.0, 5.0, 7.0, 9.0, 12.0, 18.0, 28.0, currentVal};
+    final Set<double> rates = {
+      0.0,
+      5.0,
+      7.0,
+      9.0,
+      12.0,
+      18.0,
+      28.0,
+      currentVal
+    };
     final list = rates.toList()..sort();
     return list;
   }
-
-
 
   Future<void> _loadDealerPrices(int dealerId) async {
     try {
@@ -817,6 +830,7 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
     }
     return total;
   }
+
   double get _taxTotal => _isWithoutGst
       ? 0.0
       : (_isIgst
@@ -1251,7 +1265,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                       ButtonSegment(
                         value: 'dealer',
                         label: Text('Dealer Customer'),
-                        icon: Icon(Icons.store_mall_directory_outlined, size: 16),
+                        icon:
+                            Icon(Icons.store_mall_directory_outlined, size: 16),
                       ),
                       ButtonSegment(
                         value: 'company',
@@ -1271,7 +1286,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         _customerType = selected;
                         if (selected == 'dealer') {
                           _selectedCompany = null;
-                          if (_selectedDealer == null && widget.dealers.isNotEmpty) {
+                          if (_selectedDealer == null &&
+                              widget.dealers.isNotEmpty) {
                             _selectedDealer = widget.dealers.first;
                           }
                           if (_selectedDealer != null) {
@@ -1281,7 +1297,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         } else if (selected == 'company') {
                           _dealerPriceMap.clear();
                           _selectedDealer = null;
-                          if (_selectedCompany == null && _companies.isNotEmpty) {
+                          if (_selectedCompany == null &&
+                              _companies.isNotEmpty) {
                             _selectedCompany = _companies.first;
                           }
                           if (_selectedCompany != null) {
@@ -1367,7 +1384,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                     children: [
                       // Dropdown 1: GST (CGST + SGST)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -1382,7 +1400,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: _activeTaxTreatment == 'gst'
                                     ? kcPrimaryColor.withValues(alpha: 0.12)
@@ -1390,7 +1409,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                _activeTaxTreatment == 'gst' ? 'ACTIVE' : 'INACTIVE',
+                                _activeTaxTreatment == 'gst'
+                                    ? 'ACTIVE'
+                                    : 'INACTIVE',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -1444,7 +1465,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                       ),
                       // Dropdown 2: IGST
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -1459,7 +1481,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: _activeTaxTreatment == 'igst'
                                     ? kcPrimaryColor.withValues(alpha: 0.12)
@@ -1467,7 +1490,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                _activeTaxTreatment == 'igst' ? 'ACTIVE' : 'INACTIVE',
+                                _activeTaxTreatment == 'igst'
+                                    ? 'ACTIVE'
+                                    : 'INACTIVE',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -1739,7 +1764,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                           setState(() {
                             _enableDueDate = val ?? false;
                             if (_enableDueDate && _dueDate == null) {
-                              _dueDate = _invoiceDate.add(const Duration(days: 15));
+                              _dueDate =
+                                  _invoiceDate.add(const Duration(days: 15));
                             }
                           });
                         },
@@ -1751,7 +1777,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                           setState(() {
                             _enableDueDate = !_enableDueDate;
                             if (_enableDueDate && _dueDate == null) {
-                              _dueDate = _invoiceDate.add(const Duration(days: 15));
+                              _dueDate =
+                                  _invoiceDate.add(const Duration(days: 15));
                             }
                           });
                         },
@@ -1869,7 +1896,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
               decoration: BoxDecoration(
                 color: kcPrimaryColor.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: kcPrimaryColor.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: kcPrimaryColor.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1881,8 +1909,10 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         onChanged: (val) {
                           setState(() {
                             _enableAdditionalTax = val ?? false;
-                            if (_enableAdditionalTax && _additionalTaxes.isEmpty) {
-                              _additionalTaxes.add(AdditionalTaxEntry(name: 'Cess', rate: 0.0));
+                            if (_enableAdditionalTax &&
+                                _additionalTaxes.isEmpty) {
+                              _additionalTaxes.add(
+                                  AdditionalTaxEntry(name: 'Cess', rate: 0.0));
                             }
                           });
                         },
@@ -1893,8 +1923,10 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         onTap: () {
                           setState(() {
                             _enableAdditionalTax = !_enableAdditionalTax;
-                            if (_enableAdditionalTax && _additionalTaxes.isEmpty) {
-                              _additionalTaxes.add(AdditionalTaxEntry(name: 'Cess', rate: 0.0));
+                            if (_enableAdditionalTax &&
+                                _additionalTaxes.isEmpty) {
+                              _additionalTaxes.add(
+                                  AdditionalTaxEntry(name: 'Cess', rate: 0.0));
                             }
                           });
                         },
@@ -1930,7 +1962,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                       final idx = entry.key;
                       final tax = entry.value;
                       final calculatedAmount =
-                          ((_taxableTotal * (tax.rate / 100)) * 100).round() / 100;
+                          ((_taxableTotal * (tax.rate / 100)) * 100).round() /
+                              100;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Row(
@@ -1940,7 +1973,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                               child: TextFormField(
                                 controller: tax.nameController,
                                 decoration: const InputDecoration(
-                                  labelText: 'Tax Name (e.g. Cess, Additional GST)',
+                                  labelText:
+                                      'Tax Name (e.g. Cess, Additional GST)',
                                   isDense: true,
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
@@ -1954,8 +1988,9 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                               flex: 2,
                               child: TextFormField(
                                 controller: tax.rateController,
-                                keyboardType: const TextInputType.numberWithOptions(
-                                    decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 decoration: const InputDecoration(
                                   labelText: 'Tax Rate (%)',
                                   isDense: true,
@@ -1991,7 +2026,8 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                               tooltip: 'Remove Tax Line',
                               onPressed: () {
                                 setState(() {
-                                  final removed = _additionalTaxes.removeAt(idx);
+                                  final removed =
+                                      _additionalTaxes.removeAt(idx);
                                   removed.dispose();
                                 });
                               },
@@ -2358,18 +2394,23 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                     border: Border.all(color: kcBorderColor),
                                   ),
                                   child: () {
-                                    final isGstActive = _activeTaxTreatment == 'gst';
+                                    final isGstActive =
+                                        _activeTaxTreatment == 'gst';
                                     final rate = isGstActive ? r.sgstRate : 0.0;
-                                    final amt = isGstActive ? r.sgstAmount : 0.0;
+                                    final amt =
+                                        isGstActive ? r.sgstAmount : 0.0;
                                     final rateStr = rate % 1 == 0
                                         ? rate.toInt().toString()
                                         : rate.toStringAsFixed(1);
                                     return Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
+                                          amt > 0
+                                              ? '₹${amt.toStringAsFixed(2)}'
+                                              : '₹0.00',
                                           style: GoogleFonts.inter(
                                             fontSize: 11.5,
                                             fontWeight: isGstActive && amt > 0
@@ -2409,18 +2450,23 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                     border: Border.all(color: kcBorderColor),
                                   ),
                                   child: () {
-                                    final isGstActive = _activeTaxTreatment == 'gst';
+                                    final isGstActive =
+                                        _activeTaxTreatment == 'gst';
                                     final rate = isGstActive ? r.cgstRate : 0.0;
-                                    final amt = isGstActive ? r.cgstAmount : 0.0;
+                                    final amt =
+                                        isGstActive ? r.cgstAmount : 0.0;
                                     final rateStr = rate % 1 == 0
                                         ? rate.toInt().toString()
                                         : rate.toStringAsFixed(1);
                                     return Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
+                                          amt > 0
+                                              ? '₹${amt.toStringAsFixed(2)}'
+                                              : '₹0.00',
                                           style: GoogleFonts.inter(
                                             fontSize: 11.5,
                                             fontWeight: isGstActive && amt > 0
@@ -2460,18 +2506,24 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                                     border: Border.all(color: kcBorderColor),
                                   ),
                                   child: () {
-                                    final isIgstActive = _activeTaxTreatment == 'igst';
-                                    final rate = isIgstActive ? r.igstRate : 0.0;
-                                    final amt = isIgstActive ? r.igstAmount : 0.0;
+                                    final isIgstActive =
+                                        _activeTaxTreatment == 'igst';
+                                    final rate =
+                                        isIgstActive ? r.igstRate : 0.0;
+                                    final amt =
+                                        isIgstActive ? r.igstAmount : 0.0;
                                     final rateStr = rate % 1 == 0
                                         ? rate.toInt().toString()
                                         : rate.toStringAsFixed(1);
                                     return Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          amt > 0 ? '₹${amt.toStringAsFixed(2)}' : '₹0.00',
+                                          amt > 0
+                                              ? '₹${amt.toStringAsFixed(2)}'
+                                              : '₹0.00',
                                           style: GoogleFonts.inter(
                                             fontSize: 11.5,
                                             fontWeight: isIgstActive && amt > 0
@@ -2708,12 +2760,12 @@ class _InvoiceFormDialogState extends State<InvoiceFormDialog> {
                         for (final t in _additionalTaxes)
                           if (t.name.isNotEmpty && t.rate > 0)
                             _summaryRow(
-                              '${t.name} (${t.rate % 1 == 0 ? t.rate.toInt().toString() : t.rate.toString()}%):',
-                              formatAmount(
-                                  ((_taxableTotal * (t.rate / 100)) * 100)
-                                          .round() /
-                                      100),
-                              color: kcPrimaryDark),
+                                '${t.name} (${t.rate % 1 == 0 ? t.rate.toInt().toString() : t.rate.toString()}%):',
+                                formatAmount(
+                                    ((_taxableTotal * (t.rate / 100)) * 100)
+                                            .round() /
+                                        100),
+                                color: kcPrimaryDark),
                     ],
                   );
                 }(),

@@ -1240,6 +1240,36 @@ class MockStorageService extends _i1.Mock implements _i24.StorageService {
       ) as _i21.Future<void>);
 
   @override
+  _i21.Future<void> saveActiveCompanyId(int? companyId) => (super.noSuchMethod(
+        Invocation.method(
+          #saveActiveCompanyId,
+          [companyId],
+        ),
+        returnValue: _i21.Future<void>.value(),
+        returnValueForMissingStub: _i21.Future<void>.value(),
+      ) as _i21.Future<void>);
+
+  @override
+  _i21.Future<int?> getActiveCompanyId() => (super.noSuchMethod(
+        Invocation.method(
+          #getActiveCompanyId,
+          [],
+        ),
+        returnValue: _i21.Future<int?>.value(),
+        returnValueForMissingStub: _i21.Future<int?>.value(),
+      ) as _i21.Future<int?>);
+
+  @override
+  _i21.Future<void> removeActiveCompanyId() => (super.noSuchMethod(
+        Invocation.method(
+          #removeActiveCompanyId,
+          [],
+        ),
+        returnValue: _i21.Future<void>.value(),
+        returnValueForMissingStub: _i21.Future<void>.value(),
+      ) as _i21.Future<void>);
+
+  @override
   _i21.Future<void> saveCompanySettings(_i16.CompanySettingModel? settings) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1294,6 +1324,15 @@ class MockApiService extends _i1.Mock implements _i25.ApiService {
   set onUnauthorized(_i22.VoidCallback? value) => super.noSuchMethod(
         Invocation.setter(
           #onUnauthorized,
+          value,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set onSubscriptionExpired(_i22.VoidCallback? value) => super.noSuchMethod(
+        Invocation.setter(
+          #onSubscriptionExpired,
           value,
         ),
         returnValueForMissingStub: null,
@@ -4300,6 +4339,16 @@ class MockSettingsService extends _i1.Mock implements _i34.SettingsService {
   _i21.Future<void> hydrateFromCache() => (super.noSuchMethod(
         Invocation.method(
           #hydrateFromCache,
+          [],
+        ),
+        returnValue: _i21.Future<void>.value(),
+        returnValueForMissingStub: _i21.Future<void>.value(),
+      ) as _i21.Future<void>);
+
+  @override
+  _i21.Future<void> clearSettings() => (super.noSuchMethod(
+        Invocation.method(
+          #clearSettings,
           [],
         ),
         returnValue: _i21.Future<void>.value(),

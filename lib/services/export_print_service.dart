@@ -934,7 +934,8 @@ class ExportPrintService {
                           ),
                         if (settings.fssaiNo != null &&
                             settings.fssaiNo!.trim().isNotEmpty &&
-                            settings.fssaiNo!.trim().toLowerCase() != 'null') ...[
+                            settings.fssaiNo!.trim().toLowerCase() !=
+                                'null') ...[
                           pw.SizedBox(height: 1.5),
                           pw.Text(
                             'FSSAI Lic. No: ${settings.fssaiNo}',
@@ -1046,7 +1047,8 @@ class ExportPrintService {
                         _pdfMetaRow('Invoice No:', invoice.invoiceNo,
                             isBold: true),
                         _pdfMetaRow('Date:', invoice.invoiceDate),
-                        if (settings.hasContactNumber && invoice.showContactNumber) ...[
+                        if (settings.hasContactNumber &&
+                            invoice.showContactNumber) ...[
                           if (settings.phone.trim().isNotEmpty &&
                               settings.phone.toLowerCase() != 'null')
                             _pdfMetaRow('Phone:', settings.phone),
@@ -1103,7 +1105,10 @@ class ExportPrintService {
                         ),
                         pw.SizedBox(height: 2),
                         pw.Text(
-                          invoice.customerName.replaceAll(RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)', caseSensitive: false), ''),
+                          invoice.customerName.replaceAll(
+                              RegExp(r'\s*\((?:COMP|DEALER|CODE)[^\)]*\)',
+                                  caseSensitive: false),
+                              ''),
                           style: pw.TextStyle(
                             fontSize: 11.5,
                             fontWeight: pw.FontWeight.bold,
@@ -1357,10 +1362,19 @@ class ExportPrintService {
                               isBold: true),
                           pw.SizedBox(height: 3),
                           () {
-                            final bool isFullyPaid = invoice.paidAmount >= invoice.grandTotal && invoice.grandTotal > 0;
-                            final bool isPartiallyPaid = invoice.paidAmount > 0 && invoice.paidAmount < invoice.grandTotal;
-                            final String statusText = isFullyPaid ? 'FULLY PAID' : (isPartiallyPaid ? 'PARTIALLY PAID' : 'UNPAID');
-                            return _pdfSummaryRow('Payment Status:', statusText, isBold: true);
+                            final bool isFullyPaid =
+                                invoice.paidAmount >= invoice.grandTotal &&
+                                    invoice.grandTotal > 0;
+                            final bool isPartiallyPaid =
+                                invoice.paidAmount > 0 &&
+                                    invoice.paidAmount < invoice.grandTotal;
+                            final String statusText = isFullyPaid
+                                ? 'FULLY PAID'
+                                : (isPartiallyPaid
+                                    ? 'PARTIALLY PAID'
+                                    : 'UNPAID');
+                            return _pdfSummaryRow('Payment Status:', statusText,
+                                isBold: true);
                           }(),
                         ],
                       ),

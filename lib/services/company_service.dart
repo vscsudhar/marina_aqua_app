@@ -43,7 +43,8 @@ class CompanyService {
     return CompanyModel.fromJson(data['data'] as Map<String, dynamic>);
   }
 
-  Future<CompanyModel> updateCompany(int id, Map<String, dynamic> payload) async {
+  Future<CompanyModel> updateCompany(
+      int id, Map<String, dynamic> payload) async {
     final response = await _apiService.client.put(
       '/companies/$id',
       data: payload,

@@ -315,7 +315,8 @@ class _CompanySettingsDialogState extends State<CompanySettingsDialog> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: _logoUrl != null && _logoUrl!.isNotEmpty
                                     ? Image.network(
-                                        ApiService.resolveLogoUrl(_logoUrl) ?? _logoUrl!,
+                                        ApiService.resolveLogoUrl(_logoUrl) ??
+                                            _logoUrl!,
                                         key: ValueKey(_logoUrl),
                                         fit: BoxFit.contain,
                                         errorBuilder: (_, __, ___) =>

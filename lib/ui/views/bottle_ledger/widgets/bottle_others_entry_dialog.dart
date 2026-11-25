@@ -26,9 +26,10 @@ class BottleOthersEntryDialog extends StatefulWidget {
 
 class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
   final _formKey = GlobalKey<FormState>();
-  final BottleLedgerService _ledgerService = locator.isRegistered<BottleLedgerService>()
-      ? locator<BottleLedgerService>()
-      : BottleLedgerService();
+  final BottleLedgerService _ledgerService =
+      locator.isRegistered<BottleLedgerService>()
+          ? locator<BottleLedgerService>()
+          : BottleLedgerService();
 
   late DateTime _selectedDate;
   BottleOtherProductModel? _selectedProduct;
@@ -57,8 +58,8 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
       _selectedDate = parsed ?? widget.initialDate ?? DateTime.now();
       _amountController = TextEditingController(
           text: widget.existingEntry!.amount.toStringAsFixed(2));
-      _quantityController =
-          TextEditingController(text: widget.existingEntry!.quantity.toString());
+      _quantityController = TextEditingController(
+          text: widget.existingEntry!.quantity.toString());
       _notesController =
           TextEditingController(text: widget.existingEntry!.notes);
       _totalAmount = widget.existingEntry!.totalAmount;
@@ -106,7 +107,8 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
         _products = list;
         _isLoadingProducts = false;
         if (widget.existingEntry != null) {
-          final matched = list.where((p) => p.id == widget.existingEntry!.productId);
+          final matched =
+              list.where((p) => p.id == widget.existingEntry!.productId);
           if (matched.isNotEmpty) {
             _selectedProduct = matched.first;
           }
@@ -173,7 +175,8 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
       };
 
       if (widget.existingEntry != null) {
-        await _ledgerService.updateOtherEntry(widget.existingEntry!.id, payload);
+        await _ledgerService.updateOtherEntry(
+            widget.existingEntry!.id, payload);
       } else {
         await _ledgerService.createOtherEntry(payload);
       }
@@ -230,7 +233,9 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isEditing ? 'Edit Others Entry' : 'Others Bottle Entry',
+                              isEditing
+                                  ? 'Edit Others Entry'
+                                  : 'Others Bottle Entry',
                               style: GoogleFonts.outfit(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -309,7 +314,8 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            DateFormat('dd-MM-yyyy (EEE)').format(_selectedDate),
+                            DateFormat('dd-MM-yyyy (EEE)')
+                                .format(_selectedDate),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -391,7 +397,8 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
                                 if (val != null &&
                                     (_amountController.text.trim().isEmpty ||
                                         _amountController.text.trim() == '0' ||
-                                        _amountController.text.trim() == '0.00')) {
+                                        _amountController.text.trim() ==
+                                            '0.00')) {
                                   if (val.defaultPrice > 0) {
                                     _amountController.text =
                                         val.defaultPrice.toStringAsFixed(2);
@@ -425,8 +432,9 @@ class _BottleOthersEntryDialogState extends State<BottleOthersEntryDialog> {
                             const SizedBox(height: 6),
                             TextFormField(
                               controller: _amountController,
-                              keyboardType: const TextInputType.numberWithOptions(
-                                  decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: InputDecoration(
                                 prefixText: '₹ ',
                                 prefixStyle: GoogleFonts.inter(

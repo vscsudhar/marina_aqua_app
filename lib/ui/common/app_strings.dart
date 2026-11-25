@@ -7,8 +7,7 @@ class AppStrings {
       'Enter your email or username to access your dashboard';
 
   static const String labelEmailOrUsername = 'Email or Username';
-  static const String hintEmailOrUsername =
-      'e.g., admin@dockrent.in or admin';
+  static const String hintEmailOrUsername = 'e.g., admin@dockrent.in or admin';
   static const String labelPassword = 'Password';
   static const String hintPassword = '••••••••';
   static const String labelRememberMe = 'Remember session on this device';

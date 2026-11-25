@@ -155,8 +155,8 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                               color: Colors.red.shade400, size: 40),
                           const SizedBox(height: 12),
                           Text(_errorMessage!,
-                              style:
-                                  GoogleFonts.inter(color: Colors.red.shade700)),
+                              style: GoogleFonts.inter(
+                                  color: Colors.red.shade700)),
                           const SizedBox(height: 12),
                           ElevatedButton(
                             onPressed: _loadStatement,
@@ -188,7 +188,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -209,7 +209,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
               SizedBox(
                 width: 240,
                 child: DropdownButtonFormField<int>(
-                  value: _selectedPartyId,
+                  initialValue: _selectedPartyId,
                   isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'Select Party',
@@ -239,7 +239,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
               SizedBox(
                 width: 140,
                 child: DropdownButtonFormField<int>(
-                  value: _selectedMonth,
+                  initialValue: _selectedMonth,
                   decoration: const InputDecoration(
                     labelText: 'Month',
                     border: OutlineInputBorder(),
@@ -269,7 +269,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
               SizedBox(
                 width: 110,
                 child: DropdownButtonFormField<int>(
-                  value: _selectedYear,
+                  initialValue: _selectedYear,
                   decoration: const InputDecoration(
                     labelText: 'Year',
                     border: OutlineInputBorder(),
@@ -292,7 +292,8 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
               ),
 
               IconButton(
-                icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+                icon:
+                    const Icon(Icons.refresh_rounded, color: AppColors.primary),
                 tooltip: 'Refresh Statement',
                 onPressed: _loadStatement,
               ),
@@ -394,7 +395,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
               border: Border.all(color: const Color(0xFFE2E8F0)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -488,7 +489,8 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                         final hasSales = d.entriesCount > 0;
                         return DataRow(
                           color: WidgetStateProperty.resolveWith<Color?>(
-                            (states) => hasSales ? null : const Color(0xFFFBFBFB),
+                            (states) =>
+                                hasSales ? null : const Color(0xFFFBFBFB),
                           ),
                           onSelectChanged: hasSales
                               ? (_) => _openDailyDetails(d.date)
@@ -607,7 +609,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                       // Total Row
                       DataRow(
                         color: WidgetStateProperty.all(
-                          const Color(0xFFE2E8F0).withOpacity(0.5),
+                          const Color(0xFFE2E8F0).withValues(alpha: 0.5),
                         ),
                         cells: [
                           DataCell(
@@ -629,8 +631,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                             ),
                           ),
                           ...products.map((p) {
-                            final totalQty =
-                                totals.productQuantities[p] ?? 0.0;
+                            final totalQty = totals.productQuantities[p] ?? 0.0;
                             return DataCell(
                               Text(
                                 totalQty > 0
@@ -700,7 +701,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -711,7 +712,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 22),

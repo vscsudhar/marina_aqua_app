@@ -30,7 +30,8 @@ class _PublicPartyDialogState extends State<PublicPartyDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.party?.partyName ?? '');
+    _nameController =
+        TextEditingController(text: widget.party?.partyName ?? '');
     _contactController =
         TextEditingController(text: widget.party?.contactNumber ?? '');
     _addressController =
@@ -108,7 +109,7 @@ class _PublicPartyDialogState extends State<PublicPartyDialog> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -216,7 +217,7 @@ class _PublicPartyDialogState extends State<PublicPartyDialog> {
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
-                  value: _status,
+                  initialValue: _status,
                   decoration: const InputDecoration(
                     labelText: 'Account Status',
                     border: OutlineInputBorder(),
@@ -225,7 +226,8 @@ class _PublicPartyDialogState extends State<PublicPartyDialog> {
                   ),
                   items: const [
                     DropdownMenuItem(value: 'active', child: Text('Active')),
-                    DropdownMenuItem(value: 'inactive', child: Text('Inactive')),
+                    DropdownMenuItem(
+                        value: 'inactive', child: Text('Inactive')),
                   ],
                   onChanged: (v) {
                     if (v != null) setState(() => _status = v);
@@ -236,8 +238,9 @@ class _PublicPartyDialogState extends State<PublicPartyDialog> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed:
-                          _isSaving ? null : () => Navigator.of(context).pop(false),
+                      onPressed: _isSaving
+                          ? null
+                          : () => Navigator.of(context).pop(false),
                       child: const Text('Cancel'),
                     ),
                     const SizedBox(width: 12),

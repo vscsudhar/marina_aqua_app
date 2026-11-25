@@ -95,7 +95,9 @@ class BottleLedgerService {
     final list = response.data['data'] as List? ?? [];
     return list
         .map((item) => BottleOtherProductModel.fromJson(
-            item is Map<String, dynamic> ? item : Map<String, dynamic>.from(item)))
+            item is Map<String, dynamic>
+                ? item
+                : Map<String, dynamic>.from(item)))
         .toList();
   }
 
@@ -135,7 +137,8 @@ class BottleLedgerService {
 
   /// Delete an existing Bottle Other Entry.
   Future<bool> deleteOtherEntry(int id) async {
-    final response = await _apiService.client.delete('/bottle-ledger/others/$id');
+    final response =
+        await _apiService.client.delete('/bottle-ledger/others/$id');
     return response.statusCode == 200;
   }
 
