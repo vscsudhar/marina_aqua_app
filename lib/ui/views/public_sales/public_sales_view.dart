@@ -41,14 +41,18 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
         backgroundColor: Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded,
-                    color: AppColors.textPrimary),
-                tooltip: 'Back to Dashboard',
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded,
+              color: AppColors.textPrimary),
+          tooltip: 'Back',
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
         title: Row(
           children: [
             const MarinaLogo(size: 26, showText: false),
@@ -105,13 +109,17 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
                     child: IndexedStack(
                       index: viewModel.selectedTabIndex,
                       children: [
+                        _buildPartiesTab(context, viewModel, currencyFormat),
                         _buildSalesEntriesTab(
                             context, viewModel, currencyFormat),
-                        _buildPartiesTab(context, viewModel, currencyFormat),
                         PublicSalesStatementView(
+                          key: ValueKey(
+                              'statement_${viewModel.statementPartyId ?? 0}'),
                           parties: viewModel.parties,
-                          initialPartyId: viewModel.selectedPartyFilter,
+                          initialPartyId: viewModel.statementPartyId ??
+                              viewModel.selectedPartyFilter,
                           salesService: viewModel.salesService,
+                          onBack: () => viewModel.setTabIndex(0),
                         ),
                       ],
                     ),
@@ -151,30 +159,33 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
               color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTabButton(
-                  title: 'Sales Entries',
-                  icon: Icons.receipt_long_rounded,
-                  count: viewModel.salesEntries.length,
-                  isSelected: viewModel.selectedTabIndex == 0,
-                  onTap: () => viewModel.setTabIndex(0),
-                ),
-                _buildTabButton(
-                  title: 'Parties',
-                  icon: Icons.groups_rounded,
-                  count: viewModel.parties.length,
-                  isSelected: viewModel.selectedTabIndex == 1,
-                  onTap: () => viewModel.setTabIndex(1),
-                ),
-                _buildTabButton(
-                  title: 'Monthly Statement',
-                  icon: Icons.calendar_month_rounded,
-                  isSelected: viewModel.selectedTabIndex == 2,
-                  onTap: () => viewModel.setTabIndex(2),
-                ),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildTabButton(
+                    title: 'Parties',
+                    icon: Icons.groups_rounded,
+                    count: viewModel.parties.length,
+                    isSelected: viewModel.selectedTabIndex == 0,
+                    onTap: () => viewModel.setTabIndex(0),
+                  ),
+                  _buildTabButton(
+                    title: 'Sales Entries',
+                    icon: Icons.receipt_long_rounded,
+                    count: viewModel.salesEntries.length,
+                    isSelected: viewModel.selectedTabIndex == 1,
+                    onTap: () => viewModel.setTabIndex(1),
+                  ),
+                  _buildTabButton(
+                    title: 'Monthly Statement',
+                    icon: Icons.calendar_month_rounded,
+                    isSelected: viewModel.selectedTabIndex == 2,
+                    onTap: () => viewModel.setTabIndex(2),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -596,178 +607,434 @@ class PublicSalesView extends StackedView<PublicSalesViewModel> {
       NumberFormat currencyFormat) {
     final parties = viewModel.filteredParties;
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Search & Filter Toolbar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 10,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              // Search field
+              SizedBox(
+                width: 280,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search party name, phone, address...',
+                    prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                    suffixIcon: viewModel.partySearchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 16),
+                            onPressed: () => viewModel.setPartySearchQuery(''),
+                          )
+                        : null,
+                    border: const OutlineInputBorder(),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  ),
+                  onChanged: viewModel.setPartySearchQuery,
+                ),
+              ),
+
+              // Parties count & action
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${parties.length} ${parties.length == 1 ? 'Party' : 'Parties'}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () => _openNewPartyDialog(context, viewModel),
+                    icon: const Icon(Icons.person_add_rounded, size: 16),
+                    label: Text(
+                      'New Party',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Responsive Cards Grid
+        Expanded(
+          child: parties.isEmpty
+              ? Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.person_outline_rounded,
+                            size: 48, color: Colors.grey.shade400),
+                        const SizedBox(height: 12),
+                        Text(
+                          viewModel.partySearchQuery.isNotEmpty
+                              ? 'No parties match "${viewModel.partySearchQuery}"'
+                              : 'No public parties created yet.',
+                          style:
+                              GoogleFonts.inter(color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () =>
+                              _openNewPartyDialog(context, viewModel),
+                          child: const Text('Add Direct Party'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isDesktop = constraints.maxWidth >= 720;
+                    const spacing = 14.0;
+                    final cardWidth = isDesktop
+                        ? (constraints.maxWidth - spacing) / 2
+                        : constraints.maxWidth;
+
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: parties.map((p) {
+                          return SizedBox(
+                            width: cardWidth,
+                            child: _buildPartyCard(
+                                context, viewModel, p, currencyFormat),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPartyCard(
+    BuildContext context,
+    PublicSalesViewModel viewModel,
+    PublicPartyModel party,
+    NumberFormat currencyFormat,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: parties.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.person_outline_rounded,
-                      size: 48, color: Colors.grey.shade400),
-                  const SizedBox(height: 12),
-                  Text(
-                    'No public parties created yet.',
-                    style: GoogleFonts.inter(color: AppColors.textSecondary),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Avatar, Name, Status Badge
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                child: Text(
+                  party.partyName.isNotEmpty
+                      ? party.partyName[0].toUpperCase()
+                      : 'P',
+                  style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () => _openNewPartyDialog(context, viewModel),
-                    child: const Text('Add Direct Party'),
-                  ),
-                ],
-              ),
-            )
-          : SingleChildScrollView(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(
-                    const Color(0xFFF8FAFC),
-                  ),
-                  horizontalMargin: 16,
-                  columnSpacing: 24,
-                  columns: const [
-                    DataColumn(
-                        label: Text('Party / Customer Name',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Contact',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Address',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Status',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Total Sales',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        numeric: true),
-                    DataColumn(
-                        label: Text('Sales Count',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        numeric: true),
-                    DataColumn(
-                        label: Text('Actions',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                  ],
-                  rows: parties.map((p) {
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor:
-                                    AppColors.primary.withValues(alpha: 0.1),
-                                child: Text(
-                                  p.partyName.isNotEmpty
-                                      ? p.partyName[0].toUpperCase()
-                                      : 'P',
-                                  style: GoogleFonts.outfit(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                p.partyName,
-                                style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                        ),
-                        DataCell(Text(p.contactNumber ?? '–')),
-                        DataCell(
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 200),
-                            child: Text(
-                              p.address ?? '–',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: p.isActive
-                                  ? Colors.green.shade50
-                                  : Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: p.isActive
-                                    ? Colors.green.shade300
-                                    : Colors.red.shade300,
-                              ),
-                            ),
-                            child: Text(
-                              p.status.toUpperCase(),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: p.isActive
-                                    ? Colors.green.shade800
-                                    : Colors.red.shade800,
-                              ),
-                            ),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            currencyFormat.format(p.totalSalesAmount),
-                            style: GoogleFonts.outfit(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            '${p.salesCount} entries',
-                            style: GoogleFonts.inter(
-                                color: AppColors.textSecondary),
-                          ),
-                        ),
-                        DataCell(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_note_rounded,
-                                    color: AppColors.primary, size: 20),
-                                tooltip: 'Edit Party',
-                                onPressed: () =>
-                                    _openEditPartyDialog(context, viewModel, p),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded,
-                                    color: Colors.redAccent, size: 20),
-                                tooltip: 'Delete Party',
-                                onPressed: () =>
-                                    _confirmDeleteParty(context, viewModel, p),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      party.partyName,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Direct Customer',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: party.isActive
+                      ? Colors.green.shade50
+                      : Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: party.isActive
+                        ? Colors.green.shade300
+                        : Colors.red.shade300,
+                  ),
+                ),
+                child: Text(
+                  party.status.toUpperCase(),
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: party.isActive
+                        ? Colors.green.shade800
+                        : Colors.red.shade800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 12),
+
+          // Details: Phone & Address
+          Row(
+            children: [
+              const Icon(Icons.phone_outlined,
+                  size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  party.contactNumber != null &&
+                          party.contactNumber!.trim().isNotEmpty
+                      ? party.contactNumber!
+                      : 'No contact provided',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: party.contactNumber != null &&
+                            party.contactNumber!.trim().isNotEmpty
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.location_on_outlined,
+                  size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  party.address != null && party.address!.trim().isNotEmpty
+                      ? party.address!
+                      : 'No address provided',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: party.address != null &&
+                            party.address!.trim().isNotEmpty
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Metrics Box: Total Sales & Sales Count
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Sales',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      currencyFormat.format(party.totalSalesAmount),
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0F766E),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Sales History',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${party.salesCount} ${party.salesCount == 1 ? 'sale' : 'sales'}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Actions: Statement button (prominent) + Edit + Delete
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F766E), // Teal
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () =>
+                      _openPartyStatement(context, viewModel, party),
+                  icon: const Icon(Icons.receipt_long_rounded, size: 16),
+                  label: Text(
+                    'Statement',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFF1F5F9),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.all(8),
+                ),
+                icon: const Icon(Icons.edit_note_rounded,
+                    color: AppColors.primary, size: 18),
+                tooltip: 'Edit Party',
+                onPressed: () =>
+                    _openEditPartyDialog(context, viewModel, party),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFFEE2E8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.all(8),
+                ),
+                icon: const Icon(Icons.delete_outline_rounded,
+                    color: Colors.redAccent, size: 18),
+                tooltip: 'Delete Party',
+                onPressed: () => _confirmDeleteParty(context, viewModel, party),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
+  }
+
+  void _openPartyStatement(BuildContext context, PublicSalesViewModel viewModel,
+      PublicPartyModel party) {
+    viewModel.openPartyStatement(party.id);
   }
 
   void _openNewPartyDialog(

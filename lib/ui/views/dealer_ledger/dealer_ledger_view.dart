@@ -33,13 +33,17 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                tooltip: 'Back to Dashboard',
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          tooltip: 'Back',
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
         title: Row(
           children: [
             const MarinaLogo(size: 26, showText: false),
@@ -534,19 +538,27 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
-              const Icon(Icons.inventory_2_outlined,
-                  color: Color(0xFF0284C7), size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Product-Wise Monthly Summary Breakdown',
-                style: GoogleFonts.outfit(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.inventory_2_outlined,
+                      color: Color(0xFF0284C7), size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Product-Wise Monthly Summary Breakdown',
+                    style: GoogleFonts.outfit(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary),
+                  ),
+                ],
               ),
-              const Spacer(),
               Text(
                 '*Bottle sizes & can counts are tracked separately without combining',
                 style: GoogleFonts.inter(
@@ -557,40 +569,48 @@ class DealerLedgerView extends StackedView<DealerLedgerViewModel> {
             ],
           ),
           const SizedBox(height: 12),
-          Table(
-            border: TableBorder.all(color: AppColors.border, width: 0.5),
-            columnWidths: const {
-              0: FlexColumnWidth(3),
-              1: FlexColumnWidth(1.5),
-              2: FlexColumnWidth(1.5),
-              3: FlexColumnWidth(2),
-              4: FlexColumnWidth(2),
-            },
-            children: [
-              TableRow(
-                decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 600),
+              child: Table(
+                border: TableBorder.all(color: AppColors.border, width: 0.5),
+                columnWidths: const {
+                  0: FlexColumnWidth(3),
+                  1: FlexColumnWidth(1.5),
+                  2: FlexColumnWidth(1.5),
+                  3: FlexColumnWidth(2),
+                  4: FlexColumnWidth(2),
+                },
                 children: [
-                  _tableHead('Product Name'),
-                  _tableHead('SKU'),
-                  _tableHead('Unit'),
-                  _tableHead('Monthly Quantity'),
-                  _tableHead('Total Revenue (₹)'),
+                  TableRow(
+                    decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+                    children: [
+                      _tableHead('Product Name'),
+                      _tableHead('SKU'),
+                      _tableHead('Unit'),
+                      _tableHead('Monthly Quantity'),
+                      _tableHead('Total Revenue (₹)'),
+                    ],
+                  ),
+                  ...breakdown.map((item) {
+                    return TableRow(
+                      children: [
+                        _tableCell(item.name, bold: true),
+                        _tableCell(item.sku),
+                        _tableCell(item.unit, align: TextAlign.center),
+                        _tableCell(
+                            NumberFormat('#,##0').format(item.totalQuantity),
+                            align: TextAlign.center,
+                            bold: true),
+                        _tableCell(currencyFmt.format(item.totalAmount),
+                            align: TextAlign.right, bold: true),
+                      ],
+                    );
+                  }),
                 ],
               ),
-              ...breakdown.map((item) {
-                return TableRow(
-                  children: [
-                    _tableCell(item.name, bold: true),
-                    _tableCell(item.sku),
-                    _tableCell(item.unit, align: TextAlign.center),
-                    _tableCell(NumberFormat('#,##0').format(item.totalQuantity),
-                        align: TextAlign.center, bold: true),
-                    _tableCell(currencyFmt.format(item.totalAmount),
-                        align: TextAlign.right, bold: true),
-                  ],
-                );
-              }),
-            ],
+            ),
           ),
         ],
       ),

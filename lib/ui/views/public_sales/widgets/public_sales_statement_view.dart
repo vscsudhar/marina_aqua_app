@@ -10,12 +10,14 @@ class PublicSalesStatementView extends StatefulWidget {
   final List<PublicPartyModel> parties;
   final int? initialPartyId;
   final PublicSalesService salesService;
+  final VoidCallback? onBack;
 
   const PublicSalesStatementView({
     super.key,
     required this.parties,
     this.initialPartyId,
     required this.salesService,
+    this.onBack,
   });
 
   @override
@@ -53,7 +55,9 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
   void didUpdateWidget(covariant PublicSalesStatementView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialPartyId != null &&
-        widget.initialPartyId != _selectedPartyId) {
+        (widget.initialPartyId != _selectedPartyId ||
+            widget.initialPartyId != oldWidget.initialPartyId ||
+            _statement == null)) {
       _selectedPartyId = widget.initialPartyId;
       _loadStatement();
     }
@@ -205,6 +209,13 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
             runSpacing: 10,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              if (widget.onBack != null)
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded,
+                      color: AppColors.textPrimary),
+                  tooltip: 'Back to Parties',
+                  onPressed: widget.onBack,
+                ),
               // Party selector
               SizedBox(
                 width: 240,
@@ -436,6 +447,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
+                    showCheckboxColumn: false,
                     headingRowColor: WidgetStateProperty.all(
                       const Color(0xFFF8FAFC),
                     ),
@@ -492,32 +504,54 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
                             (states) =>
                                 hasSales ? null : const Color(0xFFFBFBFB),
                           ),
-                          onSelectChanged: hasSales
-                              ? (_) => _openDailyDetails(d.date)
-                              : null,
+                          onSelectChanged: (_) => _openDailyDetails(d.date),
                           cells: [
                             // Date
                             DataCell(
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '${d.formattedDate} (${d.dayName})',
-                                    style: GoogleFonts.inter(
-                                      fontWeight: hasSales
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                      color: hasSales
-                                          ? AppColors.primary
-                                          : AppColors.textSecondary,
-                                    ),
+                              InkWell(
+                                onTap: () => _openDailyDetails(d.date),
+                                borderRadius: BorderRadius.circular(4),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 2),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '${d.formattedDate} (${d.dayName})',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: hasSales
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          color: hasSales
+                                              ? AppColors.primary
+                                              : AppColors.textSecondary,
+                                        ),
+                                      ),
+                                      if (hasSales) ...[
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary
+                                                .withValues(alpha: 0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            'View',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
                                   ),
-                                  if (hasSales) ...[
-                                    const SizedBox(width: 4),
-                                    const Icon(Icons.open_in_new_rounded,
-                                        size: 14, color: AppColors.primary),
-                                  ],
-                                ],
+                                ),
                               ),
                             ),
                             // Entries count

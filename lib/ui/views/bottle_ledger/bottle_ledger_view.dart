@@ -42,14 +42,18 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
         backgroundColor: Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded,
-                    color: AppColors.textPrimary),
-                tooltip: 'Back to Dashboard',
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded,
+              color: AppColors.textPrimary),
+          tooltip: 'Back',
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
         title: Row(
           children: [
             const MarinaLogo(size: 26, showText: false),
@@ -128,10 +132,14 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 8,
                         children: [
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 viewModel.showDamageLedger
@@ -143,39 +151,45 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                viewModel.showDamageLedger
-                                    ? 'DAMAGED BOTTLE LEDGER VIEW'
-                                    : 'BOTTLE PURCHASE & SALES DUAL LEDGER',
-                                style: GoogleFonts.outfit(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: viewModel.showDamageLedger
-                                      ? const Color(0xFFE11D48)
-                                      : const Color(0xFF0F3460),
+                              Flexible(
+                                child: Text(
+                                  viewModel.showDamageLedger
+                                      ? 'DAMAGED BOTTLE LEDGER VIEW'
+                                      : 'BOTTLE PURCHASE & SALES DUAL LEDGER',
+                                  style: GoogleFonts.outfit(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: viewModel.showDamageLedger
+                                        ? const Color(0xFFE11D48)
+                                        : const Color(0xFF0F3460),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
-                          SegmentedButton<bool>(
-                            segments: const [
-                              ButtonSegment<bool>(
-                                value: false,
-                                label: Text('Dual Purchase Ledger'),
-                                icon: Icon(Icons.compare_arrows_rounded,
-                                    size: 16),
-                              ),
-                              ButtonSegment<bool>(
-                                value: true,
-                                label: Text('Damage Bottle Ledger'),
-                                icon: Icon(Icons.remove_shopping_cart_rounded,
-                                    size: 16),
-                              ),
-                            ],
-                            selected: {viewModel.showDamageLedger},
-                            onSelectionChanged: (Set<bool> sel) {
-                              viewModel.toggleDamageLedger(sel.first);
-                            },
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SegmentedButton<bool>(
+                              segments: const [
+                                ButtonSegment<bool>(
+                                  value: false,
+                                  label: Text('Dual Purchase Ledger'),
+                                  icon: Icon(Icons.compare_arrows_rounded,
+                                      size: 16),
+                                ),
+                                ButtonSegment<bool>(
+                                  value: true,
+                                  label: Text('Damage Bottle Ledger'),
+                                  icon: Icon(Icons.remove_shopping_cart_rounded,
+                                      size: 16),
+                                ),
+                              ],
+                              selected: {viewModel.showDamageLedger},
+                              onSelectionChanged: (Set<bool> sel) {
+                                viewModel.toggleDamageLedger(sel.first);
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -242,18 +256,22 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'Dealer Bottle Purchase (Without Refill) & Others',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF0F3460),
+                                Flexible(
+                                  child: Text(
+                                    'Dealer Bottle Purchase (Without Refill) & Others',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF0F3460),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
                               children: [
                                 ElevatedButton.icon(
                                   onPressed: () => _openOthersEntryDialog(
@@ -276,7 +294,6 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
                                 OutlinedButton.icon(
                                   onPressed: () => _openOthersStatementDialog(
                                       context, viewModel),
@@ -593,8 +610,10 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
           ),
 
           // Download PDF & Print Actions
-          Row(
-            mainAxisSize: MainAxisSize.min,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               // Damage Bottle Ledger Toggle Button
               ElevatedButton.icon(
@@ -624,7 +643,6 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
               ),
-              const SizedBox(width: 8),
 
               // Download PDF Button
               ElevatedButton.icon(
@@ -647,7 +665,6 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
               ),
-              const SizedBox(width: 8),
 
               // Print Button
               OutlinedButton.icon(
@@ -780,13 +797,17 @@ class BottleLedgerView extends StackedView<BottleLedgerViewModel> {
                   const Icon(Icons.inventory_rounded,
                       color: Colors.white, size: 18),
                   const SizedBox(width: 8),
-                  Text(
-                    'MONTHLY BOTTLE STOCK REGISTER – QUANTITY AUDIT SUMMARY',
-                    style: GoogleFonts.outfit(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
+                  Expanded(
+                    child: Text(
+                      'MONTHLY BOTTLE STOCK REGISTER – QUANTITY AUDIT SUMMARY',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ],

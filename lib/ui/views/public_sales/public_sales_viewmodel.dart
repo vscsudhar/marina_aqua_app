@@ -31,6 +31,12 @@ class PublicSalesViewModel extends BaseViewModel {
   String _searchQuery = '';
   String get searchQuery => _searchQuery;
 
+  String _partySearchQuery = '';
+  String get partySearchQuery => _partySearchQuery;
+
+  int? _statementPartyId;
+  int? get statementPartyId => _statementPartyId;
+
   bool _isInitialLoading = true;
   bool get isInitialLoading => _isInitialLoading;
 
@@ -47,6 +53,17 @@ class PublicSalesViewModel extends BaseViewModel {
 
   void setTabIndex(int index) {
     _selectedTabIndex = index;
+    notifyListeners();
+  }
+
+  void openPartyStatement(int partyId) {
+    _statementPartyId = partyId;
+    _selectedTabIndex = 2; // Navigate to Statement tab
+    notifyListeners();
+  }
+
+  void setPartySearchQuery(String query) {
+    _partySearchQuery = query;
     notifyListeners();
   }
 
@@ -127,10 +144,12 @@ class PublicSalesViewModel extends BaseViewModel {
   }
 
   List<PublicPartyModel> get filteredParties {
-    if (_searchQuery.trim().isEmpty) {
+    final rawQuery =
+        _partySearchQuery.trim().isNotEmpty ? _partySearchQuery : _searchQuery;
+    if (rawQuery.trim().isEmpty) {
       return _parties;
     }
-    final q = _searchQuery.toLowerCase();
+    final q = rawQuery.trim().toLowerCase();
     return _parties.where((p) {
       final matchName = p.partyName.toLowerCase().contains(q);
       final matchContact = (p.contactNumber ?? '').toLowerCase().contains(q);

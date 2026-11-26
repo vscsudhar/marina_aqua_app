@@ -33,12 +33,17 @@ class UsersView extends StackedView<UsersViewModel> {
       appBar: AppBar(
         backgroundColor: kcSurfaceWhite,
         elevation: 0,
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: kcDeepNavy),
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: kcDeepNavy),
+          tooltip: 'Back',
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
         title: Text(
           'Staff & User Management',
           style: GoogleFonts.outfit(
@@ -359,6 +364,191 @@ class UsersView extends StackedView<UsersViewModel> {
         final user = viewModel.users[index];
         final isSelf = user.id == viewModel.currentUser?.id;
 
+        if (isMobile) {
+          return Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: kcSurfaceWhite,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kcBorderColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor:
+                          _getRoleColor(user.role).withValues(alpha: 0.15),
+                      child: Text(
+                        user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                        style: GoogleFonts.outfit(
+                          color: _getRoleColor(user.role),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  user.name,
+                                  style: GoogleFonts.outfit(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: kcDeepNavy,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                              if (isSelf) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        kcPrimaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'You',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: kcPrimaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            user.email,
+                            style: GoogleFonts.inter(
+                                fontSize: 13, color: Colors.grey.shade600),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (user.phone != null && user.phone!.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              user.phone!,
+                              style: GoogleFonts.inter(
+                                  fontSize: 12, color: Colors.grey.shade500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert,
+                          size: 20, color: Colors.grey),
+                      onSelected: (action) {
+                        if (action == 'edit') {
+                          _showEditUserDialog(context, viewModel, user);
+                        } else if (action == 'delete') {
+                          _confirmDelete(context, viewModel, user);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined, size: 18),
+                              SizedBox(width: 8),
+                              Text('Edit'),
+                            ],
+                          ),
+                        ),
+                        if (!isSelf)
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_outline,
+                                    size: 18, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Delete',
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Divider(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getRoleColor(user.role).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        user.roleDisplay,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: _getRoleColor(user.role),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          user.isActive ? 'Active' : 'Inactive',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: user.isActive
+                                ? Colors.green.shade700
+                                : Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Transform.scale(
+                          scale: 0.85,
+                          child: Switch(
+                            value: user.isActive,
+                            activeThumbColor: kcPrimaryColor,
+                            onChanged: isSelf
+                                ? null
+                                : (_) {
+                                    if (!SubscriptionGuard.checkAccess(
+                                        context)) {
+                                      return;
+                                    }
+                                    viewModel.toggleStatus(user);
+                                  },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -397,6 +587,7 @@ class UsersView extends StackedView<UsersViewModel> {
                               color: kcDeepNavy,
                             ),
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                         if (isSelf) ...[
@@ -425,6 +616,8 @@ class UsersView extends StackedView<UsersViewModel> {
                       user.email,
                       style: GoogleFonts.inter(
                           fontSize: 13, color: Colors.grey.shade600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (user.phone != null && user.phone!.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -432,6 +625,8 @@ class UsersView extends StackedView<UsersViewModel> {
                         user.phone!,
                         style: GoogleFonts.inter(
                             fontSize: 12, color: Colors.grey.shade500),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
@@ -463,7 +658,9 @@ class UsersView extends StackedView<UsersViewModel> {
                 onChanged: isSelf
                     ? null
                     : (_) {
-                        if (!SubscriptionGuard.checkAccess(context)) return;
+                        if (!SubscriptionGuard.checkAccess(context)) {
+                          return;
+                        }
                         viewModel.toggleStatus(user);
                       },
               ),

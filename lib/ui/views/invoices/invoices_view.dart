@@ -35,52 +35,79 @@ class InvoicesView extends StackedView<InvoicesViewModel> {
     return Scaffold(
       backgroundColor: kcBackgroundColor,
       appBar: AppBar(
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: kcDeepNavy),
-                tooltip: 'Back to Dashboard',
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: kcDeepNavy),
+          tooltip: 'Back to Dashboard',
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
         title: Text(
-          'Tax Invoices & Billing Management',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 18),
+          isDesktop
+              ? 'Tax Invoices & Billing Management'
+              : 'Invoices & Billing',
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.w700, fontSize: isDesktop ? 18 : 16),
+          overflow: TextOverflow.ellipsis,
         ),
         backgroundColor: Colors.white,
         foregroundColor: kcDeepNavy,
         elevation: 0.5,
-        actions: [
-          // Company Settings Button
-          OutlinedButton.icon(
-            onPressed: () => _openCompanySettings(context, viewModel),
-            icon: const Icon(Icons.settings, size: 18),
-            label: const Text('Company Settings'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: kcPrimaryDark,
-              side: const BorderSide(color: kcPrimaryColor),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Create Invoice Button
-          ElevatedButton.icon(
-            onPressed: () => _openCreateInvoice(context, viewModel),
-            icon: const Icon(Icons.add, size: 18, color: Colors.white),
-            label: Text(
-              viewModel.isWithoutGstTab
-                  ? 'New Invoice (Non-GST)'
-                  : 'New Tax Invoice',
-              style: const TextStyle(color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kcPrimaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
+        actions: isDesktop
+            ? [
+                // Company Settings Button
+                OutlinedButton.icon(
+                  onPressed: () => _openCompanySettings(context, viewModel),
+                  icon: const Icon(Icons.settings, size: 18),
+                  label: const Text('Company Settings'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kcPrimaryDark,
+                    side: const BorderSide(color: kcPrimaryColor),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Create Invoice Button
+                ElevatedButton.icon(
+                  onPressed: () => _openCreateInvoice(context, viewModel),
+                  icon: const Icon(Icons.add, size: 18, color: Colors.white),
+                  label: Text(
+                    viewModel.isWithoutGstTab
+                        ? 'New Invoice (Non-GST)'
+                        : 'New Tax Invoice',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kcPrimaryColor,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+                const SizedBox(width: 16),
+              ]
+            : [
+                IconButton(
+                  icon:
+                      const Icon(Icons.settings_outlined, color: kcPrimaryDark),
+                  tooltip: 'Company Settings',
+                  onPressed: () => _openCompanySettings(context, viewModel),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: kcPrimaryColor),
+                  tooltip: viewModel.isWithoutGstTab
+                      ? 'New Invoice (Non-GST)'
+                      : 'New Tax Invoice',
+                  onPressed: () => _openCreateInvoice(context, viewModel),
+                ),
+                const SizedBox(width: 8),
+              ],
       ),
       body: viewModel.isBusy && viewModel.invoices.isEmpty
           ? const Center(child: CircularProgressIndicator())

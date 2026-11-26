@@ -1197,7 +1197,9 @@ class DailyCollectionView extends StackedView<DailyCollectionViewModel> {
                                     supply: details,
                                     onEdit: () {
                                       if (!SubscriptionGuard.checkAccess(
-                                          context)) return;
+                                          context)) {
+                                        return;
+                                      }
                                       showDialog(
                                         context: context,
                                         builder: (_) => SupplyEntryDialog(

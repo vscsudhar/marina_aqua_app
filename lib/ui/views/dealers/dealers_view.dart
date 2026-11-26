@@ -44,7 +44,7 @@ class DealersView extends StackedView<DealersViewModel> {
           _buildTabBar(viewModel),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(isDesktop ? 20 : 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -146,6 +146,48 @@ class DealersView extends StackedView<DealersViewModel> {
       DealersViewModel viewModel, bool isDesktop, bool isTablet) {
     if (viewModel.selectedTab == 1) {
       final activeCount = viewModel.companies.where((c) => c.isActive).length;
+      if (!isDesktop && !isTablet) {
+        return Container(
+          color: kcSurfaceWhite,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 220,
+                  child: _buildMetricTile(
+                    label: 'Total Registered Companies',
+                    value: viewModel.companies.length.toString(),
+                    icon: Icons.business,
+                    color: kcPrimaryColor,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 190,
+                  child: _buildMetricTile(
+                    label: 'Active Corporate Clients',
+                    value: activeCount.toString(),
+                    icon: Icons.check_circle_outline,
+                    color: kcSuccessColor,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 220,
+                  child: _buildMetricTile(
+                    label: 'Corporate Invoicing Status',
+                    value: 'Ready',
+                    icon: Icons.receipt_long_outlined,
+                    color: const Color(0xFF0284C7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
       return Container(
         color: kcSurfaceWhite,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -330,22 +372,25 @@ class DealersView extends StackedView<DealersViewModel> {
     return Container(
       color: kcSurfaceWhite,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        children: [
-          _buildTabItem(
-            title: 'Registered Dealers (${viewModel.totalDealersCount})',
-            icon: Icons.storefront_rounded,
-            isSelected: viewModel.selectedTab == 0,
-            onTap: () => viewModel.setSelectedTab(0),
-          ),
-          const SizedBox(width: 12),
-          _buildTabItem(
-            title: 'Corporate Companies (${viewModel.companies.length})',
-            icon: Icons.business_rounded,
-            isSelected: viewModel.selectedTab == 1,
-            onTap: () => viewModel.setSelectedTab(1),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildTabItem(
+              title: 'Registered Dealers (${viewModel.totalDealersCount})',
+              icon: Icons.storefront_rounded,
+              isSelected: viewModel.selectedTab == 0,
+              onTap: () => viewModel.setSelectedTab(0),
+            ),
+            const SizedBox(width: 12),
+            _buildTabItem(
+              title: 'Corporate Companies (${viewModel.companies.length})',
+              icon: Icons.business_rounded,
+              isSelected: viewModel.selectedTab == 1,
+              onTap: () => viewModel.setSelectedTab(1),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -392,6 +437,9 @@ class DealersView extends StackedView<DealersViewModel> {
   }
 
   Widget _buildFilterToolbar(BuildContext context, DealersViewModel viewModel) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1024;
+
     if (viewModel.selectedTab == 1) {
       return Container(
         padding: const EdgeInsets.all(12),
@@ -400,9 +448,17 @@ class DealersView extends StackedView<DealersViewModel> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: kcBorderColor),
         ),
-        child: Row(
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.spaceBetween,
           children: [
-            Expanded(
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isDesktop ? 360 : double.infinity,
+                minWidth: 240,
+              ),
               child: SizedBox(
                 height: 40,
                 child: TextField(
@@ -424,7 +480,6 @@ class DealersView extends StackedView<DealersViewModel> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: kcPrimaryColor,
@@ -1352,8 +1407,11 @@ class DealersView extends StackedView<DealersViewModel> {
                   company.name,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1375,18 +1433,26 @@ class DealersView extends StackedView<DealersViewModel> {
           ),
           const SizedBox(height: 4),
           Text('Code: ${company.companyCode}',
-              style: const TextStyle(fontSize: 12, color: kcTextSecondary)),
+              style: const TextStyle(fontSize: 12, color: kcTextSecondary),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
           if (company.contactPerson != null &&
               company.contactPerson!.isNotEmpty)
             Text('Contact: ${company.contactPerson!}',
-                style: const TextStyle(fontSize: 12)),
+                style: const TextStyle(fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
           if (company.phone != null && company.phone!.isNotEmpty)
             Text('Phone: ${company.phone!}',
-                style: const TextStyle(fontSize: 12)),
+                style: const TextStyle(fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
           if (company.gstin != null && company.gstin!.isNotEmpty)
             Text('GSTIN: ${company.gstin!}',
                 style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
         ],
       ),
     );

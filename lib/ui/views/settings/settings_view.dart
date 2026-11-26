@@ -24,8 +24,10 @@ class SettingsView extends StackedView<SettingsViewModel> {
       backgroundColor: kcBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Company Settings & Tax Management',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 18),
+          isDesktop ? 'Company Settings & Tax Management' : 'Settings & Taxes',
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.w700, fontSize: isDesktop ? 18 : 16),
+          overflow: TextOverflow.ellipsis,
         ),
         backgroundColor: Colors.white,
         foregroundColor: kcDeepNavy,
@@ -33,7 +35,13 @@ class SettingsView extends StackedView<SettingsViewModel> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back to Dashboard',
-          onPressed: onBack ?? viewModel.navigateBack,
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              viewModel.navigateBack();
+            }
+          },
         ),
       ),
       body: viewModel.isBusy && viewModel.taxRates.isEmpty
@@ -205,526 +213,6 @@ class SettingsView extends StackedView<SettingsViewModel> {
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  // ===================== TAB 0: PROFILE & LOGO =====================
-
-  Widget _buildProfileTab(
-      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
-    final s = viewModel.companySettings;
-
-    final nameController = TextEditingController(text: s.companyName);
-    final taglineController = TextEditingController(text: s.tagline);
-    final phoneController = TextEditingController(text: s.phone);
-    final emailController = TextEditingController(text: s.email);
-    final websiteController = TextEditingController(text: s.website);
-    final addressController = TextEditingController(text: s.address);
-    final stateNameController = TextEditingController(text: s.stateName);
-    final stateCodeController = TextEditingController(text: s.stateCode);
-    final gstinController = TextEditingController(text: s.gstin);
-    final panController = TextEditingController(text: s.pan);
-    final fssaiController = TextEditingController(text: s.fssaiNo ?? '');
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kcBorderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader('Company Logo & Brand Identity', Icons.image_outlined),
-          const SizedBox(height: 16),
-          // Logo card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: kcVeryLightGrey,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kcBorderColor),
-            ),
-            child: Row(
-              children: [
-                // Logo preview
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: kcBorderColor),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: viewModel.previewLogoBytes != null
-                        ? Image.memory(viewModel.previewLogoBytes!,
-                            fit: BoxFit.contain)
-                        : (s.logoUrl != null || s.logoPath != null)
-                            ? Image.network(
-                                ApiService.resolveLogoUrl(
-                                        s.logoUrl ?? s.logoPath) ??
-                                    (s.logoUrl ?? s.logoPath)!,
-                                key: ValueKey(s.logoUrl ?? s.logoPath),
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => const Center(
-                                  child: Icon(Icons.water_drop,
-                                      color: kcPrimaryColor, size: 36),
-                                ),
-                              )
-                            : const Center(
-                                child: Icon(Icons.water_drop,
-                                    color: kcPrimaryColor, size: 36),
-                              ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Upload Company Logo',
-                        style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            color: kcDeepNavy),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Displayed at the top of the application sidebar, dashboard and printed A4 tax invoices.\nSupported formats: PNG, JPG, WEBP, SVG (Max file size: 2MB).',
-                        style: GoogleFonts.inter(
-                            fontSize: 12, color: kcMediumGrey),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: viewModel.isUploadingLogo
-                                ? null
-                                : () => _pickAndUploadLogo(viewModel),
-                            icon: const Icon(Icons.upload_file,
-                                size: 16, color: Colors.white),
-                            label: Text(
-                              viewModel.isUploadingLogo
-                                  ? 'Uploading...'
-                                  : 'Choose Logo File',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: kcPrimaryColor),
-                          ),
-                          if (s.logoPath != null ||
-                              viewModel.previewLogoBytes != null) ...[
-                            const SizedBox(width: 12),
-                            OutlinedButton.icon(
-                              onPressed: viewModel.deleteCompanyLogo,
-                              icon: const Icon(Icons.delete_outline,
-                                  size: 16, color: kcErrorColor),
-                              label: const Text('Remove Logo',
-                                  style: TextStyle(color: kcErrorColor)),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    color: kcErrorColor.withValues(alpha: 0.5)),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-          _sectionHeader('Legal & Contact Credentials', Icons.badge_outlined),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildTextField(
-                    controller: nameController, label: 'Company Legal Name *'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                    controller: taglineController, label: 'Tagline / Slogan'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                  child: _buildTextField(
-                      controller: phoneController,
-                      label: 'Company Contact Number',
-                      hint: 'e.g. +91 98765 43210 (Optional)')),
-              const SizedBox(width: 16),
-              Expanded(
-                  child: _buildTextField(
-                      controller: emailController, label: 'Email Address *')),
-              const SizedBox(width: 16),
-              Expanded(
-                  child: _buildTextField(
-                      controller: websiteController, label: 'Website')),
-            ],
-          ),
-          const SizedBox(height: 14),
-          _buildTextField(
-              controller: addressController,
-              label: 'Registered Business Address *',
-              maxLines: 2),
-          const SizedBox(height: 14),
-          DropdownButtonFormField<String>(
-            initialValue: kGstSupplyCodes
-                    .any((c) => c.code == stateCodeController.text.trim())
-                ? kGstSupplyCodes
-                    .firstWhere(
-                        (c) => c.code == stateCodeController.text.trim())
-                    .displayName
-                : null,
-            decoration: const InputDecoration(
-              labelText: 'Supply / State Code (Dropdown Selection)',
-              border: OutlineInputBorder(),
-              isDense: true,
-              prefixIcon: Icon(Icons.location_on_outlined,
-                  size: 20, color: kcPrimaryColor),
-            ),
-            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
-            items: kGstSupplyCodes
-                .map((c) => DropdownMenuItem(
-                      value: c.displayName,
-                      child: Text(c.displayName,
-                          style: GoogleFonts.inter(
-                              fontSize: 13, fontWeight: FontWeight.w500)),
-                    ))
-                .toList(),
-            onChanged: (val) {
-              if (val != null) {
-                final matched =
-                    kGstSupplyCodes.firstWhere((c) => c.displayName == val);
-                stateCodeController.text = matched.code;
-                stateNameController.text = matched.stateName;
-              }
-            },
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                  flex: 2,
-                  child: _buildTextField(
-                      controller: stateNameController, label: 'State Name *')),
-              const SizedBox(width: 16),
-              Expanded(
-                  child: _buildTextField(
-                      controller: stateCodeController,
-                      label: 'State Code (e.g. 33)')),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: gstinController,
-                  label: 'GSTIN (15 Digits) *',
-                  hint: '33AABCM1234F1Z9',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: panController,
-                  label: 'Company PAN (10 Chars) *',
-                  hint: 'AABCM1234F',
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-          _buildTextField(
-            controller: fssaiController,
-            label: 'FSSAI License / Registration No (Optional)',
-            hint: 'e.g. 12421008000123',
-          ),
-
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                viewModel.updateCompanySettings({
-                  'company_name': nameController.text.trim(),
-                  'tagline': taglineController.text.trim(),
-                  'phone': phoneController.text.trim(),
-                  'company_contact_number': phoneController.text.trim(),
-                  'email': emailController.text.trim(),
-                  'website': websiteController.text.trim(),
-                  'address': addressController.text.trim(),
-                  'state_name': stateNameController.text.trim(),
-                  'state_code': stateCodeController.text.trim(),
-                  'gstin': gstinController.text.trim().toUpperCase(),
-                  'pan': panController.text.trim().toUpperCase(),
-                  'fssai_no': fssaiController.text.trim(),
-                });
-              },
-              icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Company Profile',
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kcPrimaryColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ===================== TAB 1: INVOICE RULES & CURRENCY =====================
-
-  Widget _buildInvoiceRulesTab(
-      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
-    final s = viewModel.companySettings;
-
-    final prefixController = TextEditingController(text: s.invoicePrefix);
-    final paddingController =
-        TextEditingController(text: s.invoiceNumberPadding.toString());
-    final nextNumberController =
-        TextEditingController(text: s.nextInvoiceNumber.toString());
-    final currencySymbolController =
-        TextEditingController(text: s.currencySymbol);
-    final currencyCodeController = TextEditingController(text: s.currencyCode);
-    final defaultTaxController =
-        TextEditingController(text: s.defaultTaxRate.toStringAsFixed(2));
-    final termsController = TextEditingController(text: s.invoiceFooterNotes);
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kcBorderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader('Invoice Numbering Sequence & Rules', Icons.tag),
-          const SizedBox(height: 8),
-          Text(
-            'Invoices are generated automatically in the format: {PREFIX}-{SEQUENCE} or pure sequence numbers ({SEQUENCE}) if prefix is empty.',
-            style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: prefixController,
-                  label: 'Invoice Prefix (Optional)',
-                  hint: 'Optional (leave empty for numbers only)',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: paddingController,
-                  label: 'Number Padding (Digits)',
-                  hint: '4 (e.g. 0001)',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: nextNumberController,
-                  label: 'Next Sequence Number',
-                  hint: '1',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _sectionHeader(
-              'Currency & Default Tax Preferences', Icons.currency_rupee),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: currencySymbolController,
-                  label: 'Currency Symbol *',
-                  hint: '₹',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: currencyCodeController,
-                  label: 'Currency Code *',
-                  hint: 'INR',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: defaultTaxController,
-                  label: 'Default Tax Rate (%) *',
-                  hint: '18.00',
-                  suffix: '%',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _sectionHeader('Invoice Declaration', Icons.description_outlined),
-          const SizedBox(height: 16),
-          _buildTextField(
-            controller: termsController,
-            label: 'Standard Declaration on Invoices',
-            maxLines: 3,
-          ),
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                viewModel.updateCompanySettings({
-                  'invoice_prefix': prefixController.text.trim().toUpperCase(),
-                  'invoice_number_padding':
-                      int.tryParse(paddingController.text.trim()) ?? 4,
-                  'next_invoice_number':
-                      int.tryParse(nextNumberController.text.trim()) ?? 1,
-                  'currency_symbol': currencySymbolController.text.trim(),
-                  'currency_code':
-                      currencyCodeController.text.trim().toUpperCase(),
-                  'default_tax_rate':
-                      double.tryParse(defaultTaxController.text.trim()) ?? 18.0,
-                  'invoice_footer_notes': termsController.text.trim(),
-                });
-              },
-              icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Billing Preferences',
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kcPrimaryColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ===================== TAB 2: BANK & REMITTANCE =====================
-
-  Widget _buildBankTab(
-      BuildContext context, SettingsViewModel viewModel, bool isDesktop) {
-    final s = viewModel.companySettings;
-
-    final bankNameController = TextEditingController(text: s.bankName);
-    final bankBranchController = TextEditingController(text: s.bankBranch);
-    final accountNumberController =
-        TextEditingController(text: s.accountNumber);
-    final ifscCodeController = TextEditingController(text: s.ifscCode);
-    final upiIdController = TextEditingController(text: s.upiId);
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kcBorderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(
-              'Bank Account & Remittance Credentials', Icons.account_balance),
-          const SizedBox(height: 8),
-          Text(
-            'These banking details will appear on the footer of all issued tax invoices and printouts.',
-            style: GoogleFonts.inter(fontSize: 12, color: kcMediumGrey),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                    controller: bankNameController,
-                    label: 'Bank Name *',
-                    hint: 'State Bank of India'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                    controller: bankBranchController,
-                    label: 'Branch Name',
-                    hint: 'Thoraipakkam, Chennai'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildTextField(
-                    controller: accountNumberController,
-                    label: 'Account Number *'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                    controller: ifscCodeController,
-                    label: 'IFSC Code *',
-                    hint: 'SBIN0004567'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                    controller: upiIdController,
-                    label: 'UPI ID / VPA (Optional)',
-                    hint: 'marinaaqua@sbi'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                viewModel.updateCompanySettings({
-                  'bank_name': bankNameController.text.trim(),
-                  'bank_branch': bankBranchController.text.trim(),
-                  'account_number': accountNumberController.text.trim(),
-                  'ifsc_code': ifscCodeController.text.trim().toUpperCase(),
-                  'upi_id': upiIdController.text.trim(),
-                });
-              },
-              icon: const Icon(Icons.check, size: 18, color: Colors.white),
-              label: const Text('Save Bank Credentials',
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kcPrimaryColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1330,7 +818,10 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                             fontSize: 12, color: kcMediumGrey),
                       ),
                       const SizedBox(height: 12),
-                      Row(
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           ElevatedButton.icon(
                             onPressed: viewModel.isUploadingLogo
@@ -1348,8 +839,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                                 backgroundColor: kcPrimaryColor),
                           ),
                           if (s.logoPath != null ||
-                              viewModel.previewLogoBytes != null) ...[
-                            const SizedBox(width: 12),
+                              viewModel.previewLogoBytes != null)
                             OutlinedButton.icon(
                               onPressed: viewModel.deleteCompanyLogo,
                               icon: const Icon(Icons.delete_outline,
@@ -1361,7 +851,6 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
                                     color: kcErrorColor.withValues(alpha: 0.5)),
                               ),
                             ),
-                          ],
                         ],
                       ),
                     ],
@@ -1599,6 +1088,7 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<String>(
+            isExpanded: true,
             initialValue: kGstSupplyCodes
                     .any((c) => c.code == _stateCodeController.text.trim())
                 ? kGstSupplyCodes
@@ -1613,13 +1103,15 @@ class _CompanyProfileFormState extends State<_CompanyProfileForm> {
               prefixIcon: Icon(Icons.location_on_outlined,
                   size: 20, color: kcPrimaryColor),
             ),
-            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)'),
+            hint: const Text('Select Supply Code (e.g. 33 - Coimbatore)',
+                overflow: TextOverflow.ellipsis),
             items: kGstSupplyCodes
                 .map((c) => DropdownMenuItem(
                       value: c.displayName,
                       child: Text(c.displayName,
                           style: GoogleFonts.inter(
-                              fontSize: 13, fontWeight: FontWeight.w500)),
+                              fontSize: 13, fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis),
                     ))
                 .toList(),
             onChanged: (val) {

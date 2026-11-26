@@ -41,59 +41,97 @@ class PurchasesView extends StackedView<PurchasesViewModel> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           tooltip: 'Back to Dashboard',
-          onPressed: onBack ?? viewModel.goBack,
+          onPressed: () {
+            if (onBack != null) {
+              onBack!();
+            } else {
+              viewModel.goBack();
+            }
+          },
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Purchases & Inventory Management',
-              style: GoogleFonts.outfit(
-                  fontSize: 18,
+        title: isDesktop
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Purchases & Inventory Management',
+                    style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary),
+                  ),
+                  Text(
+                    'Procurement, stock ledger tracking, supplier history & adjustments',
+                    style: GoogleFonts.inter(
+                        fontSize: 12, color: AppColors.textSecondary),
+                  ),
+                ],
+              )
+            : Text(
+                'Purchases & Stock',
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary),
-            ),
-            Text(
-              'Procurement, stock ledger tracking, supplier history & adjustments',
-              style: GoogleFonts.inter(
-                  fontSize: 12, color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
-            tooltip: 'Refresh',
-            onPressed: viewModel.refresh,
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: () => viewModel.openStockAdjustment(context),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.amber.shade900,
-              side: BorderSide(color: Colors.amber.shade400),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            ),
-            icon: const Icon(Icons.tune, size: 16),
-            label: Text('Stock Adjustment',
-                style: GoogleFonts.inter(
-                    fontSize: 12, fontWeight: FontWeight.w600)),
-          ),
-          const SizedBox(width: 10),
-          ElevatedButton.icon(
-            onPressed: () => viewModel.openCreatePurchase(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-            icon: const Icon(Icons.add_shopping_cart, size: 16),
-            label: Text('New Purchase',
-                style: GoogleFonts.inter(
-                    fontSize: 12, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(width: 16),
-        ],
+                  color: AppColors.textPrimary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+        actions: isDesktop
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+                  tooltip: 'Refresh',
+                  onPressed: viewModel.refresh,
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: () => viewModel.openStockAdjustment(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.amber.shade900,
+                    side: BorderSide(color: Colors.amber.shade400),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  ),
+                  icon: const Icon(Icons.tune, size: 16),
+                  label: Text('Stock Adjustment',
+                      style: GoogleFonts.inter(
+                          fontSize: 12, fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: () => viewModel.openCreatePurchase(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  icon: const Icon(Icons.add_shopping_cart, size: 16),
+                  label: Text('New Purchase',
+                      style: GoogleFonts.inter(
+                          fontSize: 12, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 16),
+              ]
+            : [
+                IconButton(
+                  icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+                  tooltip: 'Refresh',
+                  onPressed: viewModel.refresh,
+                ),
+                IconButton(
+                  icon: Icon(Icons.tune, color: Colors.amber.shade900),
+                  tooltip: 'Stock Adjustment',
+                  onPressed: () => viewModel.openStockAdjustment(context),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_shopping_cart,
+                      color: AppColors.primary),
+                  tooltip: 'New Purchase',
+                  onPressed: () => viewModel.openCreatePurchase(context),
+                ),
+                const SizedBox(width: 4),
+              ],
       ),
       body: viewModel.isBusy && viewModel.purchases.isEmpty
           ? const Center(child: CircularProgressIndicator())

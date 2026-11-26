@@ -66,7 +66,13 @@ class ProductsView extends StackedView<ProductsViewModel> {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        onPressed: onBack ?? viewModel.navigateBack,
+        onPressed: () {
+          if (onBack != null) {
+            onBack!();
+          } else {
+            viewModel.navigateBack();
+          }
+        },
         tooltip: 'Back to Dashboard',
       ),
       title: Row(
@@ -81,21 +87,28 @@ class ProductsView extends StackedView<ProductsViewModel> {
                 color: kcPrimaryLight, size: 20),
           ),
           const SizedBox(width: 12),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Product Master & Catalog',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              Text(
-                'Water Products, Raw Materials, Units & Inventory Rules',
-                style: TextStyle(fontSize: 11, color: kcLightGrey),
-              ),
-            ],
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Product Master & Catalog',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Water Products, Raw Materials, Units & Inventory Rules',
+                  style: TextStyle(fontSize: 11, color: kcLightGrey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -1093,14 +1106,19 @@ class ProductsView extends StackedView<ProductsViewModel> {
     final meta = viewModel.productMeta;
     return Container(
       padding: const EdgeInsets.only(top: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        runAlignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 12,
+        runSpacing: 8,
         children: [
           Text(
             'Showing page ${meta.currentPage} of ${meta.lastPage} (${meta.total} total products)',
             style: const TextStyle(fontSize: 12, color: kcMediumGrey),
           ),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(

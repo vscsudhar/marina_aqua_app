@@ -1807,8 +1807,9 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                           selected: tempAllocation == 'refill',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val)
+                            if (val) {
                               setDialogState(() => tempAllocation = 'refill');
+                            }
                           },
                         ),
                         ChoiceChip(
@@ -1818,8 +1819,9 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                           selected: tempAllocation == 'bottle',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val)
+                            if (val) {
                               setDialogState(() => tempAllocation = 'bottle');
+                            }
                           },
                         ),
                         ChoiceChip(
@@ -1828,8 +1830,9 @@ class _PaymentEntryDialogState extends State<PaymentEntryDialog> {
                           selected: tempAllocation == 'others',
                           selectedColor: kcPrimaryColor.withValues(alpha: 0.18),
                           onSelected: (val) {
-                            if (val)
+                            if (val) {
                               setDialogState(() => tempAllocation = 'others');
+                            }
                           },
                         ),
                       ],
