@@ -20,6 +20,7 @@ import 'package:marina_aqua/ui/views/invoices/invoices_view.dart';
 import 'package:marina_aqua/ui/views/products/products_view.dart';
 import 'package:marina_aqua/ui/views/damaged_products/damaged_products_view.dart';
 import 'package:marina_aqua/ui/views/purchases/purchases_view.dart';
+import 'package:marina_aqua/ui/views/expenses/expenses_view.dart';
 import 'package:marina_aqua/ui/views/settings/settings_view.dart';
 import 'package:marina_aqua/ui/widgets/app_sidebar.dart';
 import 'package:marina_aqua/ui/widgets/plan_expired_guard.dart';
@@ -102,6 +103,12 @@ class HomeView extends StackedView<HomeViewModel> {
         return DamagedProductsView(onBack: onBack);
       case 'purchases':
         return PurchasesView(onBack: onBack);
+      case 'expenses':
+        return ExpensesView(
+          onBack: onBack,
+          initialFromDate: viewModel.expensesInitialFromDate,
+          initialToDate: viewModel.expensesInitialToDate,
+        );
       case 'invoices':
         return InvoicesView(onBack: onBack);
       case 'collections':
@@ -362,6 +369,21 @@ class HomeView extends StackedView<HomeViewModel> {
                     badgeColor: (metrics?.lowStockItemsCount ?? 0) > 0
                         ? kcWarningColor
                         : kcSuccessColor,
+                  ),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: viewModel.openExpensesFromDashboard,
+                    child: KpiCard(
+                      title: 'Total Expenses',
+                      value: currencyFormat
+                          .format(viewModel.expenseSummary?.todayExpenses ?? 0),
+                      subtitle:
+                          'This Month: ${currencyFormat.format(viewModel.expenseSummary?.monthExpenses ?? 0)}',
+                      icon: Icons.account_balance_wallet_rounded,
+                      accentColor: const Color(0xFFD97706),
+                      isCurrency: true,
+                      badgeText: 'TODAY',
+                    ),
                   ),
                   const KpiCard(
                     title: 'Operating Zone & Currency',

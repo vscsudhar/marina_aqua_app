@@ -8,7 +8,9 @@ import 'package:marina_aqua/models/user_model.dart';
 import 'package:marina_aqua/services/api_service.dart';
 import 'package:marina_aqua/services/auth_service.dart';
 import 'package:marina_aqua/models/billing_models.dart';
+import 'package:marina_aqua/models/expense_models.dart';
 import 'package:marina_aqua/services/dashboard_service.dart';
+import 'package:marina_aqua/services/expense_service.dart';
 import 'package:marina_aqua/services/settings_service.dart';
 import 'package:marina_aqua/services/subscription_guard.dart';
 import 'package:marina_aqua/ui/common/app_title_helper.dart';
@@ -18,6 +20,7 @@ class HomeViewModel extends ReactiveViewModel {
   final _authService = locator<AuthService>();
   final _dashboardService = locator<DashboardService>();
   final _settingsService = locator<SettingsService>();
+  final _expenseService = ExpenseService();
 
   @override
   List<ListenableServiceMixin> get listenableServices =>
@@ -56,6 +59,14 @@ class HomeViewModel extends ReactiveViewModel {
 
   DashboardChartsModel? _charts;
   DashboardChartsModel? get charts => _charts;
+
+  ExpenseSummaryModel? _expenseSummary;
+  ExpenseSummaryModel? get expenseSummary => _expenseSummary;
+
+  String? _expensesInitialFromDate;
+  String? get expensesInitialFromDate => _expensesInitialFromDate;
+  String? _expensesInitialToDate;
+  String? get expensesInitialToDate => _expensesInitialToDate;
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
@@ -146,6 +157,14 @@ class HomeViewModel extends ReactiveViewModel {
 
       _summary = results[0] as DashboardSummaryModel;
       _charts = results[1] as DashboardChartsModel;
+
+      // Fetch expense summary respecting the active dashboard date filter
+      try {
+        _expenseSummary = await _expenseService.getSummary(
+          fromDate: startDateParam ?? dateParam,
+          toDate: endDateParam ?? dateParam,
+        );
+      } catch (_) {}
     } on ApiException catch (e) {
       _errorMessage = e.message;
     } catch (e) {
@@ -184,6 +203,8 @@ class HomeViewModel extends ReactiveViewModel {
         return '/public-sales';
       case 'purchases':
         return Routes.purchasesView;
+      case 'expenses':
+        return '/expenses';
       case 'products':
         return Routes.productsView;
       case 'damaged_products':
@@ -201,6 +222,10 @@ class HomeViewModel extends ReactiveViewModel {
   }
 
   void onShortcutSelected(String moduleId) {
+    if (moduleId == 'expenses') {
+      _expensesInitialFromDate = null;
+      _expensesInitialToDate = null;
+    }
     if (_activeModule == moduleId) {
       if (moduleId == 'dashboard') {
         fetchDashboardData();
@@ -213,6 +238,40 @@ class HomeViewModel extends ReactiveViewModel {
     if (moduleId == 'dashboard') {
       fetchDashboardData();
     }
+    notifyListeners();
+  }
+
+  void openExpensesFromDashboard() {
+    final fmt = DateFormat('yyyy-MM-dd');
+    final now = _selectedDate;
+    switch (_dateFilter) {
+      case DashboardDateFilter.today:
+        _expensesInitialFromDate = fmt.format(now);
+        _expensesInitialToDate = fmt.format(now);
+        break;
+      case DashboardDateFilter.yesterday:
+        final y = now.subtract(const Duration(days: 1));
+        _expensesInitialFromDate = fmt.format(y);
+        _expensesInitialToDate = fmt.format(y);
+        break;
+      case DashboardDateFilter.thisWeek:
+        final mon = now.subtract(Duration(days: now.weekday - 1));
+        final sun = mon.add(const Duration(days: 6));
+        _expensesInitialFromDate = fmt.format(mon);
+        _expensesInitialToDate = fmt.format(sun);
+        break;
+      case DashboardDateFilter.thisMonth:
+        _expensesInitialFromDate = fmt.format(DateTime(now.year, now.month, 1));
+        _expensesInitialToDate =
+            fmt.format(DateTime(now.year, now.month + 1, 0));
+        break;
+      case DashboardDateFilter.custom:
+        _expensesInitialFromDate = fmt.format(now);
+        _expensesInitialToDate = fmt.format(now);
+        break;
+    }
+    _activeModule = 'expenses';
+    _updatePageTitle();
     notifyListeners();
   }
 
@@ -230,6 +289,9 @@ class HomeViewModel extends ReactiveViewModel {
         break;
       case 'purchases':
         pageName = 'Purchases & Stock';
+        break;
+      case 'expenses':
+        pageName = 'Expenses';
         break;
       case 'invoices':
         pageName = 'Invoices & Billing';

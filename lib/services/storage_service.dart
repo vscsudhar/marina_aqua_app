@@ -9,12 +9,13 @@ class StorageService {
   static const String _keyRememberMe = 'marina_aqua_remember_me';
   static const String _keyRememberedLogin = 'marina_aqua_remembered_login';
   static const String _keyCompanySettings = 'marina_aqua_company_settings';
-  static const String _keyActiveCompanyId = 'marina_aqua_active_company_id';
 
   SharedPreferences? _prefs;
 
   Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
+    // Clean up any legacy active company context ID stored from removed switcher
+    await _prefs!.remove('marina_aqua_active_company_id');
   }
 
   Future<SharedPreferences> _getPrefs() async {
@@ -87,24 +88,8 @@ class StorageService {
     final prefs = await _getPrefs();
     await prefs.remove(_keyToken);
     await prefs.remove(_keyUser);
-    await prefs.remove(_keyActiveCompanyId);
+    await prefs.remove('marina_aqua_active_company_id');
     await prefs.remove(_keyCompanySettings);
-  }
-
-  // Active Company Context
-  Future<void> saveActiveCompanyId(int companyId) async {
-    final prefs = await _getPrefs();
-    await prefs.setInt(_keyActiveCompanyId, companyId);
-  }
-
-  Future<int?> getActiveCompanyId() async {
-    final prefs = await _getPrefs();
-    return prefs.getInt(_keyActiveCompanyId);
-  }
-
-  Future<void> removeActiveCompanyId() async {
-    final prefs = await _getPrefs();
-    await prefs.remove(_keyActiveCompanyId);
   }
 
   // Company Settings caching

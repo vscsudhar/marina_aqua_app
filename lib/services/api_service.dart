@@ -79,10 +79,6 @@ class ApiService {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          final activeCompanyId = await _storageService.getActiveCompanyId();
-          if (activeCompanyId != null && activeCompanyId > 0) {
-            options.headers['X-Company-Id'] = activeCompanyId.toString();
-          }
           return handler.next(options);
         },
         onError: (DioException e, handler) {

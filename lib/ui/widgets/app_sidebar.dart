@@ -111,6 +111,15 @@ class AppSidebar extends StatelessWidget {
       badge: 'INVENTORY',
     ),
     AppSidebarItem(
+      id: 'expenses',
+      title: 'Expenses',
+      subtitle: 'Bills, cash & UPI expenses',
+      icon: Icons.account_balance_wallet_rounded,
+      color: Color(0xFFD97706),
+      route: '/expenses',
+      badge: 'EXPENSES',
+    ),
+    AppSidebarItem(
       id: 'products',
       title: 'Products Catalog',
       subtitle: 'Jars, boxes & pricing',
