@@ -38,6 +38,22 @@ class ExportPlatform {
     html.window.open(url, '_blank');
   }
 
+  /// Opens a tab synchronously inside the click gesture to prevent popup blocking,
+  /// then navigates it to the signed URL once loaded.
+  static Future<void> openAsyncUrlInBrowser(
+      Future<String> Function() urlLoader) async {
+    final win = html.window.open('about:blank', '_blank');
+    try {
+      final url = await urlLoader();
+      (win as dynamic).location.href = url;
+    } catch (e) {
+      try {
+        (win as dynamic).close();
+      } catch (_) {}
+      rethrow;
+    }
+  }
+
   static Future<String?> saveFile(List<int> bytes, String fileName) async {
     downloadFile(bytes, fileName, 'application/octet-stream');
     return fileName;
@@ -48,7 +64,12 @@ class ExportPlatform {
       final u8 = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
       final blob = html.Blob([u8], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
-      html.window.open(url, '_blank');
+      final win = html.window.open(url, '_blank');
+      // If popup blocker prevented opening a new tab, trigger direct download
+      // ignore: unnecessary_null_comparison
+      if (win == null) {
+        downloadFile(u8, '$title.pdf', 'application/pdf');
+      }
       Future.delayed(const Duration(minutes: 2), () {
         html.Url.revokeObjectUrl(url);
       });

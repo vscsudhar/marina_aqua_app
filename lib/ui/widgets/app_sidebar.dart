@@ -31,6 +31,7 @@ class AppSidebarItem {
 
 class AppSidebar extends StatelessWidget {
   final String currentRoute;
+  final String? activeModule;
   final UserModel? user;
   final Function(String moduleId)? onShortcutSelected;
   final VoidCallback? onLogout;
@@ -39,6 +40,7 @@ class AppSidebar extends StatelessWidget {
   const AppSidebar({
     super.key,
     this.currentRoute = Routes.homeView,
+    this.activeModule,
     this.user,
     this.onShortcutSelected,
     this.onLogout,
@@ -293,7 +295,11 @@ class AppSidebar extends StatelessWidget {
                   itemCount: shortcuts.length,
                   itemBuilder: (context, index) {
                     final item = shortcuts[index];
-                    final isSelected = currentRoute == item.route;
+                    final isSelected = activeModule != null
+                        ? activeModule == item.id
+                        : (currentRoute == item.route ||
+                            (item.route != Routes.homeView &&
+                                currentRoute.startsWith('${item.route}/')));
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 4),

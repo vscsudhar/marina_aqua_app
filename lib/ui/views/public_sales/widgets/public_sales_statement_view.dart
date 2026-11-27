@@ -32,6 +32,7 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
 
   bool _isLoading = false;
   bool _isExporting = false;
+  bool _isPrinting = false;
   String? _errorMessage;
   PublicSalesMonthlyStatementModel? _statement;
 
@@ -90,14 +91,17 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
   }
 
   Future<void> _exportPdf() async {
-    if (_selectedPartyId == null) return;
+    if (_selectedPartyId == null || _isExporting || _isPrinting) return;
     setState(() => _isExporting = true);
+    final sw = Stopwatch()..start();
     try {
       await widget.salesService.downloadMonthlyStatement(
         partyId: _selectedPartyId!,
         year: _selectedYear,
         month: _selectedMonth,
       );
+      debugPrint(
+          '[PublicSalesStatementView] On-demand Monthly PDF download completed in ${sw.elapsedMilliseconds} ms');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -110,6 +114,34 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
     } finally {
       if (mounted) {
         setState(() => _isExporting = false);
+      }
+    }
+  }
+
+  Future<void> _printPdf() async {
+    if (_selectedPartyId == null || _isPrinting || _isExporting) return;
+    setState(() => _isPrinting = true);
+    final sw = Stopwatch()..start();
+    try {
+      await widget.salesService.printMonthlyStatement(
+        partyId: _selectedPartyId!,
+        year: _selectedYear,
+        month: _selectedMonth,
+      );
+      debugPrint(
+          '[PublicSalesStatementView] On-demand Monthly PDF print completed in ${sw.elapsedMilliseconds} ms');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to print PDF: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isPrinting = false);
       }
     }
   }
@@ -314,16 +346,42 @@ class _PublicSalesStatementViewState extends State<PublicSalesStatementView> {
           // Actions
           Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: [
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                onPressed: _isExporting ? null : _exportPdf,
+                onPressed: (_isPrinting || _isExporting) ? null : _printPdf,
+                icon: _isPrinting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.print_outlined,
+                        color: AppColors.primary, size: 18),
+                label: Text(
+                  'Print',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: (_isExporting || _isPrinting) ? null : _exportPdf,
                 icon: _isExporting
                     ? const SizedBox(
                         width: 16,

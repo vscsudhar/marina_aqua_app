@@ -48,6 +48,7 @@ class HomeView extends StackedView<HomeViewModel> {
       backgroundColor: kcBackgroundColor,
       drawer: AppSidebar(
         currentRoute: viewModel.currentRoute,
+        activeModule: viewModel.activeModule,
         user: user,
         onShortcutSelected: viewModel.onShortcutSelected,
         onLogout: () => _confirmLogout(context, viewModel),
@@ -60,6 +61,7 @@ class HomeView extends StackedView<HomeViewModel> {
             AppSidebar(
               isPermanent: true,
               currentRoute: viewModel.currentRoute,
+              activeModule: viewModel.activeModule,
               user: user,
               onShortcutSelected: viewModel.onShortcutSelected,
               onLogout: () => _confirmLogout(context, viewModel),

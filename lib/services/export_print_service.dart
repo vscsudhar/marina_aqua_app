@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:dio/dio.dart';
@@ -33,7 +33,7 @@ class ExportPrintService {
 
   static pw.ThemeData? _pdfTheme;
 
-  /// Loads bundled Unicode NotoSans fonts (Regular and Bold) supporting Indian Rupee symbol (₹ / U+20B9)
+  /// Loads bundled Unicode NotoSans fonts (Regular and Bold) supporting Indian Rupee symbol (â‚¹ / U+20B9)
   static Future<pw.ThemeData> getPdfTheme() async {
     if (_pdfTheme != null) return _pdfTheme!;
     try {
@@ -69,6 +69,7 @@ class ExportPrintService {
     required String fileName,
     required String mimeType,
   }) async {
+    final stopwatch = Stopwatch()..start();
     final response = await _apiService.client.get(
       endpoint,
       queryParameters: queryParams ?? {},
@@ -79,8 +80,12 @@ class ExportPrintService {
       ),
     );
 
+    final fetchMs = stopwatch.elapsedMilliseconds;
     final bytes = response.data as List<int>;
     downloadBytes(bytes, fileName, mimeType);
+    final totalMs = stopwatch.elapsedMilliseconds;
+    debugPrint(
+        '[ExportPrintService] downloadFromApi completed in $totalMs ms (Network: $fetchMs ms, Dispatch: ${totalMs - fetchMs} ms, Size: ${bytes.length} bytes)');
   }
 
   /// Fetch PDF from backend and launch system/browser print preview directly.
@@ -89,6 +94,7 @@ class ExportPrintService {
     Map<String, dynamic>? queryParams,
     String title = 'DockRent Document',
   }) async {
+    final stopwatch = Stopwatch()..start();
     final response = await _apiService.client.get(
       endpoint,
       queryParameters: queryParams ?? {},
@@ -99,8 +105,12 @@ class ExportPrintService {
       ),
     );
 
+    final fetchMs = stopwatch.elapsedMilliseconds;
     final bytes = response.data as List<int>;
     await printPdfBytes(bytes, title: title);
+    final totalMs = stopwatch.elapsedMilliseconds;
+    debugPrint(
+        '[ExportPrintService] printFromApi completed in $totalMs ms (Network: $fetchMs ms, Print Preview: ${totalMs - fetchMs} ms, Size: ${bytes.length} bytes)');
   }
 
   /// Trigger download of in-memory bytes to user system.
@@ -131,6 +141,11 @@ class ExportPrintService {
   /// Open external URL in browser (e.g. printable web view stream).
   void openUrlInBrowser(String url) {
     ExportPlatform.openInBrowser(url);
+  }
+
+  /// Open an asynchronously fetched signed URL in browser without popup blocking.
+  Future<void> openAsyncUrlInBrowser(Future<String> Function() urlLoader) {
+    return ExportPlatform.openAsyncUrlInBrowser(urlLoader);
   }
 
   // ==========================================
@@ -591,12 +606,12 @@ class ExportPrintService {
 
   String _formatRoundOff(double val) {
     if (val.abs() < 0.00001) {
-      return '₹0.00';
+      return 'â‚¹0.00';
     }
     final sign = val > 0 ? '+' : '-';
     final absVal = val.abs();
     final str = absVal.toStringAsFixed(2);
-    return '$sign₹$str';
+    return '$signâ‚¹$str';
   }
 
   pw.Widget _pdfMetaRow(String label, String value, {bool isBold = false}) {
@@ -740,20 +755,20 @@ class ExportPrintService {
             'Item Description',
             'HSN/SAC',
             'Qty & Unit',
-            'Rate (₹)',
-            'Disc (₹)',
-            'Total (₹)',
+            'Rate (â‚¹)',
+            'Disc (â‚¹)',
+            'Total (â‚¹)',
           ]
         : [
             '#',
             'Item Description',
             'HSN/SAC',
             'Qty & Unit',
-            'Rate (₹)',
-            'Disc (₹)',
-            'Taxable (₹)',
-            !invoice.isInterstate ? 'GST Split (CGST+SGST)' : 'IGST (₹)',
-            'Total (₹)',
+            'Rate (â‚¹)',
+            'Disc (â‚¹)',
+            'Taxable (â‚¹)',
+            !invoice.isInterstate ? 'GST Split (CGST+SGST)' : 'IGST (â‚¹)',
+            'Total (â‚¹)',
           ];
 
     // Prepare table rows with actual decimals
@@ -1330,22 +1345,22 @@ class ExportPrintService {
                       child: pw.Column(
                         children: [
                           _pdfSummaryRow('Subtotal:',
-                              '₹${_formatAmount(invoice.subtotal)}'),
+                              'â‚¹${_formatAmount(invoice.subtotal)}'),
                           if (invoice.discountTotal > 0)
                             _pdfSummaryRow('Discount:',
-                                '- ₹${_formatAmount(invoice.discountTotal)}'),
+                                '- â‚¹${_formatAmount(invoice.discountTotal)}'),
                           if (!isWithoutGst) ...[
                             _pdfSummaryRow('Taxable Amount:',
-                                '₹${_formatAmount(invoice.taxableAmount)}',
+                                'â‚¹${_formatAmount(invoice.taxableAmount)}',
                                 isBold: true),
                             if (!invoice.isInterstate) ...[
                               _pdfSummaryRow('CGST:',
-                                  '₹${_formatAmount(invoice.cgstAmount)}'),
+                                  'â‚¹${_formatAmount(invoice.cgstAmount)}'),
                               _pdfSummaryRow('SGST:',
-                                  '₹${_formatAmount(invoice.sgstAmount)}'),
+                                  'â‚¹${_formatAmount(invoice.sgstAmount)}'),
                             ] else ...[
                               _pdfSummaryRow('IGST:',
-                                  '₹${_formatAmount(invoice.igstAmount)}'),
+                                  'â‚¹${_formatAmount(invoice.igstAmount)}'),
                             ],
                           ],
                           _pdfSummaryRow(
@@ -1353,12 +1368,12 @@ class ExportPrintService {
                               isBold: true),
                           pw.Divider(thickness: 0.8, color: brandDarkNavy),
                           _pdfSummaryRow('Grand Total:',
-                              '₹${_formatAmount(invoice.grandTotal)}',
+                              'â‚¹${_formatAmount(invoice.grandTotal)}',
                               isBold: true, fontSize: 11.5),
                           _pdfSummaryRow('Amount Paid:',
-                              '₹${_formatAmount(invoice.paidAmount)}'),
+                              'â‚¹${_formatAmount(invoice.paidAmount)}'),
                           _pdfSummaryRow('Balance Due:',
-                              '₹${_formatAmount(invoice.balanceDue)}',
+                              'â‚¹${_formatAmount(invoice.balanceDue)}',
                               isBold: true),
                           pw.SizedBox(height: 3),
                           () {

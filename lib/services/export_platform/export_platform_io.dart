@@ -16,6 +16,12 @@ class ExportPlatform {
     }
   }
 
+  static Future<void> openAsyncUrlInBrowser(
+      Future<String> Function() urlLoader) async {
+    final url = await urlLoader();
+    openInBrowser(url);
+  }
+
   static Future<String?> saveFile(List<int> bytes, String fileName) async {
     try {
       // Find downloads or user home directory

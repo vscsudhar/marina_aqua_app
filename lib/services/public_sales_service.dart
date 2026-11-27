@@ -303,21 +303,38 @@ class PublicSalesService {
   }
 
   // ==========================================
-  // PDF Printing & Downloads
+  // HTML Printing & Save as PDF (On-Demand via Signed Laravel URL)
   // ==========================================
+
+  Future<String> _fetchSignedPrintUrl(
+    String endpoint,
+    Map<String, dynamic> queryParams,
+  ) async {
+    final response = await _apiService.client.get(
+      endpoint,
+      queryParameters: queryParams,
+    );
+    final url = response.data['data']?['url']?.toString() ?? '';
+    if (url.isEmpty) {
+      throw Exception('Failed to generate statement print URL');
+    }
+    return url;
+  }
 
   Future<void> printMonthlyStatement({
     required int partyId,
     required int year,
     required int month,
   }) async {
-    await _exportPrintService.printFromApi(
-      endpoint: '/public-sales/parties/$partyId/statement/pdf',
-      queryParams: {
-        'year': year,
-        'month': month,
-      },
-      title: 'Public Sales Monthly Statement',
+    await _exportPrintService.openAsyncUrlInBrowser(
+      () => _fetchSignedPrintUrl(
+        '/public-sales/parties/$partyId/statement/print-url',
+        {
+          'year': year,
+          'month': month,
+          'auto_print': 1,
+        },
+      ),
     );
   }
 
@@ -327,16 +344,15 @@ class PublicSalesService {
     required int month,
     String? fileName,
   }) async {
-    final effectiveFileName = fileName ??
-        'public_sales_monthly_statement_${partyId}_${year}_$month.pdf';
-    await _exportPrintService.downloadFromApi(
-      endpoint: '/public-sales/parties/$partyId/statement/pdf',
-      queryParams: {
-        'year': year,
-        'month': month,
-      },
-      fileName: effectiveFileName,
-      mimeType: 'application/pdf',
+    await _exportPrintService.openAsyncUrlInBrowser(
+      () => _fetchSignedPrintUrl(
+        '/public-sales/parties/$partyId/statement/print-url',
+        {
+          'year': year,
+          'month': month,
+          'auto_print': 1,
+        },
+      ),
     );
   }
 
@@ -344,12 +360,14 @@ class PublicSalesService {
     required int partyId,
     required String date,
   }) async {
-    await _exportPrintService.printFromApi(
-      endpoint: '/public-sales/parties/$partyId/daily-statement/pdf',
-      queryParams: {
-        'date': date,
-      },
-      title: 'Public Sales Daily Statement',
+    await _exportPrintService.openAsyncUrlInBrowser(
+      () => _fetchSignedPrintUrl(
+        '/public-sales/parties/$partyId/daily-statement/print-url',
+        {
+          'date': date,
+          'auto_print': 1,
+        },
+      ),
     );
   }
 
@@ -358,15 +376,14 @@ class PublicSalesService {
     required String date,
     String? fileName,
   }) async {
-    final effectiveFileName =
-        fileName ?? 'public_sales_daily_statement_${partyId}_$date.pdf';
-    await _exportPrintService.downloadFromApi(
-      endpoint: '/public-sales/parties/$partyId/daily-statement/pdf',
-      queryParams: {
-        'date': date,
-      },
-      fileName: effectiveFileName,
-      mimeType: 'application/pdf',
+    await _exportPrintService.openAsyncUrlInBrowser(
+      () => _fetchSignedPrintUrl(
+        '/public-sales/parties/$partyId/daily-statement/print-url',
+        {
+          'date': date,
+          'auto_print': 1,
+        },
+      ),
     );
   }
 }

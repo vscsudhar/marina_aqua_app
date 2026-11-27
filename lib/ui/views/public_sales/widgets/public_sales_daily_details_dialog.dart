@@ -32,6 +32,7 @@ class _PublicSalesDailyDetailsDialogState
   String? _errorMessage;
   PublicSalesDailyDetailsModel? _details;
   bool _isDownloading = false;
+  bool _isPrinting = false;
 
   final currencyFormat =
       NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
@@ -65,18 +66,49 @@ class _PublicSalesDailyDetailsDialogState
     }
   }
 
-  Future<void> _printOrDownload() async {
+  Future<void> _printStatement() async {
+    if (_isPrinting || _isDownloading) return;
+    setState(() => _isPrinting = true);
+    final sw = Stopwatch()..start();
+    try {
+      await widget.salesService.printDailyStatement(
+        partyId: widget.partyId,
+        date: widget.date,
+      );
+      debugPrint(
+          '[PublicSalesDailyDetailsDialog] On-demand Daily PDF print completed in ${sw.elapsedMilliseconds} ms');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to print statement: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isPrinting = false);
+      }
+    }
+  }
+
+  Future<void> _downloadStatement() async {
+    if (_isDownloading || _isPrinting) return;
     setState(() => _isDownloading = true);
+    final sw = Stopwatch()..start();
     try {
       await widget.salesService.downloadDailyStatement(
         partyId: widget.partyId,
         date: widget.date,
       );
+      debugPrint(
+          '[PublicSalesDailyDetailsDialog] On-demand Daily PDF download completed in ${sw.elapsedMilliseconds} ms');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to print/download: $e'),
+            content: Text('Failed to download statement: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -145,7 +177,7 @@ class _PublicSalesDailyDetailsDialogState
                     ),
                   ),
                   IconButton(
-                    icon: _isDownloading
+                    icon: _isPrinting
                         ? const SizedBox(
                             width: 18,
                             height: 18,
@@ -154,7 +186,23 @@ class _PublicSalesDailyDetailsDialogState
                         : const Icon(Icons.print_rounded,
                             color: AppColors.primary),
                     tooltip: 'Print Daily Statement',
-                    onPressed: _isDownloading ? null : _printOrDownload,
+                    onPressed: (_isPrinting || _isDownloading)
+                        ? null
+                        : _printStatement,
+                  ),
+                  IconButton(
+                    icon: _isDownloading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.download_rounded,
+                            color: AppColors.primary),
+                    tooltip: 'Download PDF',
+                    onPressed: (_isDownloading || _isPrinting)
+                        ? null
+                        : _downloadStatement,
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded,

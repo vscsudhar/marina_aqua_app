@@ -9,6 +9,12 @@ abstract class ExportPlatform {
         'Cannot open browser without platform implementation');
   }
 
+  static Future<void> openAsyncUrlInBrowser(
+      Future<String> Function() urlLoader) async {
+    throw UnsupportedError(
+        'Cannot open browser without platform implementation');
+  }
+
   static Future<String?> saveFile(List<int> bytes, String fileName) async {
     throw UnsupportedError('Cannot save file without platform implementation');
   }

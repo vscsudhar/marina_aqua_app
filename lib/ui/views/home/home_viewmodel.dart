@@ -180,12 +180,18 @@ class HomeViewModel extends ReactiveViewModel {
         return Routes.dealerLedgerView;
       case 'bottle_ledger':
         return '/bottle-ledger';
+      case 'public_sales':
+        return '/public-sales';
       case 'purchases':
         return Routes.purchasesView;
       case 'products':
         return Routes.productsView;
+      case 'damaged_products':
+        return '/damaged-products';
       case 'invoices':
         return Routes.invoicesView;
+      case 'users':
+        return '/users';
       case 'settings':
         return Routes.settingsView;
       case 'dashboard':
